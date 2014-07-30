@@ -1,0 +1,9 @@
+List of changes made to compile using GFortan 4.8.0 (Jon Flaishans):
+
+Output.f90 - added line continuation characters (&) in multiple places (lines needed to be less than 129 char)
+
+MainPesticideCalculator.f90 - added line continuation characters (&) in multiple places
+                            - Change "count_rate" type to "integar" (was "real")
+			    - Ln 39: Changed "C:\SAM_Uber\SAM.inp" to "SAM.inp"
+
+Variables.f90 - Changed file paths from "C:\SAM_Uber\..." to match my directory structure/path
