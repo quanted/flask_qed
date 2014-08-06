@@ -9,6 +9,12 @@ import boto.utils
 import json
 from gevent import monkey
 monkey.patch_all()
+
+"""
+WSGI 'application' callable (entry point)
+"""
+application = bottle.default_app()
+
 ##########################################################################################
 #####AMAZON KEY, store output files. You might have to write your own import approach#####
 ##########################################################################################
