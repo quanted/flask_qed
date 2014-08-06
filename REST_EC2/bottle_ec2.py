@@ -14,7 +14,7 @@ monkey.patch_all()
 WSGI 'application' callable (entry point)
 """
 # application = bottle.default_app()
-application = Bottle()
+# application = Bottle()
 
 ##########################################################################################
 #####AMAZON KEY, store output files. You might have to write your own import approach#####
@@ -577,4 +577,4 @@ def get_html():
 
 
 
-application.run(host=host_ip, port=80, server="gevent", debug=True)
+# application.run(host=host_ip, port=80, server="gevent", debug=True)
