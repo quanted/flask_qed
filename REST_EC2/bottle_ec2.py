@@ -1,5 +1,4 @@
-import bottle
-from bottle import route, run, debug, post, request, auth_basic, abort, error
+from bottle import route, run, post, request, auth_basic, abort, error
 # Needed for apache/mod_wsgi
 from bottle import default_app
 # import keys_Picloud_S3
@@ -583,4 +582,4 @@ def file_upload():
 
 
 # application.run(host=host_ip, port=80, server="gevent", debug=True)
-debug(True)
+# debug(True)
