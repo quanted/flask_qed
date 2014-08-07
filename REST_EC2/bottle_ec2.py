@@ -357,7 +357,7 @@ def przm_rest(jid):
 # ##################################przm_batch##############################################
 # result_all=[]
 # @route('/przm_batch/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 # def przm_rest(jid):
 #     from przm_rest import PRZM_pi_new
 #     for k, v in request.json.iteritems():
