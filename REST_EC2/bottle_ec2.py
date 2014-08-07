@@ -1,3 +1,4 @@
+import bottle
 from bottle import route, run, debug, post, request, auth_basic, abort, error
 # Needed for apache/mod_wsgi
 from bottle import default_app
