@@ -1,5 +1,5 @@
 import bottle
-from bottle import route, run, post, request, auth_basic, abort
+from bottle import route, run, debug, post, request, auth_basic, abort, error
 # Needed for apache/mod_wsgi
 from bottle import default_app
 # import keys_Picloud_S3
