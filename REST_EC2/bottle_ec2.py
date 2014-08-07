@@ -27,7 +27,7 @@ application = Bottle()
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
 host_ip=boto.utils.get_instance_metadata()['local-ipv4']
-print host_ip
+print 'host_ip = ', host_ip
 
 class NumPyArangeEncoder(json.JSONEncoder):
     def default(self, obj):
