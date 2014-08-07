@@ -1,14 +1,14 @@
 import bottle
 from bottle import route, run, post, request, auth_basic, abort
-import keys_Picloud_S3
+# import keys_Picloud_S3
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.s3.bucket import Bucket
 import os
 import boto.utils
 import json
-from gevent import monkey
-monkey.patch_all()
+# from gevent import monkey
+# monkey.patch_all()
 
 """
 WSGI 'application' callable (entry point)
@@ -19,10 +19,10 @@ application = Bottle()
 ##########################################################################################
 #####AMAZON KEY, store output files. You might have to write your own import approach#####
 ##########################################################################################
-s3_key = keys_Picloud_S3.amazon_s3_key
-s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
-rest_key = keys_Picloud_S3.picloud_api_key
-rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
+# s3_key = keys_Picloud_S3.amazon_s3_key
+# s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
+# rest_key = keys_Picloud_S3.picloud_api_key
+# rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
 ###########################################################################################
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
@@ -40,15 +40,15 @@ from pymongo import Connection
 connection = Connection(host_ip, 27017)
 db = connection.ubertool
 
-def check(user, passwd):
-    if user == rest_key and passwd == rest_secretkey:
-        return True
-    return False
+# def check(user, passwd):
+#     if user == rest_key and passwd == rest_secretkey:
+#         return True
+#     return False
 all_result = {}
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def terrplant_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -67,7 +67,7 @@ def terrplant_rest(jid):
 
 ##################################sip#############################################
 @route('/sip/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def sip_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -83,7 +83,7 @@ def sip_rest(jid):
 
 ##################################stir#############################################
 @route('/stir/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def stir_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -102,7 +102,7 @@ def stir_rest(jid):
 
 ##################################dust#############################################
 @route('/dust/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def dust_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -119,7 +119,7 @@ def dust_rest(jid):
 
 ##################################trex2#############################################
 @route('/trex2/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def trex2_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -140,7 +140,7 @@ def trex2_rest(jid):
 
 ##################################therps#############################################
 @route('/therps/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def therps_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -161,7 +161,7 @@ def therps_rest(jid):
 
 ##################################iec#############################################
 @route('/iec/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def iec_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -177,7 +177,7 @@ def iec_rest(jid):
 
 ##################################agdrift#############################################
 @route('/agdrift/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def agdrift_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -207,7 +207,7 @@ def agdrift_rest(jid):
 
 ##################################earthworm#############################################
 @route('/earthworm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def earthworm_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -223,7 +223,7 @@ def earthworm_rest(jid):
 
 ##################################rice#############################################
 @route('/rice/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def rice_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -239,7 +239,7 @@ def rice_rest(jid):
 
 ##################################kabam#############################################
 @route('/kabam/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def kabam_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -257,7 +257,7 @@ def kabam_rest(jid):
 
 ###############geneec####################
 @route('/geneec/<jid>', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def myroute(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -273,7 +273,7 @@ def myroute(jid):
 
 ###############przm5####################
 @route('/przm5/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm5_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -309,7 +309,7 @@ def przm5_rest(jid):
 
 ################################# VVWM #############################################
 @route('/vvwm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def vvwm_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -339,7 +339,7 @@ def vvwm_rest(jid):
 
 ##################################przm##############################################
 @route('/przm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -354,7 +354,7 @@ def przm_rest(jid):
 # ##################################przm_batch##############################################
 # result_all=[]
 # @route('/przm_batch/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 # def przm_rest(jid):
 #     from przm_rest import PRZM_pi_new
 #     for k, v in request.json.iteritems():
@@ -378,7 +378,7 @@ def przm_rest(jid):
 ##################################przm_batch##############################################
 
 @route('/przm_batch/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm_rest(jid):
     result_all=[]
     from przm_rest import PRZM_pi_new
@@ -407,7 +407,7 @@ def przm_rest(jid):
 
 ##################################pfam##############################################
 @route('/pfam/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 
 def pfam_rest(jid):
     import time
@@ -428,7 +428,7 @@ def pfam_rest(jid):
 
 ##################################przm_exams##############################################
 @route('/przm_exams/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm_exams_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -444,7 +444,7 @@ def przm_exams_rest(jid):
 
 ##################################exams##############################################
 @route('/exams/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def exams_rest(jid):
     import time
     for k, v in request.json.iteritems():
@@ -457,7 +457,7 @@ def exams_rest(jid):
 
 ################File upload####################
 @route('/file_upload', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def file_upload():
     import shutil
     for k, v in request.json.iteritems():
@@ -482,7 +482,7 @@ def file_upload():
 
 ##########insert results into mongodb#########################
 @route('/save_history', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def insert_output_html():
     for k, v in request.json.iteritems():
         exec "%s = v" % k
@@ -491,7 +491,7 @@ def insert_output_html():
 
 ##########update html field in mongodb#########################
 @route('/update_html', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def update_output_html():
     for k, v in request.json.iteritems():
         exec "%s = v" % k
@@ -500,7 +500,7 @@ def update_output_html():
 
 ###############Check History####################
 @route('/ubertool_history/<model_name>/<jid>')
-@auth_basic(check)
+# @auth_basic(check)
 def get_document(model_name, jid):
     entity = db[model_name].find_one({'_id':jid})
     if not entity:
@@ -509,7 +509,7 @@ def get_document(model_name, jid):
 
 
 @route('/user_history', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_user_model_hist():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -522,7 +522,7 @@ def get_user_model_hist():
     return {"hist_all":hist_all}
 
 @route('/get_html_output', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_html_output():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -533,7 +533,7 @@ def get_html_output():
     return {"html_output":html_output}
 
 @route('/get_przm_batch_output', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_przm_batch_output():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -544,7 +544,7 @@ def get_przm_batch_output():
     return {"result":result}
 
 @route('/get_pdf', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_pdf():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -560,7 +560,7 @@ def get_pdf():
     return {"result":result}
 
 @route('/get_html', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_html():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
