@@ -2,28 +2,35 @@ import bottle
 from bottle import route, run, debug, post, request, auth_basic, abort, error
 # Needed for apache/mod_wsgi
 from bottle import default_app
-# import keys_Picloud_S3
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.s3.bucket import Bucket
 import os
 import boto.utils
 import json
-# from gevent import monkey
-# monkey.patch_all()
 
 
-# application = bottle.default_app()
-# application = Bottle()
+# Check whether running on EB/EC2 or Tao's EC2
+if os.environ.has_key("eb_server"):
+    pass
+else:
+    import keys_Picloud_S3
+    from gevent import monkey
+    monkey.patch_all()
 
-##########################################################################################
-#####AMAZON KEY, store output files. You might have to write your own import approach#####
-##########################################################################################
-# s3_key = keys_Picloud_S3.amazon_s3_key
-# s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
-# rest_key = keys_Picloud_S3.picloud_api_key
-# rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
-###########################################################################################
+    ##########################################################################################
+    #####AMAZON KEY, store output files. You might have to write your own import approach#####
+    ##########################################################################################
+    s3_key = keys_Picloud_S3.amazon_s3_key
+    s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
+    rest_key = keys_Picloud_S3.picloud_api_key
+    rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
+    ###########################################################################################
+    # def check(user, passwd):
+    # if user == rest_key and passwd == rest_secretkey:
+    #     return True
+    # return False
+
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
 host_ip=boto.utils.get_instance_metadata()['local-ipv4']
@@ -36,17 +43,12 @@ class NumPyArangeEncoder(json.JSONEncoder):
             return obj.tolist() # or map(int, obj)
         return json.JSONEncoder.default(self, obj)
 
-# Jon F.
-# from pymongo import Connection
-# connection = Connection(host_ip, 27017)
-# db = connection.ubertool
+# Connect to MongoDB server
+from pymongo import Connection
+connection = Connection(host_ip, 27017)
+db = connection.ubertool
 
-
-# Jon F.
-# def check(user, passwd):
-#     if user == rest_key and passwd == rest_secretkey:
-#         return True
-#     return False
+# Initial REST call return dictionary
 all_result = {}
 
 ##################################terrplant#############################################
@@ -193,20 +195,6 @@ def agdrift_rest(jid):
         all_result[jid]['result']=result
     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
 ##################################agdrift#############################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ##################################earthworm#############################################
 @route('/earthworm/<jid>', method='POST') 
@@ -379,33 +367,31 @@ def przm_rest(jid):
 # ##################################przm_batch##############################################
 
 ##################################przm_batch##############################################
+@route('/przm_batch/<jid>', method='POST') 
+# @auth_basic(check)
+def przm_rest(jid):
+    result_all=[]
+    from przm_rest import PRZM_pi_new
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    zz=0
+    for przm_obs_temp in przm_objs:
+        # print zz
+        # przm_obs_temp = przm_objs[index]
+        result_temp = PRZM_pi_new.PRZM_pi(przm_obs_temp['NOA'], przm_obs_temp['met_o'], przm_obs_temp['inp_o'], przm_obs_temp['run_o'], przm_obs_temp['MM'], przm_obs_temp['DD'], przm_obs_temp['YY'], przm_obs_temp['CAM_f'], przm_obs_temp['DEPI_text'], przm_obs_temp['Ar_text'], przm_obs_temp['EFF'], przm_obs_temp['Drft'])
+        przm_obs_temp['link'] = result_temp[0]
+        przm_obs_temp['x_precip'] = [float(i) for i in result_temp[1]]
+        przm_obs_temp['x_runoff'] = [float(i) for i in result_temp[2]]
+        przm_obs_temp['x_et'] = [float(i) for i in result_temp[3]]
+        przm_obs_temp['x_irr'] = [float(i) for i in result_temp[4]]
+        przm_obs_temp['x_leachate'] = [float(i)/100000 for i in result_temp[5]]
+        przm_obs_temp['x_pre_irr'] = [i+j for i,j in zip(przm_obs_temp['x_precip'], przm_obs_temp['x_irr'])]
+        result_all.append(przm_obs_temp)
+        zz=zz+1
+    element={"user_id":"admin", "_id":jid, "run_type":'batch', "output_html": "", "model_object_dict":result_all}
+    db['przm'].save(element)
 
-# Jon F.
-# @route('/przm_batch/<jid>', method='POST') 
-# # @auth_basic(check)
-# def przm_rest(jid):
-#     result_all=[]
-#     from przm_rest import PRZM_pi_new
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     zz=0
-#     for przm_obs_temp in przm_objs:
-#         # print zz
-#         # przm_obs_temp = przm_objs[index]
-#         result_temp = PRZM_pi_new.PRZM_pi(przm_obs_temp['NOA'], przm_obs_temp['met_o'], przm_obs_temp['inp_o'], przm_obs_temp['run_o'], przm_obs_temp['MM'], przm_obs_temp['DD'], przm_obs_temp['YY'], przm_obs_temp['CAM_f'], przm_obs_temp['DEPI_text'], przm_obs_temp['Ar_text'], przm_obs_temp['EFF'], przm_obs_temp['Drft'])
-#         przm_obs_temp['link'] = result_temp[0]
-#         przm_obs_temp['x_precip'] = [float(i) for i in result_temp[1]]
-#         przm_obs_temp['x_runoff'] = [float(i) for i in result_temp[2]]
-#         przm_obs_temp['x_et'] = [float(i) for i in result_temp[3]]
-#         przm_obs_temp['x_irr'] = [float(i) for i in result_temp[4]]
-#         przm_obs_temp['x_leachate'] = [float(i)/100000 for i in result_temp[5]]
-#         przm_obs_temp['x_pre_irr'] = [i+j for i,j in zip(przm_obs_temp['x_precip'], przm_obs_temp['x_irr'])]
-#         result_all.append(przm_obs_temp)
-#         zz=zz+1
-#     element={"user_id":"admin", "_id":jid, "run_type":'batch', "output_html": "", "model_object_dict":result_all}
-#     db['przm'].save(element)
-
-    # return {"user_id":"admin", "result": result_all, "_id":jid}
+    return {"user_id":"admin", "result": result_all, "_id":jid}
     
 ##################################przm_batch##############################################
 
@@ -484,103 +470,106 @@ def file_upload():
     os.chdir(src1_up)
     shutil.rmtree(src1)
 
-# Jon F.
+
 ##########insert results into mongodb#########################
-# @route('/save_history', method='POST') 
-# # @auth_basic(check)
-# def insert_output_html():
-#     for k, v in request.json.iteritems():
-#         exec "%s = v" % k
-#     element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
-#     db[model_name].save(element)
+@route('/save_history', method='POST') 
+# @auth_basic(check)
+def insert_output_html():
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
+    db[model_name].save(element)
 
-# ##########update html field in mongodb#########################
-# @route('/update_html', method='POST') 
-# # @auth_basic(check)
-# def update_output_html():
-#     for k, v in request.json.iteritems():
-#         exec "%s = v" % k
-#     # print request.json
-#     db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
+##########update html field in mongodb#########################
+@route('/update_html', method='POST') 
+# @auth_basic(check)
+def update_output_html():
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    # print request.json
+    db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
 
-# ###############Check History####################
-# @route('/ubertool_history/<model_name>/<jid>')
-# # @auth_basic(check)
-# def get_document(model_name, jid):
-#     entity = db[model_name].find_one({'_id':jid})
-#     if not entity:
-#         abort(404, 'No document with jid %s' % jid)
-#     return entity
-
-
-# @route('/user_history', method='POST')
-# # @auth_basic(check)
-# def get_user_model_hist():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     hist_all = []
-#     entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
-#     for i in entity:
-#         hist_all.append(i)
-#     if not entity:
-#         abort(404, 'No document with jid %s' % jid)
-#     return {"hist_all":hist_all}
-
-# @route('/get_html_output', method='POST')
-# # @auth_basic(check)
-# def get_html_output():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
-#     for i in html_output_c:
-#         # print i
-#         html_output = i['output_html']
-#     return {"html_output":html_output}
-
-# @route('/get_przm_batch_output', method='POST')
-# # @auth_basic(check)
-# def get_przm_batch_output():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
-#     for i in result_output_c:
-#         # print i
-#         result = i['model_object_dict']
-#     return {"result":result}
-
-# @route('/get_pdf', method='POST')
-# # @auth_basic(check)
-# def get_pdf():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     final_str = pdf_t
-#     final_str = final_str + """<br>"""
-#     if (int(pdf_nop)>0):
-#         for i in range(int(pdf_nop)):
-#             final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
-#             final_str = final_str + """<br>"""
-
-#     from generate_doc import generatepdf_pi
-#     result=generatepdf_pi.generatepdf_pi(final_str)
-#     return {"result":result}
-
-# @route('/get_html', method='POST')
-# # @auth_basic(check)
-# def get_html():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     final_str = pdf_t
-#     final_str = final_str + """<br>"""
-#     if (int(pdf_nop)>0):
-#         for i in range(int(pdf_nop)):
-#             final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
-#             final_str = final_str + """<br>"""
-
-#     from generate_doc import generatehtml_pi
-#     result=generatehtml_pi.generatehtml_pi(final_str)
-#     return {"result":result}
+###############Check History####################
+@route('/ubertool_history/<model_name>/<jid>')
+# @auth_basic(check)
+def get_document(model_name, jid):
+    entity = db[model_name].find_one({'_id':jid})
+    if not entity:
+        abort(404, 'No document with jid %s' % jid)
+    return entity
 
 
+@route('/user_history', method='POST')
+# @auth_basic(check)
+def get_user_model_hist():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    hist_all = []
+    entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
+    for i in entity:
+        hist_all.append(i)
+    if not entity:
+        abort(404, 'No document with jid %s' % jid)
+    return {"hist_all":hist_all}
 
-# application.run(host=host_ip, port=80, server="gevent", debug=True)
-debug(True)
+@route('/get_html_output', method='POST')
+# @auth_basic(check)
+def get_html_output():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
+    for i in html_output_c:
+        # print i
+        html_output = i['output_html']
+    return {"html_output":html_output}
+
+@route('/get_przm_batch_output', method='POST')
+# @auth_basic(check)
+def get_przm_batch_output():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
+    for i in result_output_c:
+        # print i
+        result = i['model_object_dict']
+    return {"result":result}
+
+@route('/get_pdf', method='POST')
+# @auth_basic(check)
+def get_pdf():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    final_str = pdf_t
+    final_str = final_str + """<br>"""
+    if (int(pdf_nop)>0):
+        for i in range(int(pdf_nop)):
+            final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
+            final_str = final_str + """<br>"""
+
+    from generate_doc import generatepdf_pi
+    result=generatepdf_pi.generatepdf_pi(final_str)
+    return {"result":result}
+
+@route('/get_html', method='POST')
+# @auth_basic(check)
+def get_html():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    final_str = pdf_t
+    final_str = final_str + """<br>"""
+    if (int(pdf_nop)>0):
+        for i in range(int(pdf_nop)):
+            final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
+            final_str = final_str + """<br>"""
+
+    from generate_doc import generatehtml_pi
+    result=generatehtml_pi.generatehtml_pi(final_str)
+    return {"result":result}
+
+
+
+if os.environ.has_key("eb_server"):
+    debug(True)
+else:
+    # Not used with Apache / mod_wsgi (EB)
+    run(host=host_ip, port=80, server="gevent", debug=True)
