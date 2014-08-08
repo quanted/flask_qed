@@ -5,7 +5,8 @@ def PRZM_pi(noa, met, inp, run, MM, DD, YY, CAM_f, DEPI_text, Ar_text, EFF, Drft
     import shutil
     import subprocess
     import zipfile
-    from boto.s3.connection import S3Connection
+    # from boto.s3.connection import S3Connection
+    import boto
     from boto.s3.key import Key
     from boto.s3.bucket import Bucket
     import string
@@ -245,7 +246,8 @@ def PRZM_pi(noa, met, inp, run, MM, DD, YY, CAM_f, DEPI_text, Ar_text, EFF, Drft
             zout.write(name)
     zout.close()
     #save the zipfile to amazon server
-    conn = S3Connection(key, secretkey)
+    # conn = S3Connection(key, secretkey)
+    conn = boto.connect_s3()
     bucket = Bucket(conn, 'przm')
     k=Key(bucket)
     # print "start upload"
