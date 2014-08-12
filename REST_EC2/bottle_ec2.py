@@ -43,10 +43,13 @@ class NumPyArangeEncoder(json.JSONEncoder):
             return obj.tolist() # or map(int, obj)
         return json.JSONEncoder.default(self, obj)
 
+"""
+    REMOVED MONOGO FOR EB SERVER
+"""
 # Connect to MongoDB server
-from pymongo import Connection
-connection = Connection(host_ip, 27017)
-db = connection.ubertool
+# from pymongo import Connection
+# connection = Connection(host_ip, 27017)
+# db = connection.ubertool
 
 # Initial REST call return dictionary
 all_result = {}
@@ -389,7 +392,10 @@ def przm_rest(jid):
         result_all.append(przm_obs_temp)
         zz=zz+1
     element={"user_id":"admin", "_id":jid, "run_type":'batch', "output_html": "", "model_object_dict":result_all}
-    db['przm'].save(element)
+    """
+        COMMENTED OUT TO REMOVE MONGO DEPENDENCY
+    """
+    # db['przm'].save(element)
 
     return {"user_id":"admin", "result": result_all, "_id":jid}
     
@@ -470,101 +476,103 @@ def file_upload():
     os.chdir(src1_up)
     shutil.rmtree(src1)
 
-
+"""
+    COMMENTED OUT TO REMOVE MONOGO DEPENDENCY
+"""
 ##########insert results into mongodb#########################
-@route('/save_history', method='POST') 
-# @auth_basic(check)
-def insert_output_html():
-    for k, v in request.json.iteritems():
-        exec "%s = v" % k
-    element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
-    db[model_name].save(element)
+# @route('/save_history', method='POST') 
+# # @auth_basic(check)
+# def insert_output_html():
+#     for k, v in request.json.iteritems():
+#         exec "%s = v" % k
+#     element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
+#     db[model_name].save(element)
 
-##########update html field in mongodb#########################
-@route('/update_html', method='POST') 
-# @auth_basic(check)
-def update_output_html():
-    for k, v in request.json.iteritems():
-        exec "%s = v" % k
-    # print request.json
-    db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
+# ##########update html field in mongodb#########################
+# @route('/update_html', method='POST') 
+# # @auth_basic(check)
+# def update_output_html():
+#     for k, v in request.json.iteritems():
+#         exec "%s = v" % k
+#     # print request.json
+#     db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
 
-###############Check History####################
-@route('/ubertool_history/<model_name>/<jid>')
-# @auth_basic(check)
-def get_document(model_name, jid):
-    entity = db[model_name].find_one({'_id':jid})
-    if not entity:
-        abort(404, 'No document with jid %s' % jid)
-    return entity
+# ###############Check History####################
+# @route('/ubertool_history/<model_name>/<jid>')
+# # @auth_basic(check)
+# def get_document(model_name, jid):
+#     entity = db[model_name].find_one({'_id':jid})
+#     if not entity:
+#         abort(404, 'No document with jid %s' % jid)
+#     return entity
 
 
-@route('/user_history', method='POST')
-# @auth_basic(check)
-def get_user_model_hist():
-    for k, v in request.json.iteritems():
-        exec '%s = v' % k
-    hist_all = []
-    entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
-    for i in entity:
-        hist_all.append(i)
-    if not entity:
-        abort(404, 'No document with jid %s' % jid)
-    return {"hist_all":hist_all}
+# @route('/user_history', method='POST')
+# # @auth_basic(check)
+# def get_user_model_hist():
+#     for k, v in request.json.iteritems():
+#         exec '%s = v' % k
+#     hist_all = []
+#     entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
+#     for i in entity:
+#         hist_all.append(i)
+#     if not entity:
+#         abort(404, 'No document with jid %s' % jid)
+#     return {"hist_all":hist_all}
 
-@route('/get_html_output', method='POST')
-# @auth_basic(check)
-def get_html_output():
-    for k, v in request.json.iteritems():
-        exec '%s = v' % k
-    html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
-    for i in html_output_c:
-        # print i
-        html_output = i['output_html']
-    return {"html_output":html_output}
+# @route('/get_html_output', method='POST')
+# # @auth_basic(check)
+# def get_html_output():
+#     for k, v in request.json.iteritems():
+#         exec '%s = v' % k
+#     html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
+#     for i in html_output_c:
+#         # print i
+#         html_output = i['output_html']
+#     return {"html_output":html_output}
 
-@route('/get_przm_batch_output', method='POST')
-# @auth_basic(check)
-def get_przm_batch_output():
-    for k, v in request.json.iteritems():
-        exec '%s = v' % k
-    result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
-    for i in result_output_c:
-        # print i
-        result = i['model_object_dict']
-    return {"result":result}
+# @route('/get_przm_batch_output', method='POST')
+# # @auth_basic(check)
+# def get_przm_batch_output():
+#     for k, v in request.json.iteritems():
+#         exec '%s = v' % k
+#     result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
+#     for i in result_output_c:
+#         # print i
+#         result = i['model_object_dict']
+#     return {"result":result}
 
-@route('/get_pdf', method='POST')
-# @auth_basic(check)
-def get_pdf():
-    for k, v in request.json.iteritems():
-        exec '%s = v' % k
-    final_str = pdf_t
-    final_str = final_str + """<br>"""
-    if (int(pdf_nop)>0):
-        for i in range(int(pdf_nop)):
-            final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
-            final_str = final_str + """<br>"""
+# @route('/get_pdf', method='POST')
+# # @auth_basic(check)
+# def get_pdf():
+#     for k, v in request.json.iteritems():
+#         exec '%s = v' % k
+#     final_str = pdf_t
+#     final_str = final_str + """<br>"""
+#     if (int(pdf_nop)>0):
+#         for i in range(int(pdf_nop)):
+#             final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
+#             final_str = final_str + """<br>"""
 
-    from generate_doc import generatepdf_pi
-    result=generatepdf_pi.generatepdf_pi(final_str)
-    return {"result":result}
+#     from generate_doc import generatepdf_pi
+#     result=generatepdf_pi.generatepdf_pi(final_str)
+#     return {"result":result}
 
-@route('/get_html', method='POST')
-# @auth_basic(check)
-def get_html():
-    for k, v in request.json.iteritems():
-        exec '%s = v' % k
-    final_str = pdf_t
-    final_str = final_str + """<br>"""
-    if (int(pdf_nop)>0):
-        for i in range(int(pdf_nop)):
-            final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
-            final_str = final_str + """<br>"""
+# @route('/get_html', method='POST')
+# # @auth_basic(check)
+# def get_html():
+#     for k, v in request.json.iteritems():
+#         exec '%s = v' % k
+#     final_str = pdf_t
+#     final_str = final_str + """<br>"""
+#     if (int(pdf_nop)>0):
+#         for i in range(int(pdf_nop)):
+#             final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
+#             final_str = final_str + """<br>"""
 
-    from generate_doc import generatehtml_pi
-    result=generatehtml_pi.generatehtml_pi(final_str)
-    return {"result":result}
+#     from generate_doc import generatehtml_pi
+#     result=generatehtml_pi.generatehtml_pi(final_str)
+#     return {"result":result}
 
 
 
