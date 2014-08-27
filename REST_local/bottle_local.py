@@ -468,6 +468,19 @@ def przm_exams_rest(jid):
     return {'user_id':'admin', 'result': result, '_id':jid}
 ##################################przm_exams##############################################
 
+################################## SAM ##############################################
+@route('/sam/<jid>', method='POST')
+def sam_rest(jid):
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    all_result.setdefault(jid,{}).setdefault('status','none')
+
+    from sam_rest import sam_rest_model
+    result = sam_rest_model.sam()
+    return {'user_id':'admin', 'result': result, '_id':jid}
+    
+################################## SAM ##############################################
+
 ##################File upload####################
 @route('/file_upload', method='POST') 
 @auth_basic(check)

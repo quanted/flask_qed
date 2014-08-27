@@ -12,7 +12,7 @@ def PRZM_pi(noa, met, inp, run, MM, DD, YY, CAM_f, DEPI_text, Ar_text, EFF, Drft
     import string
     import random
     import sys
-    import keys_Picloud_S3
+    # import keys_Picloud_S3
 
     # print 'MM=', MM
     # print 'DD=', DD
@@ -31,8 +31,8 @@ def PRZM_pi(noa, met, inp, run, MM, DD, YY, CAM_f, DEPI_text, Ar_text, EFF, Drft
 ##########################################################################################
 #####AMAZON KEY, store output files. You might have to write your own import approach#####
 ##########################################################################################
-    key = keys_Picloud_S3.amazon_s3_key
-    secretkey = keys_Picloud_S3.amazon_s3_secretkey
+    # key = keys_Picloud_S3.amazon_s3_key
+    # secretkey = keys_Picloud_S3.amazon_s3_secretkey
 ##################################################################################
 ######Create a folder if it does not existed, where holds calculations' output.#####
 ##################################################################################
