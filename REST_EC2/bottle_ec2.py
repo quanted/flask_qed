@@ -13,29 +13,27 @@ import json
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
     pass
-#else:
-#    import keys_Picloud_S3
-#    from gevent import monkey
-#    monkey.patch_all()
+else:
+    import keys_Picloud_S3
+    from gevent import monkey
+    monkey.patch_all()
 
     ##########################################################################################
     #####AMAZON KEY, store output files. You might have to write your own import approach#####
     ##########################################################################################
-#    s3_key = keys_Picloud_S3.amazon_s3_key
-#    s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
-#    rest_key = keys_Picloud_S3.picloud_api_key
-#    rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
+    s3_key = keys_Picloud_S3.amazon_s3_key
+    s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
+    rest_key = keys_Picloud_S3.picloud_api_key
+    rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
     ###########################################################################################
     # def check(user, passwd):
     # if user == rest_key and passwd == rest_secretkey:
     #     return True
     # return False
 
-#bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
+bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
-#host_ip=boto.utils.get_instance_metadata()['local-ipv4']
-#host_ip = '134.67.114.3'
-host_ip = '172.20.100.13'
+host_ip=boto.utils.get_instance_metadata()['local-ipv4']
 print 'host_ip = ', host_ip
 
 class NumPyArangeEncoder(json.JSONEncoder):
@@ -582,5 +580,4 @@ if os.environ.has_key("eb_server"):
     debug(True)
 else:
     # Not used with Apache / mod_wsgi (EB)
-#    run(host=host_ip, port=80, server="gevent", debug=True)
-    run(host=host_ip, port=80, debug=True)
+    run(host=host_ip, port=80, server="gevent", debug=True)

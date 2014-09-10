@@ -1,6 +1,6 @@
 import bottle
 from bottle import route, run, debug, post, request, auth_basic, abort, error
-# Needed for apache/mod_wsgi
+# Needed for apache/mod_wsgi/nginx/uwsgi
 from bottle import default_app
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -35,8 +35,8 @@ if os.environ.has_key("eb_server"):
 
 #host_ip=boto.utils.get_instance_metadata()['local-ipv4']
 #host_ip = '134.67.114.3'
-host_ip = '172.20.100.13'
-print 'host_ip = ', host_ip
+# host_ip = '172.20.100.13'
+# print 'host_ip = ', host_ip
 
 class NumPyArangeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -578,9 +578,9 @@ def file_upload():
 
 
 
-if os.environ.has_key("eb_server"):
-    debug(True)
-else:
+# if os.environ.has_key("eb_server"):
+    # debug(True)
+# else:
     # Not used with Apache / mod_wsgi (EB)
 #    run(host=host_ip, port=80, server="gevent", debug=True)
-    run(host=host_ip, port=80, debug=True)
+    # run(host=host_ip, port=80, debug=True)
