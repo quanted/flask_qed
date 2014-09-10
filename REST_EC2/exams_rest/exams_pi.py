@@ -27,7 +27,8 @@ def exams_pi(chem_name, scenarios, met, farm, mw, sol, koc, vp, aem, anm, aqp, t
     ##################################################################################
     ######Create a folder if it does not existed, where holds calculations' output.#####
     ##################################################################################
-    cwd='/home/ubuntu/Rest_EC2/exams_rest'
+    #cwd='/home/ubuntu/Rest_EC2/exams_rest'
+    cwd = os.path.dirname(os.path.realpath(__file__))
     src=cwd
     src1=cwd+'/'+name_temp
     if not os.path.exists(src1):

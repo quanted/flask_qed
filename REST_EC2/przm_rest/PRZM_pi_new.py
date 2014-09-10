@@ -36,8 +36,9 @@ def PRZM_pi(noa, met, inp, run, MM, DD, YY, CAM_f, DEPI_text, Ar_text, EFF, Drft
 ##################################################################################
 ######Create a folder if it does not existed, where holds calculations' output.#####
 ##################################################################################
-    cwd='/home/ubuntu/Rest_EC2/przm_rest'
+    #cwd='/home/ubuntu/Rest_EC2/przm_rest'
     # cwd='D:/Dropbox/ubertool_src/REST/REST_local/przm_rest/'
+    cwd = os.path.dirname(os.path.realpath(__file__))
     # print("cwd="+cwd)
 
     src=cwd

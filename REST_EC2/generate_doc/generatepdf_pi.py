@@ -32,7 +32,8 @@ def generatepdf_pi(input_str):
 ##################################################################################
 ######Create a folder if it does not existed, where holds calculations' output.#####
 ##################################################################################
-    cwd='/home/ubuntu/Rest_EC2/generate_doc'
+    #cwd='/home/ubuntu/Rest_EC2/generate_doc'
+    cwd = os.path.dirname(os.path.realpath(__file__))
     src=cwd
     src1=cwd+'/'+name_temp
     if not os.path.exists(src1):

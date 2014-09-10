@@ -32,7 +32,8 @@ def pfam_pi(wat_hl,wat_t,ben_hl,ben_t,unf_hl,unf_t,aqu_hl,aqu_t,hyd_hl,mw,vp,sol
 ##################################################################################
 ######Create a folder if it does not existed, where holds calculations' output.#####
 ##################################################################################
-    cwd='/home/ubuntu/Rest_EC2/pfam_rest'
+    #cwd='/home/ubuntu/Rest_EC2/pfam_rest'
+    cwd = os.path.dirname(os.path.realpath(__file__))
     src=cwd
     src1=src+'/'+name_temp
     if not os.path.exists(src1):

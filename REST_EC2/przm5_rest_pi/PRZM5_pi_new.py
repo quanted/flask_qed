@@ -52,7 +52,8 @@ def PRZM5_pi(pfac, snowmelt, evapDepth,
 ######Create a folder if it does not existed, where holds calculations' output.#####
 ##################################################################################
     # cwd = os.getcwd()+'/przm5_rest_pi/'
-    cwd='/home/ubuntu/Rest_EC2/przm5_rest_pi/'
+    #cwd='/home/ubuntu/Rest_EC2/przm5_rest_pi/'
+    cwd = os.path.dirname(os.path.realpath(__file__))
     print("cwd="+cwd)
 
     src=cwd
