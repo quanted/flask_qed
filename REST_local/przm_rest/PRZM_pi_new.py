@@ -246,20 +246,21 @@ def PRZM_pi(noa, met, inp, run, MM, DD, YY, CAM_f, DEPI_text, Ar_text, EFF, Drft
             zout.write(name)
     zout.close()
     #save the zipfile to amazon server
+    print "Before S3 call"
     conn = S3Connection(key, secretkey)
     bucket = Bucket(conn, 'przm')
     k=Key(bucket)
-    # print "start upload"
+    print "start upload"
     name1='PRZM_'+name_temp+'.zip'
     k.key=name1
     k.set_contents_from_filename('test.zip')
-    # print "done upload"
+    print "done upload"
     link='https://s3.amazonaws.com/przm/'+name1
     k.set_acl('public-read-write')
     src1_up=os.path.abspath(os.path.join(src1, '..'))
     os.chdir(src1_up)
     shutil.rmtree(src1)
-    # print('Done')
+    print('Done')
 
     return link, x_precip, x_runoff, x_et, x_irr, x_leachate
 

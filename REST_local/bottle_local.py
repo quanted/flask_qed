@@ -349,9 +349,10 @@ def vvwm_rest(jid):
 
 ##################################przm##############################################
 @route('/przm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 
 def przm_rest(jid):
+    print "PRZM Rest Func"
     import time
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -435,7 +436,7 @@ def exams_rest(jid):
 
 ##################################pfam##############################################
 @route('/pfam/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 
 def pfam_rest(jid):
     import time

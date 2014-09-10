@@ -5,7 +5,7 @@ save
     !***** Recipe Path ***************************
     character(len=100)  :: RecipePath 
     !Randomize Recipe CDL, out of 5 CDL subfolders, see Utilities - mmf 7/2014
-    character(len=100)  :: DwRecipepath =   '..\..\dwRecipes\DWI_recipes_082014\' !'J:\dwRecipes_huc12\'
+    !character(len=100)  :: DwRecipePath =   '..\..\dwRecipes\DWI_recipes_082014\' !'J:\dwRecipes_huc12\'
     character(len=100)  :: EcoRecipepath =  '..\..\EcoRecipes_huc12\huc12_Xwalk_recipes\' !C:\SAM_repository\EcoRecipes_huc12\' !'J:\EcoRecipes_huc12\'
     character(len=40)   :: recipe_name      !the current recipe file being processed
     
@@ -87,6 +87,7 @@ save
     integer,dimension(maxdays)         :: appmethod
     integer                            :: startjul
     integer                            :: endjul
+    character(len=100)  :: DwRecipepath 
     
    character(len=100)                  :: monthindex
    integer, dimension(maxdays)         :: mthindex

@@ -42,6 +42,7 @@ def PRZM5_pi(pfac, snowmelt, evapDepth,
         return ''.join(random.choice(chars) for x in range(size))
 
     name_temp=id_generator()
+    print name_temp
 
 ##########################################################################################
 #####AMAZON KEY, store output files. You might have to write your own import approach#####
@@ -51,9 +52,7 @@ def PRZM5_pi(pfac, snowmelt, evapDepth,
 ##################################################################################
 ######Create a folder if it does not existed, where holds calculations' output.#####
 ##################################################################################
-    cwd = 'D:/Dropbox/ubertool_src/REST/REST_local/przm5_rest/'   # Tao
-    # cwd = 'C:/Users/Jon/Documents/GitHub/ubertool_src/REST/REST_local/przm5_rest/'    # Jon
-    # cwd='/home/picloud/PRZM5/'
+    cwd = os.path.dirname(os.path.realpath(__file__))
     print("cwd="+cwd)
 
     src=cwd

@@ -2,7 +2,7 @@ program PesticideCalculator
    use Variables !, ONLY: appdate, appnumrec, napps, appMethod, appDepth, koc, Soil_HalfLife, cropdesired,totalApplied, &
                        !Scenario_Path, recipe_name, RecipePath,DwRecipepath,EcoRecipepath,area,pesticide_applied, &
                        !Hydropath,DwHydropath,EcoHydropath,Flowpath,EcoFlowpath,DwFlowpath,Outpath,DwROutPath,DwFOutPath,EcoOutPath,&
-                       !eco_or_dw,Scenario_Path,appMass,Number_crop_ids, ndates, start_count, startjul, endjul, &
+                       !eco_or_dw,Scenario_Path,appMass,Number_crop_ids, ndates, start_count, startjul, endjul, DwRecipepath, &
                        !num_records,juliandates,sdates,totalarea,Total_Runoff, dailyApplied, crop, mukey, &
                        !Total_Runoff_Mass,degradation_aqueous,degradation_sorbed,objID,dummy,xarea,vol,flow  
    use transport
@@ -35,49 +35,32 @@ program PesticideCalculator
    
    integer:: badscenario
    integer :: count_rate
+
+   character(len=100) :: filename_jon
+   character(len=100) :: sam_input_file
+   logical :: have_file
+
    
-   
+   sam_input_file = "SAM.inp"
+   write(*,9200) trim(sam_input_file)
+   9200 format ("##### sam_input_file---", ">>", a, "<<")
    call cpu_time (t1)  
    call SYSTEM_CLOCK(count1)
 
    !Read Chemical Inputs and get Scenario Files
      !Read inputFile and eco_or_dw from SAM.inp (created by SAMv1.vb)
-       open (UNIT=39, FILE=trim(adjustl("..\..\SAM.inp")),IOSTAT=ierror, STATUS = 'OLD')
-       read(39,*,IOSTAT=io_status) eco_or_dw     !Line 1; old- inputFile,
+   open (UNIT=39, FILE=sam_input_file,IOSTAT=ierror, STATUS = 'OLD')
+   
+   !open (UNIT=39, FILE=trim(adjustl("..\..\SAM.inp")),IOSTAT=ierror, STATUS = 'OLD')
+   read(39,*,IOSTAT=io_status) eco_or_dw     !Line 1; old- inputFile,
+   write (*, 9300) "eco_or_dw", Trim(eco_or_dw)
+   9300 Format ("-------", a, ">>", a ,"<<")
 
    !call get_command_argument(1,inputFile)  !files.txt for eco and dw
    !call get_command_argument(2, eco_or_dw) 
          
-   if (eco_or_dw == "eco") then
-     recipePath = EcoRecipePath 
-     Hydropath = EcoHydropath
-     Flowpath = EcoFlowpath
-     outpath    = EcoOutPath
-     inputFileFlow = "huc12_outlets_metric.csv"  !"EcoMon_flowdata_TabDelim.txt"  !For Eco Flow txt file
-   else if (eco_or_dw == "dwr") then
-     recipePath = DwRecipePath 
-     Hydropath = DwHydropath
-     Flowpath = DwFlowpath
-     outpath    = DwROutPath
-     inputFileFlow = "DWI_Monthly_Flows_Reservoir_Only_metric_1838.csv"   !For DW Reservoirs txt file
-   else if (eco_or_dw == "dwf") then
-     recipePath = DwRecipePath 
-     Hydropath = DwHydropath
-     Flowpath = DwFlowpath
-     outpath    = DwFOutPath
-     inputFileFlow = "DWI_Monthly_Flows_Flowing_Only_metric.csv"     !For DW Flowing txt file
    
-   end if
 
-   !call randomf(1,5,random)
-   !random_int = random
-   
-   open(UNIT=61, FILE=trim(adjustl(recipepath))//"Bad_Scenarios.txt")
-   !open(UNIT=61, FILE=trim(adjustl(recipepath))//"CDL_"//trim(str(random_int))//"Bad_Scenarios.txt")
-   open(UNIT=86, FILE=trim(adjustl(Flowpath))//trim(adjustl(inputFileFlow)),IOSTAT=ierror, STATUS = 'OLD')
-   
-   !UNIT 13 - Old input file (files.txt) contains chemical properties, applications, and the scenarios that are associated with the watershed
-   !open (UNIT=13, FILE=trim(adjustl(recipePath))//trim(adjustl(inputFile)),IOSTAT=ierror, STATUS = 'OLD') !NOT SURE IF NEEDED!!
    
    !THESE CHEMICAL/RECIPE PROPERTIES ARE ENTERED IN GUI & READ IN FROM "SAM.inp"
    read (39,*) start_count                    !Line 2; num_record of simulation start date, since 1/1/1948
@@ -100,7 +83,48 @@ program PesticideCalculator
    read (39,*) toxthreshold                   !Line 19; Output tox threshold level (30d or ann)
    read (39,*) toxthrestype                   !Line 20; Output tox thres type (1=30d,2=ann)
    read (39,*) outputformat                   !Line 21; Output format (1=table,2=map)
-     
+   read (39,*) DwRecipepath                   !Line 22; Path to DwRecipes
+   filename_jon = "Bad_Scenarios.txt"
+   filename_jon = trim(DwRecipepath)//filename_jon
+   write (*,9100)  Trim(filename_jon)
+   9100 format ("##### filename_jon---", ">>", a, "<<")
+
+   !call randomf(1,5,random)
+   !random_int = random
+   open (unit=97, file="recipe.txt")
+   write (97,*) trim(adjustl(recipePath))
+   print *, trim(adjustl(recipePath))
+   open(UNIT=61, FILE=filename_jon)
+   !open(UNIT=61, FILE=trim(adjustl(recipePath))//trim("Bad_Scenarios.txt")
+   !open(UNIT=61, FILE=trim(adjustl(recipePath))//"CDL_"//trim(str(random_int))//"Bad_Scenarios.txt")
+   open(UNIT=86, FILE=trim(adjustl(Flowpath))//trim(adjustl(inputFileFlow)),IOSTAT=ierror, STATUS = 'OLD')
+   
+   !UNIT 13 - Old input file (files.txt) contains chemical properties, applications, and the scenarios that are associated with the watershed
+   !open (UNIT=13, FILE=trim(adjustl(recipePath))//trim(adjustl(inputFile)),IOSTAT=ierror, STATUS = 'OLD') !NOT SURE IF NEEDED!!
+    
+   if (eco_or_dw == "eco") then
+     write (*,*) "ECO"
+     recipePath = EcoRecipePath 
+     Hydropath = EcoHydropath
+     Flowpath = EcoFlowpath
+     outpath    = EcoOutPath
+     inputFileFlow = "huc12_outlets_metric.csv"  !"EcoMon_flowdata_TabDelim.txt"  !For Eco Flow txt file
+   else if (eco_or_dw == "dwr") then
+     write (*,*) "DWR"
+     recipePath = DwRecipePath 
+     Hydropath = DwHydropath
+     Flowpath = DwFlowpath
+     outpath    = DwROutPath
+     inputFileFlow = "DWI_Monthly_Flows_Reservoir_Only_metric_1838.csv"   !For DW Reservoirs txt file
+   else if (eco_or_dw == "dwf") then
+     write (*,*) "DWF"
+     recipePath = DwRecipePath 
+     Hydropath = DwHydropath
+     Flowpath = DwFlowpath
+     outpath    = DwFOutPath
+     inputFileFlow = "DWI_Monthly_Flows_Flowing_Only_metric.csv"     !For DW Flowing txt file
+   
+   end if
 
    appmass = appmass/10000.                   !convert applied Mass to kg/m2
    degradation_aqueous = 0.693/Soil_HalfLife  !per day
