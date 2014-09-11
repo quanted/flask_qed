@@ -5,10 +5,11 @@ from bottle import default_app
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.s3.bucket import Bucket
-import os
+import os, sys
 import boto.utils
 import json
 
+print repr(sys.path)
 
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
