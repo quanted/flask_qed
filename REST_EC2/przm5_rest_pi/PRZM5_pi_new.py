@@ -96,8 +96,8 @@ def PRZM5_pi(pfac, snowmelt, evapDepth,
     inp = "PRZM5.inp"
     met = "test.dvf"
     # print(os.listdir(src1))   #check what files are copied
-
-    shutil.copy(src+"przm5.exe", src1)
+    src = os.path.join(src, "przm5.exe")   # create path to exe
+    shutil.copy(src, src1)
     shutil.copy(src+met,src1)
     print(os.getcwd())
     print(os.listdir(src1))   #check what files are copied

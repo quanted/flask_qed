@@ -5,7 +5,7 @@ def PRZM_pi(noa, met, inp, run, MM, DD, YY, CAM_f, DEPI_text, Ar_text, EFF, Drft
     import shutil
     import subprocess
     import zipfile
-    # from boto.s3.connection import S3Connection
+    from boto.s3.connection import S3Connection
     import boto
     from boto.s3.key import Key
     from boto.s3.bucket import Bucket
