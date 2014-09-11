@@ -4,3 +4,4 @@ pymongo
 requests
 pytz
 bottle
+simplejson
