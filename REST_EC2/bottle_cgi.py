@@ -14,23 +14,23 @@ print repr(sys.path)
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
     pass
-#else:
-#    import keys_Picloud_S3
+else:
+    import keys_Picloud_S3
 #    from gevent import monkey
 #    monkey.patch_all()
 
     ##########################################################################################
     #####AMAZON KEY, store output files. You might have to write your own import approach#####
     ##########################################################################################
-#    s3_key = keys_Picloud_S3.amazon_s3_key
-#    s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
+    s3_key = keys_Picloud_S3.amazon_s3_key
+    s3_secretkey = keys_Picloud_S3.amazon_s3_secretkey
 #    rest_key = keys_Picloud_S3.picloud_api_key
 #    rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
     ###########################################################################################
-    # def check(user, passwd):
-    # if user == rest_key and passwd == rest_secretkey:
-    #     return True
-    # return False
+    def check(user, passwd):
+        if user == rest_key and passwd == rest_secretkey:
+            return True
+        return False
 
 #bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 

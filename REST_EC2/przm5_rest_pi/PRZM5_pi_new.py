@@ -94,11 +94,15 @@ def PRZM5_pi(pfac, snowmelt, evapDepth,
 
 # ########Copy files to the tempt folder#############
     inp = "PRZM5.inp"
-    met = "test.dvf"
+    #met = "test.dvf"     #old met data naming
     # print(os.listdir(src1))   #check what files are copied
-    src = os.path.join(src, "przm5.exe")   # create path to exe
-    shutil.copy(src, src1)
-    shutil.copy(src+met,src1)
+    exe = os.path.join(src, "przm5.exe")   # create path to exe
+    met = os.path.join(src, "test.dvf")   # create path to met data
+    #inp = os.path.join(src, "PRZM5.inp")   # create path to inp
+    
+    shutil.copy(exe, src1)
+    shutil.copy(met,src1)
+
     print(os.getcwd())
     print(os.listdir(src1))   #check what files are copied
 
@@ -168,24 +172,24 @@ def PRZM5_pi(pfac, snowmelt, evapDepth,
             zout.write(name)
     zout.close()
 
-    # ##upload file to S3
-    # conn = S3Connection(key, secretkey)
-    # bucket = Bucket(conn, 'przm5')
-    # k=Key(bucket)
+    ##upload file to S3
+    conn = S3Connection(key, secretkey)
+    bucket = Bucket(conn, 'przm5')
+    k=Key(bucket)
 
     name1='PRZM5_'+name_temp+'.zip'
-    # k.key=name1
+    k.key=name1
     link='https://s3.amazonaws.com/przm5/'+name1
     print link
 
+    #return link, PRCP_IRRG_sum, RUNF_sum, CEVP_TETD_sum, src1, name1
+
+    k.set_contents_from_filename('test.zip')
+
+    k.set_acl('public-read-write')
+    print 'upload finished'
+    os.chdir(src)
+
     return link, PRCP_IRRG_sum, RUNF_sum, CEVP_TETD_sum, src1, name1
-
-    # k.set_contents_from_filename('test.zip')
-
-    # k.set_acl('public-read-write')
-    # print 'upload finished'
-    # os.chdir(src)
-
-    # return link, PRCP_IRRG_sum, RUNF_sum, CEVP_TETD_sum
 
     # return 'done'
