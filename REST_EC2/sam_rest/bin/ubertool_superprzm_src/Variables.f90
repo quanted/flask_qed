@@ -5,29 +5,29 @@ save
     !***** Recipe Path ***************************
     character(len=200)  :: RecipePath 
     !Randomize Recipe CDL, out of 5 CDL subfolders, see Utilities - mmf 7/2014
-    character(len=200)  :: DwRecipePath =   '\dwRecipes\DWI_recipes_082014\' !'J:\dwRecipes_huc12\'
-    character(len=200)  :: EcoRecipepath =  '\EcoRecipes_huc12\huc12_Xwalk_recipes\' !'C:\SAM_repository\EcoRecipes_huc12\' !'J:\EcoRecipes_huc12\'
+    character(len=200)  :: DwRecipePath =   '/dwRecipes/DWI_recipes_082014/'
+    character(len=200)  :: EcoRecipepath =  '/EcoRecipes_huc12/huc12_Xwalk_recipes/'
     character(len=40)   :: recipe_name      !the current recipe file being processed
     
     !***** binScenario Path ***************************
-    character(len=200)  :: Scenario_Path =  '\binScenarios_all_check\binScenarios_SoilGrps\' !'1extr_test\' !'J:\binScenarios_1extr\'
+    character(len=200)  :: Scenario_Path =  '/binScenarios_all_check/binScenarios_SoilGrps/'
     character(len=4)    :: eco_or_dw       !specifies eco or dw paths
     
     !*******Watershed Hydrology Path*******************
     character(len=200)  :: Hydropath
-    character(len=200)  :: DwHydropath = '\dwOutput_all\dwOutput_SoilGrps\' !'J:\dwOutput_1extr_huc12\'   !****_hydro.txt, contains: totalarea, num_records, Total_Runoff
-    character(len=200)  :: EcoHydropath = '\EcoOutput_all\EcoOutput_SoilGrps\' !'1extr_huc12_test\' !'J:\EcoOutput_1extr_huc12\' !****_hydro.txt
+    character(len=200)  :: DwHydropath = '/dwOutput_all/dwOutput_SoilGrps/' !****_hydro.txt, contains: totalarea, num_records, Total_Runoff
+    character(len=200)  :: EcoHydropath = '/EcoOutput_all/EcoOutput_SoilGrps/' !****_hydro.txt
     
     !*******Flow Volumes Path***************************
     character(len=200)  :: Flowpath
-    character(len=200)  :: DwFlowpath = '\dwRecipes\DWI_recipes_082014\'  !'J:\dwRecipes_huc12\'
-    character(len=200)  :: EcoFlowpath = '\EcoRecipes_huc12\huc12_Xwalk_recipes\'  !'J:\EcoRecipes_huc12\' 
+    character(len=200)  :: DwFlowpath = '/dwRecipes/DWI_recipes_082014/'
+    character(len=200)  :: EcoFlowpath = '/EcoRecipes_huc12/huc12_Xwalk_recipes/'
     
     !**** OUTPUT PATH **************************************
     character(len=200)  :: Outpath
-    character(len=200)  :: EcoOutpath =  '\EcoPestOut_all\EcoPestOut_SoilGrps\' !'EcoPestOut_1extr_73.4by_30yr_huc12_test\' !'J:\EcoPestOut_1extr_73.4by_30yr_huc12\' !'G:\Teams and Panels\Special Teams\SAM\EcoPestOut\TriApp_20days\'
-    character(len=200)  :: DwFOutpath =  '\dwPestOut_all\dwPestOut_SoilGrps\Flowing\'  !'J:\dwPestOut_1extr_73.4by_30yr_huc12\Flowing\' !'G:\Teams and Panels\Special Teams\SAM\dwPestOut\Flowing\'
-    character(len=200)  :: DwROutpath =  '\dwPestOut_all\dwPestOut_SoilGrps\Reservoirs\' !'J:\dwPestOut_1extr_73.4by_30yr_huc12\Reservoirs\' !'G:\Teams and Panels\Special Teams\SAM\dwPestOut\Reservoirs\'
+    character(len=200)  :: EcoOutpath =  '/EcoPestOut_all/EcoPestOut_SoilGrps/'
+    character(len=200)  :: DwFOutpath =  '/dwPestOut_all/dwPestOut_SoilGrps/Flowing/'
+    character(len=200)  :: DwROutpath =  '/dwPestOut_all/dwPestOut_SoilGrps/Reservoirs/'
     
     !Parameters
     integer, parameter :: maxdays = 45000 !24000 !this is the number of days used for allocations
