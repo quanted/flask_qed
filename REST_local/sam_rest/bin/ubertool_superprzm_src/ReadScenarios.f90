@@ -9,13 +9,13 @@ subroutine ReadScenarios(filename)
                       count_runoff ,count_velocity , date_runoff, date_velocity,org_carbon  !,depth
     
     implicit none
-    character(len=100),intent(in) :: filename
+    character(len=200),intent(in) :: filename
     integer :: ierror   , i
 
     
     open (UNIT=88, FILE=filename,IOSTAT=ierror, STATUS = 'OLD', FORM ='UNFORMATTED')   
     if (ierror /= 0) then 
-                 write(61,*) "problem with ",filename  !Bad_scenario.txt
+                 write(61,*) "problem with ",trim(filename), " ierror = ",ierror !Bad_scenario.txt
       return
     end if
    
