@@ -1,3 +1,0 @@
- problem with \binScenarios_all_check\binScenarios_SoilGrps\B3H2st8_10 ierror =            2
- problem with \binScenarios_all_check\binScenarios_SoilGrps\B3H2st8_15 ierror =            2
- problem with \binScenarios_all_check\binScenarios_SoilGrps\B1H3st8_10 ierror =            2

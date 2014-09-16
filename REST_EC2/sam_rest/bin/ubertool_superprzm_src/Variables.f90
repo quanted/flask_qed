@@ -10,7 +10,7 @@ save
     character(len=40)   :: recipe_name      !the current recipe file being processed
     
     !***** binScenario Path ***************************
-    character(len=200)  :: Scenario_Path =  '/binScenarios_all_check/binScenarios_SoilGrps/'
+    character(len=200)  :: Scenario_Path =  '/binScenarios_all/binScenarios_SoilGrps/'
     character(len=4)    :: eco_or_dw       !specifies eco or dw paths
     
     !*******Watershed Hydrology Path*******************

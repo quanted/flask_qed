@@ -159,7 +159,7 @@ implicit none
    write(59,*)  flow, avgrunoff/flow, totalarea, avgrunoff
    !write(59,*) "Mthly avg flows"
    !write(59,*)  flow_scaled
-   write(59,*) "JulianDate, TotalFlow(m3/d), Baseflow(m3/d), Runoff(m3/d), AvgConc(ug/L)" !, Mass(kg), AvgConc(ug/L), Runoff(m3/d)"   !SimpleConc (ug/L)
+   write(59,*) "JulianDate, TotalFlow(m3/d), Baseflow(m3/d), Runoff(m3/d), AvgConc(ug/L)" !, Mass(kg), AvgConc(ug/L), Runoff(m3/d)   !SimpleConc (ug/L)
    
    do i = 1, ndates       
        write(59,*) juliandates(i), q_adj_tot(i), baseflow(i), Total_Runoff(start_count-1+i), avgconc_adj(i)*1000000. !, rain(start_count+i), Total_Runoff(start_count+i), Total_Runoff_Mass(start_count+i), avgconc_adj(start_count+i)*1000000. !, conc_simple(start_count+i)*1000000.  !kg/m3->ug/L

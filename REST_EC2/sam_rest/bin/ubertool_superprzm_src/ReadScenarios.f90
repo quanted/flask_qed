@@ -12,7 +12,6 @@ subroutine ReadScenarios(filename)
     character(len=200),intent(in) :: filename
     integer :: ierror   , i
 
-    
     open (UNIT=88, FILE=filename,IOSTAT=ierror, STATUS = 'OLD', FORM ='UNFORMATTED')   
     if (ierror /= 0) then 
                  write(61,*) "problem with ",trim(filename), " ierror = ",ierror !Bad_scenario.txt

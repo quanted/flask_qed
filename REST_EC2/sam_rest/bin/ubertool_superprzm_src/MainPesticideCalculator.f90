@@ -49,8 +49,8 @@ program PesticideCalculator
    write(*,*) "curr_path = ",curr_path
 
    sam_input_file = trim(adjustl(curr_path))//trim('\ubertool_superprzm_src\Debug\SAM.inp')
-   write(*,9200) trim(sam_input_file)
-   9200 format ("##### sam_input_file---", ">>", a, "<<")
+   !write(*,9200) trim(sam_input_file)
+   !9200 format ("##### sam_input_file---", ">>", a, "<<")
 
    !Read Chemical Inputs and get Scenario Files
      !Read inputFile and eco_or_dw from SAM.inp (created by SAMv1.vb)
@@ -73,11 +73,11 @@ program PesticideCalculator
      inputFileFlow = "DWI_Monthly_Flows_Reservoir_Only_metric_1838.csv"   !For DW Reservoirs txt file
      
      !Printing out PATHS
-     write(*,*) "recipePath: ",recipePath
-     write(*,*) "Hydropath: ",Hydropath
-     write(*,*) "Flowpath: ",Flowpath
-     write(*,*) "outpath: ",outpath
-     write(*,*) "inputFileFlow: ",inputFileFlow
+     !write(*,*) "recipePath: ",recipePath
+     !write(*,*) "Hydropath: ",Hydropath
+     !write(*,*) "Flowpath: ",Flowpath
+     !write(*,*) "outpath: ",outpath
+     !write(*,*) "inputFileFlow: ",inputFileFlow
 
    else if (eco_or_dw == "dwf") then
      write (*,*) "DWF"
@@ -95,7 +95,6 @@ program PesticideCalculator
    open(UNIT=61, FILE=trim(adjustl(recipepath))//"Bad_Scenarios.txt")
    !open(UNIT=61, FILE=trim(adjustl(recipepath))//"CDL_"//trim(str(random_int))//"Bad_Scenarios.txt")
    open(UNIT=86, FILE=trim(adjustl(Flowpath))//trim(adjustl(inputFileFlow)),IOSTAT=ierror, STATUS = 'OLD')
-   
    !UNIT 13 - Old input file (files.txt) contains chemical properties, applications, and the scenarios that are associated with the watershed
    !open (UNIT=13, FILE=trim(adjustl(recipePath))//trim(adjustl(inputFile)),IOSTAT=ierror, STATUS = 'OLD') !NOT SURE IF NEEDED!!
 
@@ -120,28 +119,6 @@ program PesticideCalculator
    read (39,*) toxthreshold                   !Line 19; Output tox threshold level (30d or ann)
    read (39,*) toxthrestype                   !Line 20; Output tox thres type (1=30d,2=ann)
    read (39,*) outputformat                   !Line 21; Output format (1=table,2=map)
-
-   write(*,*) start_count                    
-   write(*,*) startjul                       
-   write(*,*) endjul                         
-   write(*,*) ndates                         
-   !write(*,*) (juliandates(i), i=1,ndates)   
-   !write(*,*) (sdates(i), i=1,ndates)        
-   write(*,*) "Chemical name....skipped"                               
-   write(*,*) Number_crop_ids                
-   write(*,*) cropdesired(1:Number_crop_ids) 
-   write(*,*) Koc                            
-   write(*,*) Soil_HalfLife                  
-   write(*,*) napps                          
-   !write(*,*) (appnumrec(i),i=1,napps)       
-   !write(*,*) (appdate(i), i=1,napps)        
-   !write(*,*) (appmass(i), i=1,napps)        
-   !write(*,*) (appMethod(i), i=1,napps)      
-   write(*,*) outputtype                     
-   write(*,*) toxthreshold                   
-   write(*,*) toxthrestype                   
-   write(*,*) outputformat                   
-
    
    appmass = appmass/10000.                   !convert applied Mass to kg/m2
    degradation_aqueous = 0.693/Soil_HalfLife  !per day
@@ -169,7 +146,7 @@ program PesticideCalculator
    else if (eco_or_dw == "dwf") then
        read (86,*,IOSTAT=io_status) recipe_name,dummy,dummy,dummy,flow1,flow2,flow3,flow4,flow5,flow6,flow7,flow8,flow9,flow10,&
                 flow11,flow12,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12,xa1,xa2,xa3,xa4,xa5,xa6,xa7,xa8,xa9,xa10,xa11,xa12  
-       write (*,*) recipe_name
+       !write (*,*) recipe_name
        if (is_iostat_end(io_status))  exit Loop_B  !End of File
        inputFileHydro = trim(adjustl(recipe_name)) // "_hydro.txt"   !For dwOutput txt files
    end if
@@ -223,15 +200,16 @@ program PesticideCalculator
                    !***********************************************
                    
                    
-                   scenariofilename = trim(adjustl(Scenario_Path)) // trim(filename)
+                   scenariofilename = trim(adjustl(curr_path))//trim(adjustl(Scenario_Path)) // trim(filename)
          
                    fullcount = fullcount +1  !count all the scenarios in a recipe file
                    if (any(cropdesired(1:Number_crop_ids) == crop )) then
                          count= count+1  !count only the relevant scenarios
                          call Readscenarios (scenariofilename)
-               
                          totalApplied = totalApplied + sum(appMass)*area
                          dailyApplied =  sum(appMass)*area
+                         !write(*,*) "totalApplied ",totalApplied
+                         !write(*,*) "dailyApplied ",dailyApplied
                          !write(*,*) "P1", pesticide_mass_soil(:,1)
         
                          call process_pesticide_applications
