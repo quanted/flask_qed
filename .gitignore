@@ -24,3 +24,5 @@ Thumbs.db
 *.pem
 env/*
 build/*
+*.mod
+fort.*

@@ -10,7 +10,8 @@ def sam():
     exe = "SuperPRZMPesticide.exe"
     sam_path = os.path.join(curr_dir, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
     # print sam_path
-    a = subprocess.Popen(sam_path, shell=True)
+    sam_args = os.path.join(curr_dir, 'bin')
+    a = subprocess.Popen(sam_path + " " + sam_args)
     a.wait()
 
     print "Done"
