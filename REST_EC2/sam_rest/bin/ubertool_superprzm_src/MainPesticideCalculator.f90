@@ -48,7 +48,7 @@ program PesticideCalculator
    call get_command_argument(1, curr_path)  ! Pass file path to root of project (e.g., where 'dwRecipes' is)
    write(*,*) "curr_path = ",curr_path
 
-   sam_input_file = trim(adjustl(curr_path))//trim('\ubertool_superprzm_src\Debug\SAM.inp')
+   sam_input_file = trim(adjustl(curr_path))//trim('/ubertool_superprzm_src/Debug/SAM.inp')
    !write(*,9200) trim(sam_input_file)
    !9200 format ("##### sam_input_file---", ">>", a, "<<")
 

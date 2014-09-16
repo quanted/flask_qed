@@ -10,7 +10,7 @@ fpp =
 fpp_opts =
 
 # FC = lf95
-FC = gfortran
+FC = gfortran44
 
 # Lf95 flags
 # -dbl -- extend all single precision real items to double precision
@@ -62,7 +62,7 @@ f90code = 	PesticideInputs.f90 \
 targets : SuperPRZMpesticide.exe
 
 SuperPRZMpesticide.exe : $(f90code) 
-	$(FC) $(ldflags) -fbacktrace -o $@ $(f90code)
+	$(FC) $(ldflags) -o $@ $(f90code)
 
 # -ffixed-line-length-0
 #End-of-File Makefile
