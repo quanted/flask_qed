@@ -18,8 +18,6 @@ Icon^M^M
 .project
 .pydevproject
 keys_Picloud_S3.py
-REST_local/keys_Picloud_S3.py
-REST_EC2/keys_Picloud_S3.py
 Thumbs.db
 *.pem
 env/*
