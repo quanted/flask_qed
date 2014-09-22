@@ -13,8 +13,10 @@ print repr(sys.path)
 
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
+    print "Has 'eb_server' key"
     pass
 else:
+    print "Does not have 'eb_server' key"
     import keys_Picloud_S3
 #    from gevent import monkey
 #    monkey.patch_all()
