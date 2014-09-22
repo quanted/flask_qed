@@ -476,8 +476,8 @@ def sam_rest(jid):
         exec '%s = v' % k
     all_result.setdefault(jid,{}).setdefault('status','none')
 
-    from sam_rest import sam_rest_model
-    result = sam_rest_model.sam()
+    from sam_rest import sam_rest_win
+    result = sam_rest_win.sam()
     return {'user_id':'admin', 'result': result, '_id':jid}
     
 ################################## SAM ##############################################
