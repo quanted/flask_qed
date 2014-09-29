@@ -44,7 +44,11 @@ def sam():
     # for name in fname:
     #     if name !='przm5.exe' and name !='test.dvf':
     #         zout.write(name)
-    superPRZM_ouput = os.path.join(curr_dir, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs', '1838_pestAvgConc_distrib.out')
+    
+    # dwr
+    #superPRZM_ouput = os.path.join(curr_dir, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs', '1838_pestAvgConc_distrib.out')
+    # eco
+    superPRZM_ouput = os.path.join(curr_dir, 'bin', 'EcoPestOut_all', 'dwPestOut_SoilGrps', 'EcoPestOut_SoilGrps')
     print superPRZM_ouput
     zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
     zout.close()
