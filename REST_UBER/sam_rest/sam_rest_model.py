@@ -3,7 +3,8 @@
 
 import os
 import subprocess
-import zipfile
+#import zipfile
+import shutil
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.s3.bucket import Bucket
@@ -40,18 +41,17 @@ def sam():
     print name_temp
     
     ##zip the output files
-    zout=zipfile.ZipFile("temp.zip", "w", zipfile.ZIP_DEFLATED)
-    # for name in fname:
-    #     if name !='przm5.exe' and name !='test.dvf':
-    #         zout.write(name)
+    #zout=zipfile.ZipFile("temp.zip", "w", zipfile.ZIP_DEFLATED)
     
     # dwr
-    #superPRZM_ouput = os.path.join(curr_dir, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs', '1838_pestAvgConc_distrib.out')
+    # superPRZM_ouput = os.path.join(curr_dir, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs', '1838_pestAvgConc_distrib.out')
     # eco
-    superPRZM_ouput = os.path.join(curr_dir, 'bin', 'EcoPestOut_all', 'dwPestOut_SoilGrps', 'EcoPestOut_SoilGrps')
-    print superPRZM_ouput
-    zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
-    zout.close()
+    superPRZM_ouput = os.path.join(curr_dir, 'bin', 'EcoPestOut_all', 'EcoPestOut_SoilGrps')
+    # print superPRZM_ouput
+    #zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
+    #zout.close()
+    zout = shutil.make_archive(os.path.join(curr_dir, 'temp'), "zip", root_dir=superPRZM_ouput)
+    print "zout =", zout
 
     ##Create connection to S3
     conn = S3Connection(key, secretkey)
@@ -65,7 +65,8 @@ def sam():
     print link
     
     ##Upload zip file to S3
-    k.set_contents_from_filename('temp.zip')
+    #k.set_contents_from_filename('temp.zip')
+    k.set_contents_from_filename(zout)
     k.set_acl('public-read-write')
     print 'upload finished'
 
