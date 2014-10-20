@@ -28,17 +28,18 @@ def sam():
 ##########################################################################################
 ##########################################################################################
 
+    name_temp=id_generator()
+    print name_temp
+    
     curr_dir = os.path.dirname(os.path.realpath(__file__))
     exe = "SuperPRZMpesticide.exe"
     sam_path = os.path.join(curr_dir, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
     print sam_path
-    sam_args = os.path.join(curr_dir, 'bin')
-    a = subprocess.Popen(sam_path + " " + sam_args, shell=1)
+    sam_arg1_curr_path = os.path.join(curr_dir, 'bin')
+    sam_arg2_out_path_unique = name_temp
+    a = subprocess.Popen(sam_path + " " + sam_arg1_curr_path + sam_arg2_out_path_unique, shell=1)
     a.wait()
     print "Done"
-
-    name_temp=id_generator()
-    print name_temp
     
     ##zip the output files
     #zout=zipfile.ZipFile("temp.zip", "w", zipfile.ZIP_DEFLATED)
@@ -50,7 +51,7 @@ def sam():
     # print superPRZM_ouput
     #zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
     #zout.close()
-    zout = shutil.make_archive(os.path.join(curr_dir, 'temp'), "zip", root_dir=superPRZM_ouput)
+    zout = shutil.make_archive(os.path.join(curr_dir, name_temp, 'temp'), "zip", root_dir=superPRZM_ouput)
     print "zout =", zout
 
     ##Create connection to S3
@@ -69,5 +70,8 @@ def sam():
     k.set_contents_from_filename(zout)
     k.set_acl('public-read-write')
     print 'upload finished'
+
+    # Delete zip
+    shutil.rmtree(os.path.join(curr_dir, name_temp))
 
     return link, "Done!"

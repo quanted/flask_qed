@@ -38,6 +38,7 @@ program PesticideCalculator
 
    character(len=200) :: sam_input_file
    character(len=200) :: curr_path
+   character(len=6)   :: out_path_unique
 
    
    call cpu_time (t1)  
@@ -46,6 +47,7 @@ program PesticideCalculator
    !call get_command_argument(1,inputFile)  !files.txt for eco and dw
    !call get_command_argument(2, eco_or_dw) 
    call get_command_argument(1, curr_path)  ! Pass file path to root of project (e.g., where 'dwRecipes' is)
+   call get_command_argument(2, out_path_unique)  ! Pass random dir name for output
    write(*,*) "curr_path = ",curr_path
 
    sam_input_file = trim(adjustl(curr_path))//trim('/ubertool_superprzm_src/Debug/SAM.inp')
@@ -62,14 +64,14 @@ program PesticideCalculator
      recipePath = trim(adjustl(curr_path))//trim(EcoRecipePath)
      Hydropath = trim(adjustl(curr_path))//trim(EcoHydropath)
      Flowpath = trim(adjustl(curr_path))//trim(EcoFlowpath)
-     outpath    = trim(adjustl(curr_path))//trim(EcoOutPath)
+     outpath    = trim(out_path_unique//adjustl(curr_path))//trim(EcoOutPath)
      inputFileFlow = "huc12_outlets_metric.csv"  !"EcoMon_flowdata_TabDelim.txt"  !For Eco Flow txt file
    else if (eco_or_dw == "dwr") then
      write (*,*) "DWR"
      recipePath = trim(adjustl(curr_path))//trim(DwRecipePath)
      Hydropath = trim(adjustl(curr_path))//trim(DwHydropath)
      Flowpath = trim(adjustl(curr_path))//trim(DwFlowpath)
-     outpath    = trim(adjustl(curr_path))//trim(DwROutPath)
+     outpath    = trim(out_path_unique//adjustl(curr_path))//trim(DwROutPath)
      inputFileFlow = "DWI_Monthly_Flows_Reservoir_Only_metric_1838.csv"   !For DW Reservoirs txt file
      
      !Printing out PATHS
@@ -84,7 +86,7 @@ program PesticideCalculator
      recipePath = trim(adjustl(curr_path))//trim(DwRecipePath)
      Hydropath = trim(adjustl(curr_path))//trim(DwHydropath)
      Flowpath = trim(adjustl(curr_path))//trim(DwFlowpath)
-     outpath    = trim(adjustl(curr_path))//trim(DwFOutPath)
+     outpath    = trim(out_path_unique//adjustl(curr_path))//trim(DwFOutPath)
      inputFileFlow = "DWI_Monthly_Flows_Flowing_Only_metric.csv"     !For DW Flowing txt file
    
    end if
