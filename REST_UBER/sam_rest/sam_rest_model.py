@@ -50,7 +50,7 @@ def sam():
     # print superPRZM_ouput
     #zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
     #zout.close()
-    zout = shutil.make_archive(os.path.join(curr_dir, 'temp'), "zip", root_dir=superPRZM_ouput)
+    zout = shutil.make_archive(os.path.join(curr_dir, name_temp, 'temp'), "zip", root_dir=superPRZM_ouput)
     print "zout =", zout
 
     ##Create connection to S3
@@ -69,5 +69,8 @@ def sam():
     k.set_contents_from_filename(zout)
     k.set_acl('public-read-write')
     print 'upload finished'
+
+    # Delete zip
+    shutil.rmtree(os.path.join(curr_dir, name_temp))
 
     return link, "Done!"

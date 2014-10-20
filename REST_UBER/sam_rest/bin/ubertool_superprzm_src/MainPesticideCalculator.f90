@@ -169,9 +169,9 @@ program PesticideCalculator
          !random_int = random   
          !write(*,*) trim(adjustl(recipepath))//trim(adjustl(recipe_name))
          if (eco_or_dw == "eco") then   !For Eco Basins
-             open (UNIT=21, FILE=trim(adjustl(recipepath))//"HUC_"//trim(adjustl(recipe_name))//"_recipe.txt",IOSTAT=ierror, &
+             open (UNIT=21, FILE=trim(adjustl(recipepath))//"HUC"//trim(adjustl(recipe_name))//"_recipe.txt",IOSTAT=ierror, &
                     STATUS = 'OLD')
-             !open (UNIT=21, FILE=trim(adjustl(recipepath))//"CDL_"//trim(str(random_int))//"HUC_"//trim(adjustl(recipe_name))//"_recipe.txt",IOSTAT=ierror, STATUS = 'OLD')
+             !open (UNIT=21, FILE=trim(adjustl(recipepath))//"CDL_"//trim(str(random_int))//"HUC"//trim(adjustl(recipe_name))//"_recipe.txt",IOSTAT=ierror, STATUS = 'OLD')
          else     !For DW Basins
              open (UNIT=21, FILE=trim(adjustl(recipepath))//"R5_DWI_"//trim(adjustl(recipe_name))//"_recipe.txt",IOSTAT=ierror, &
                     STATUS = 'OLD')
