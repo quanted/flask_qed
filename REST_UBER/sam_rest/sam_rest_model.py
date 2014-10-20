@@ -35,9 +35,15 @@ def sam():
     exe = "SuperPRZMpesticide.exe"
     sam_path = os.path.join(curr_dir, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
     print sam_path
+
     sam_arg1_curr_path = os.path.join(curr_dir, 'bin')
     sam_arg2_out_path_unique = name_temp
-    a = subprocess.Popen(sam_path + " " + sam_arg1_curr_path + sam_arg2_out_path_unique, shell=1)
+
+    out_path_unique = os.path.join(sam_arg1_curr_path, name_temp)
+    # os.makedirs(out_path_unique)
+    os.makedirs(os.path.join(out_path_unique, 'EcoPestOut_all', 'EcoPestOut_SoilGrps'))
+
+    a = subprocess.Popen(sam_path + " " + sam_arg1_curr_path + " " + sam_arg2_out_path_unique, shell=1)
     a.wait()
     print "Done"
     
@@ -51,7 +57,7 @@ def sam():
     # print superPRZM_ouput
     #zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
     #zout.close()
-    zout = shutil.make_archive(os.path.join(curr_dir, name_temp, 'temp'), "zip", root_dir=superPRZM_ouput)
+    zout = shutil.make_archive(os.path.join(out_path_unique, 'temp'), "zip", root_dir=superPRZM_ouput)
     print "zout =", zout
 
     ##Create connection to S3
@@ -72,6 +78,6 @@ def sam():
     print 'upload finished'
 
     # Delete zip
-    shutil.rmtree(os.path.join(curr_dir, name_temp))
+    shutil.rmtree(out_path_unique)
 
     return link, "Done!"

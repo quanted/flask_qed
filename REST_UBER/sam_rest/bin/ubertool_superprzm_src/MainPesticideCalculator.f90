@@ -64,14 +64,22 @@ program PesticideCalculator
      recipePath = trim(adjustl(curr_path))//trim(EcoRecipePath)
      Hydropath = trim(adjustl(curr_path))//trim(EcoHydropath)
      Flowpath = trim(adjustl(curr_path))//trim(EcoFlowpath)
-     outpath    = trim(out_path_unique//adjustl(curr_path))//trim(EcoOutPath)
+     outpath    = trim(adjustl(curr_path))//'/'//out_path_unique//trim(EcoOutPath)
      inputFileFlow = "huc12_outlets_metric.csv"  !"EcoMon_flowdata_TabDelim.txt"  !For Eco Flow txt file
+
+     !Printing out PATHS
+     !write(*,*) "recipePath: ",recipePath
+     !write(*,*) "Hydropath: ",Hydropath
+     !write(*,*) "Flowpath: ",Flowpath
+     !write(*,*) "outpath: ",outpath
+     !write(*,*) "inputFileFlow: ",inputFileFlow
+
    else if (eco_or_dw == "dwr") then
      write (*,*) "DWR"
      recipePath = trim(adjustl(curr_path))//trim(DwRecipePath)
      Hydropath = trim(adjustl(curr_path))//trim(DwHydropath)
      Flowpath = trim(adjustl(curr_path))//trim(DwFlowpath)
-     outpath    = trim(out_path_unique//adjustl(curr_path))//trim(DwROutPath)
+     outpath    = trim(adjustl(curr_path))//'/'//out_path_unique//trim(DwROutPath)
      inputFileFlow = "DWI_Monthly_Flows_Reservoir_Only_metric_1838.csv"   !For DW Reservoirs txt file
      
      !Printing out PATHS
@@ -86,7 +94,7 @@ program PesticideCalculator
      recipePath = trim(adjustl(curr_path))//trim(DwRecipePath)
      Hydropath = trim(adjustl(curr_path))//trim(DwHydropath)
      Flowpath = trim(adjustl(curr_path))//trim(DwFlowpath)
-     outpath    = trim(out_path_unique//adjustl(curr_path))//trim(DwFOutPath)
+     outpath    = trim(adjustl(curr_path))//'/'//out_path_unique//trim(DwFOutPath)
      inputFileFlow = "DWI_Monthly_Flows_Flowing_Only_metric.csv"     !For DW Flowing txt file
    
    end if
