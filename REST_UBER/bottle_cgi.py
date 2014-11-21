@@ -36,7 +36,7 @@ else:
 
 #bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
-#host_ip=boto.utils.get_instance_metadata()['local-ipv4']
+host_ip=boto.utils.get_instance_metadata()['local-ipv4']
 #host_ip = '134.67.114.3'
 # host_ip = '172.20.100.13'
 # print 'host_ip = ', host_ip
@@ -48,13 +48,11 @@ class NumPyArangeEncoder(json.JSONEncoder):
             return obj.tolist() # or map(int, obj)
         return json.JSONEncoder.default(self, obj)
 
-"""
-    REMOVED MONOGO FOR EB SERVER
-"""
+
 # Connect to MongoDB server
-# from pymongo import Connection
-# connection = Connection(host_ip, 27017)
-# db = connection.ubertool
+from pymongo import Connection
+connection = Connection(host_ip, 27017)
+db = connection.ubertool
 
 # Initial REST call return dictionary
 all_result = {}
@@ -500,70 +498,70 @@ def file_upload():
     shutil.rmtree(src1)
 
 """
-    COMMENTED OUT TO REMOVE MONOGO DEPENDENCY
+    MongoDB
 """
-##########insert results into mongodb#########################
-# @route('/save_history', method='POST') 
-# # @auth_basic(check)
-# def insert_output_html():
-#     for k, v in request.json.iteritems():
-#         exec "%s = v" % k
-#     element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
-#     db[model_name].save(element)
+#########insert results into mongodb#########################
+@route('/save_history', method='POST') 
+# @auth_basic(check)
+def insert_output_html():
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
+    db[model_name].save(element)
 
-# ##########update html field in mongodb#########################
-# @route('/update_html', method='POST') 
-# # @auth_basic(check)
-# def update_output_html():
-#     for k, v in request.json.iteritems():
-#         exec "%s = v" % k
-#     # print request.json
-#     db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
+##########update html field in mongodb#########################
+@route('/update_html', method='POST') 
+# @auth_basic(check)
+def update_output_html():
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    # print request.json
+    db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
 
-# ###############Check History####################
-# @route('/ubertool_history/<model_name>/<jid>')
-# # @auth_basic(check)
-# def get_document(model_name, jid):
-#     entity = db[model_name].find_one({'_id':jid})
-#     if not entity:
-#         abort(404, 'No document with jid %s' % jid)
-#     return entity
+###############Check History####################
+@route('/ubertool_history/<model_name>/<jid>')
+# @auth_basic(check)
+def get_document(model_name, jid):
+    entity = db[model_name].find_one({'_id':jid})
+    if not entity:
+        abort(404, 'No document with jid %s' % jid)
+    return entity
 
 
-# @route('/user_history', method='POST')
-# # @auth_basic(check)
-# def get_user_model_hist():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     hist_all = []
-#     entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
-#     for i in entity:
-#         hist_all.append(i)
-#     if not entity:
-#         abort(404, 'No document with jid %s' % jid)
-#     return {"hist_all":hist_all}
+@route('/user_history', method='POST')
+# @auth_basic(check)
+def get_user_model_hist():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    hist_all = []
+    entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
+    for i in entity:
+        hist_all.append(i)
+    if not entity:
+        abort(404, 'No document with jid %s' % jid)
+    return {"hist_all":hist_all}
 
-# @route('/get_html_output', method='POST')
-# # @auth_basic(check)
-# def get_html_output():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
-#     for i in html_output_c:
-#         # print i
-#         html_output = i['output_html']
-#     return {"html_output":html_output}
+@route('/get_html_output', method='POST')
+# @auth_basic(check)
+def get_html_output():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
+    for i in html_output_c:
+        # print i
+        html_output = i['output_html']
+    return {"html_output":html_output}
 
-# @route('/get_przm_batch_output', method='POST')
-# # @auth_basic(check)
-# def get_przm_batch_output():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
-#     for i in result_output_c:
-#         # print i
-#         result = i['model_object_dict']
-#     return {"result":result}
+@route('/get_przm_batch_output', method='POST')
+# @auth_basic(check)
+def get_przm_batch_output():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
+    for i in result_output_c:
+        # print i
+        result = i['model_object_dict']
+    return {"result":result}
 
 # @route('/get_pdf', method='POST')
 # # @auth_basic(check)
