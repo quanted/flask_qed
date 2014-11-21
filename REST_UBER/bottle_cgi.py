@@ -36,10 +36,6 @@ else:
 
 #bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
-host_ip=boto.utils.get_instance_metadata()['local-ipv4']
-#host_ip = '134.67.114.3'
-# host_ip = '172.20.100.13'
-# print 'host_ip = ', host_ip
 
 class NumPyArangeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -50,8 +46,8 @@ class NumPyArangeEncoder(json.JSONEncoder):
 
 
 # Connect to MongoDB server
-from pymongo import Connection
-connection = Connection(host_ip, 27017)
+from pymongo import MongoClient
+connection = MongoClient('localhost', 27017)
 db = connection.ubertool
 
 # Initial REST call return dictionary
