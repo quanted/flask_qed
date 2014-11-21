@@ -25,5 +25,6 @@ build/*
 *.mod
 fort.*
 *.pid
-REST_UBER/sam_rest/bin/binScenarios_all/*
+REST_UBER/sam_rest/bin/*
+REST_UBER/sam_rest/temp.zip
 /var/www/ubertool/ubertool_ecorest/REST_UBER/sam_rest/bin/bin_mother_lode/*
