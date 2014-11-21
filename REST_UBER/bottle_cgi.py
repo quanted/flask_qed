@@ -445,13 +445,19 @@ def przm_exams_rest(jid):
 ################################## SAM ##############################################
 @route('/sam/<jid>', method='POST')
 def sam_rest(jid):
+
+    #import thread
+
     for k, v in request.json.iteritems():
         exec '%s = v' % k
     all_result.setdefault(jid,{}).setdefault('status','none')
 
-    from sam_rest import sam_rest_model
-    result = sam_rest_model.sam()
-    return {'user_id':'admin', 'result': result, '_id':jid}
+    #from sam_rest import sam_rest_model
+    # result = sam_rest_model.sam()
+    #thread.start_new_thread(sam_rest_model.sam, ())
+    # sam_rest_model.sam()
+    # return {'user_id':'admin', 'result': result, '_id':jid}
+    return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
     
 ################################## SAM ##############################################
 
