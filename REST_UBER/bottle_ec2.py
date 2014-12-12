@@ -9,14 +9,16 @@ import os
 import boto.utils
 import json
 import warnings
-
+ 
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
+    print "Has 'eb_server' key"
     pass
 else:
+    print "Does not have 'eb_server' key"
     import keys_Picloud_S3
-    from gevent import monkey
-    monkey.patch_all()
+    # from gevent import monkey
+    # monkey.patch_all()
 
     ##########################################################################################
     #####AMAZON KEY, store output files. You might have to write your own import approach#####
@@ -31,7 +33,7 @@ else:
             return True
         return False
 
-bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
+# bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
 
 class NumPyArangeEncoder(json.JSONEncoder):
