@@ -8,7 +8,7 @@ from boto.s3.bucket import Bucket
 import os
 import boto.utils
 import json
-
+import warnings
 
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
@@ -44,19 +44,18 @@ class NumPyArangeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 """
-    REMOVED MONOGO FOR EB SERVER
+    Connect to MongoDB server
 """
-# Connect to MongoDB server
-# from pymongo import Connection
-# connection = Connection(host_ip, 27017)
-# db = connection.ubertool
+from pymongo import Connection
+connection = Connection(host_ip, 27017)
+db = connection.ubertool
 
 # Initial REST call return dictionary
 all_result = {}
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def terrplant_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -75,7 +74,7 @@ def terrplant_rest(jid):
 
 ##################################sip#############################################
 @route('/sip/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def sip_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -91,7 +90,7 @@ def sip_rest(jid):
 
 ##################################stir#############################################
 @route('/stir/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def stir_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -110,7 +109,7 @@ def stir_rest(jid):
 
 ##################################dust#############################################
 @route('/dust/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def dust_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -127,7 +126,7 @@ def dust_rest(jid):
 
 ##################################trex2#############################################
 @route('/trex2/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def trex2_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -148,7 +147,7 @@ def trex2_rest(jid):
 
 ##################################therps#############################################
 @route('/therps/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def therps_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -169,7 +168,7 @@ def therps_rest(jid):
 
 ##################################iec#############################################
 @route('/iec/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def iec_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -185,7 +184,7 @@ def iec_rest(jid):
 
 ##################################agdrift#############################################
 @route('/agdrift/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def agdrift_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -201,7 +200,7 @@ def agdrift_rest(jid):
 
 ##################################earthworm#############################################
 @route('/earthworm/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def earthworm_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -217,7 +216,7 @@ def earthworm_rest(jid):
 
 ##################################rice#############################################
 @route('/rice/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def rice_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -233,7 +232,7 @@ def rice_rest(jid):
 
 ##################################kabam#############################################
 @route('/kabam/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def kabam_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -251,7 +250,7 @@ def kabam_rest(jid):
 
 ###############geneec####################
 @route('/geneec/<jid>', method='POST')
-# @auth_basic(check)
+@auth_basic(check)
 def myroute(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -267,7 +266,7 @@ def myroute(jid):
 
 ###############przm5####################
 @route('/przm5/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def przm5_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -303,7 +302,7 @@ def przm5_rest(jid):
 
 ################################# VVWM #############################################
 @route('/vvwm/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def vvwm_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -333,7 +332,7 @@ def vvwm_rest(jid):
 
 ##################################przm##############################################
 @route('/przm/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def przm_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -348,7 +347,7 @@ def przm_rest(jid):
 # ##################################przm_batch##############################################
 # result_all=[]
 # @route('/przm_batch/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 # def przm_rest(jid):
 #     from przm_rest import PRZM_pi_new
 #     for k, v in request.json.iteritems():
@@ -371,7 +370,7 @@ def przm_rest(jid):
 
 ##################################przm_batch##############################################
 @route('/przm_batch/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def przm_rest(jid):
     result_all=[]
     from przm_rest import PRZM_pi_new
@@ -403,7 +402,7 @@ def przm_rest(jid):
 
 ##################################pfam##############################################
 @route('/pfam/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 
 def pfam_rest(jid):
     import time
@@ -424,7 +423,7 @@ def pfam_rest(jid):
 
 ##################################przm_exams##############################################
 @route('/przm_exams/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def przm_exams_rest(jid):
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -437,10 +436,26 @@ def przm_exams_rest(jid):
     return {'user_id':'admin', 'result': result, '_id':jid}
 ##################################przm_exams##############################################
 
+################################## SAM ##############################################
+@route('/sam/<jid>', method='POST')
+def sam_rest(jid):
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+        print k
+    all_result.setdefault(jid,{}).setdefault('status','none')
+
+    # Commented out for Local Run
+    #from sam_rest import sam_rest_win
+    #result = sam_rest_win.sam()
+    #return {'user_id':'admin', 'result': result, '_id':jid}
+    # Local faking of results
+    return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
+    
+################################## SAM ##############################################
 
 ##################################exams##############################################
 @route('/exams/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def exams_rest(jid):
     import time
     for k, v in request.json.iteritems():
@@ -453,7 +468,7 @@ def exams_rest(jid):
 
 ################File upload####################
 @route('/file_upload', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def file_upload():
     import shutil
     for k, v in request.json.iteritems():
@@ -477,102 +492,131 @@ def file_upload():
     shutil.rmtree(src1)
 
 """
-    COMMENTED OUT TO REMOVE MONOGO DEPENDENCY
+    MongoDB
 """
-##########insert results into mongodb#########################
-# @route('/save_history', method='POST') 
-# # @auth_basic(check)
-# def insert_output_html():
-#     for k, v in request.json.iteritems():
-#         exec "%s = v" % k
-#     element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
-#     db[model_name].save(element)
+#########insert results into mongodb#########################
+@route('/save_history_html', method='POST') 
+@auth_basic(check)
+def insert_output_html():
+    """
+    DEPRECATED: Use save_model_object(model_object_dict, model_name, run_type) instead
+    """
+    warnings.warn("DEPRECATED: Use save_model_object(model_object_dict, model_name, run_type) instead", DeprecationWarning)
 
-# ##########update html field in mongodb#########################
-# @route('/update_html', method='POST') 
-# # @auth_basic(check)
-# def update_output_html():
-#     for k, v in request.json.iteritems():
-#         exec "%s = v" % k
-#     # print request.json
-#     db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
-
-# ###############Check History####################
-# @route('/ubertool_history/<model_name>/<jid>')
-# # @auth_basic(check)
-# def get_document(model_name, jid):
-#     entity = db[model_name].find_one({'_id':jid})
-#     if not entity:
-#         abort(404, 'No document with jid %s' % jid)
-#     return entity
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
+    db[model_name].save(element)
 
 
-# @route('/user_history', method='POST')
-# # @auth_basic(check)
-# def get_user_model_hist():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     hist_all = []
-#     entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
-#     for i in entity:
-#         hist_all.append(i)
-#     if not entity:
-#         abort(404, 'No document with jid %s' % jid)
-#     return {"hist_all":hist_all}
+@route('/save_history', method='POST') 
+@auth_basic(check)
+def insert_model_obj():
+    """
+    Save model object to MongoDB as new document
+    """
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    element={"user_id":"admin", "_id":_id, "run_type":run_type, "model_object_dict":model_object_dict}
+    db[model_name].save(element)
+    # logging.info("Save history test, _id = "+_id)
 
-# @route('/get_html_output', method='POST')
-# # @auth_basic(check)
-# def get_html_output():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
-#     for i in html_output_c:
-#         # print i
-#         html_output = i['output_html']
-#     return {"html_output":html_output}
 
-# @route('/get_przm_batch_output', method='POST')
-# # @auth_basic(check)
-# def get_przm_batch_output():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
-#     for i in result_output_c:
-#         # print i
-#         result = i['model_object_dict']
-#     return {"result":result}
+##########update html field in mongodb#########################
+@route('/update_html', method='POST') 
+@auth_basic(check)
+def update_output_html():
+    """
+    DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB
+    """
+    warnings.warn("DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB", DeprecationWarning)
 
-# @route('/get_pdf', method='POST')
-# # @auth_basic(check)
-# def get_pdf():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     final_str = pdf_t
-#     final_str = final_str + """<br>"""
-#     if (int(pdf_nop)>0):
-#         for i in range(int(pdf_nop)):
-#             final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
-#             final_str = final_str + """<br>"""
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    # print request.json
+    db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
 
-#     from generate_doc import generatepdf_pi
-#     result=generatepdf_pi.generatepdf_pi(final_str)
-#     return {"result":result}
+###############Check History####################
+@route('/ubertool_history/<model_name>/<jid>')
+@auth_basic(check)
+def get_document(model_name, jid):
+    entity = db[model_name].find_one({'_id':jid})
+    if not entity:
+        abort(404, 'No document with jid %s' % jid)
+    return entity
 
-# @route('/get_html', method='POST')
-# # @auth_basic(check)
-# def get_html():
-#     for k, v in request.json.iteritems():
-#         exec '%s = v' % k
-#     final_str = pdf_t
-#     final_str = final_str + """<br>"""
-#     if (int(pdf_nop)>0):
-#         for i in range(int(pdf_nop)):
-#             final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
-#             final_str = final_str + """<br>"""
 
-#     from generate_doc import generatehtml_pi
-#     result=generatehtml_pi.generatehtml_pi(final_str)
-#     return {"result":result}
+@route('/user_history', method='POST')
+@auth_basic(check)
+def get_user_model_hist():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    hist_all = []
+    entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
+    for i in entity:
+        hist_all.append(i)
+    if not entity:
+        abort(404, 'No document with jid %s' % jid)
+    return {"hist_all":hist_all}
+
+@route('/get_html_output', method='POST')
+@auth_basic(check)
+def get_html_output():
+    """
+    DEPRECATED: Use get_model_object(jid, model_name) instead
+    """
+    warnings.warn("DEPRECATED: Use get_model_object(jid, model_name) instead", DeprecationWarning)
+
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
+    for i in html_output_c:
+        # print i
+        html_output = i['output_html']
+    return {"html_output":html_output}
+
+@route('/get_przm_batch_output', method='POST')
+@auth_basic(check)
+def get_przm_batch_output():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
+    for i in result_output_c:
+        # print i
+        result = i['model_object_dict']
+    return {"result":result}
+
+@route('/get_pdf', method='POST')
+@auth_basic(check)
+def get_pdf():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    final_str = pdf_t
+    final_str = final_str + """<br>"""
+    if (int(pdf_nop)>0):
+        for i in range(int(pdf_nop)):
+            final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
+            final_str = final_str + """<br>"""
+
+    from generate_doc import generatepdf_pi
+    result=generatepdf_pi.generatepdf_pi(final_str)
+    return {"result":result}
+
+@route('/get_html', method='POST')
+@auth_basic(check)
+def get_html():
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    final_str = pdf_t
+    final_str = final_str + """<br>"""
+    if (int(pdf_nop)>0):
+        for i in range(int(pdf_nop)):
+            final_str = final_str + """<img id="imgChart1" src="%s" />"""%(pdf_p[i])
+            final_str = final_str + """<br>"""
+
+    from generate_doc import generatehtml_pi
+    result=generatehtml_pi.generatehtml_pi(final_str)
+    return {"result":result}
 
 
 

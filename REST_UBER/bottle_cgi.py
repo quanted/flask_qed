@@ -8,6 +8,7 @@ from boto.s3.bucket import Bucket
 import os, sys
 import boto.utils
 import json
+import warnings
 
 print repr(sys.path)
 
@@ -497,18 +498,40 @@ def file_upload():
     MongoDB
 """
 #########insert results into mongodb#########################
-@route('/save_history', method='POST') 
+@route('/save_history_html', method='POST') 
 # @auth_basic(check)
 def insert_output_html():
+    """
+    DEPRECATED: Use save_model_object(model_object_dict, model_name, run_type) instead
+    """
+    warnings.warn("DEPRECATED: Use save_model_object(model_object_dict, model_name, run_type) instead", DeprecationWarning)
+
     for k, v in request.json.iteritems():
         exec "%s = v" % k
     element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
     db[model_name].save(element)
 
+@route('/save_history', method='POST') 
+@auth_basic(check)
+def insert_model_obj():
+    """
+    Save model object to MongoDB as new document
+    """
+    for k, v in request.json.iteritems():
+        exec "%s = v" % k
+    element={"user_id":"admin", "_id":_id, "run_type":run_type, "model_object_dict":model_object_dict}
+    db[model_name].save(element)
+    # logging.info("Save history test, _id = "+_id)
+
 ##########update html field in mongodb#########################
 @route('/update_html', method='POST') 
 # @auth_basic(check)
 def update_output_html():
+    """
+    DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB
+    """
+    warnings.warn("DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB", DeprecationWarning)
+
     for k, v in request.json.iteritems():
         exec "%s = v" % k
     # print request.json
@@ -540,6 +563,11 @@ def get_user_model_hist():
 @route('/get_html_output', method='POST')
 # @auth_basic(check)
 def get_html_output():
+    """
+    DEPRECATED: Use get_model_object(jid, model_name) instead
+    """
+    warnings.warn("DEPRECATED: Use get_model_object(jid, model_name) instead", DeprecationWarning)
+
     for k, v in request.json.iteritems():
         exec '%s = v' % k
     html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
