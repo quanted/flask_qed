@@ -60,8 +60,8 @@ def enable_cors(fn):
 
     return _enable_cors
 
-
 def errorMessage(error):
+    """Returns exeption error message as valid JSON string to caller"""
     logging.exception(e)
     error = str(e)
     return {'user_id':'admin', 'result': {'error': True}, '_id':jid}
