@@ -9,6 +9,7 @@ import os
 import boto.utils
 import json
 import warnings
+import logging
  
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
@@ -58,9 +59,9 @@ all_result = {}
 
 def errorMessage(error):
     """Returns exeption error message as valid JSON string to caller"""
-    logging.exception(e)
-    error = str(e)
-    return {'user_id':'admin', 'result': {'error': True}, '_id':jid}
+    logging.exception(error)
+    e = str(error)
+    return {'user_id':'admin', 'result': {'error': e}, '_id':jid}
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
