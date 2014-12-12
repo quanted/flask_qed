@@ -1,3 +1,18 @@
+"""
+    Backend server script runnig Bottle, a lightweight Python server. 
+    All incoming requests to the backend server are handled here including 
+    model run execution and MongoDB querying. 
+
+    To run this script locally you will need MongoDB installed and running 
+    on your machine on its default port (27017).  To start the server, 
+    open terminal in this file's location and run the followning command:
+
+    'python bottle_local.py'
+
+    The Bottle serve will now be running and you view the logs in real time 
+    in the terminal window.  "ctrl + C" to stop the server.
+"""
+
 import bottle
 from bottle import route, run, post, request, auth_basic, abort, response
 import keys_Picloud_S3
