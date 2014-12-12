@@ -56,11 +56,11 @@ db = connection.ubertool
 all_result = {}
 
 
-def errorMessage(error):
+def errorMessage(error, jid):
     """Returns exeption error message as valid JSON string to caller"""
-    logging.exception(e)
-    error = str(e)
-    return {'user_id':'admin', 'result': {'error': True}, '_id':jid}
+    logging.exception(error)
+    e = str(error)
+    return {'user_id':'admin', 'result': {'error': e}, '_id':jid}
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
@@ -81,7 +81,7 @@ def terrplant_rest(jid):
 
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################terrplant#############################################
 
@@ -101,7 +101,7 @@ def sip_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################sip#############################################
 
@@ -124,7 +124,7 @@ def stir_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################sip#############################################
 
@@ -145,7 +145,7 @@ def dust_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 ##################################sip#############################################
 
 ##################################trex2#############################################
@@ -169,7 +169,7 @@ def trex2_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result':result_json, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################trex2#############################################
 
@@ -194,7 +194,7 @@ def therps_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result':result_json, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################therps#############################################
 
@@ -214,7 +214,7 @@ def iec_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################iec#############################################
 
@@ -234,7 +234,7 @@ def agdrift_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################agdrift#############################################
 
@@ -254,7 +254,7 @@ def earthworm_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################earthworm#############################################
 
@@ -274,7 +274,7 @@ def rice_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################rice#############################################
 
@@ -295,7 +295,7 @@ def kabam_rest(jid):
             all_result[jid]['result']=result
         return {'user_id':'admin', 'result':result_json, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################kabam#############################################
 
@@ -316,7 +316,7 @@ def myroute(jid):
         all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ###############przm5####################
 @route('/przm5/<jid>', method='POST') 
@@ -355,7 +355,7 @@ def przm5_rest(jid):
         all_result[jid]['result']=result
         return {'user_id':'admin', 'result': result, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ################################# VVWM #############################################
 @route('/vvwm/<jid>', method='POST') 
@@ -386,7 +386,7 @@ def vvwm_rest(jid):
 
         return {'user_id':'admin', 'result': result, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ################################# VVWM #############################################
 
@@ -403,7 +403,7 @@ def przm_rest(jid):
 
         return {'user_id':'admin', 'result': result, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
     
 ##################################przm##############################################
 
@@ -461,7 +461,7 @@ def przm_rest(jid):
 
         return {"user_id":"admin", "result": result_all, "_id":jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
     
 ##################################przm_batch##############################################
 
@@ -484,7 +484,7 @@ def pfam_rest(jid):
                ben_por,dry_bkd,foc_wat,foc_ben,ss,wat_c_doc,chl,dfac,q10,area_app)
         return {'user_id':'admin', 'result': result, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
     
 ##################################pfam##############################################
 
@@ -504,7 +504,7 @@ def przm_exams_rest(jid):
                                              farm, mw, sol, koc, vp, aem, anm, aqp, tmper, n_ph, ph_out, hl_out)
         return {'user_id':'admin', 'result': result, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################przm_exams##############################################
 
@@ -525,7 +525,7 @@ def sam_rest(jid):
         # return {'user_id':'admin', 'result': result, '_id':jid}
         return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
     
 ################################## SAM ##############################################
 
@@ -543,7 +543,7 @@ def exams_rest(jid):
         result = exams_pi.exams_pi(chem_name, scenarios, met, farm, mw, sol, koc, vp, aem, anm, aqp, tmper, n_ph, ph_out, hl_out)
         return {'user_id':'admin', 'result': result, '_id':jid}
     except Exception, e:
-        return errorMessage(e)
+        return errorMessage(e, jid)
 
 ##################################exams##############################################
 
