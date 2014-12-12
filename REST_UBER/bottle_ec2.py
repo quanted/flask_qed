@@ -26,10 +26,10 @@ else:
     rest_key = keys_Picloud_S3.picloud_api_key
     rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
     ###########################################################################################
-    # def check(user, passwd):
-    # if user == rest_key and passwd == rest_secretkey:
-    #     return True
-    # return False
+    def check(user, passwd):
+        if user == rest_key and passwd == rest_secretkey:
+            return True
+        return False
 
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 

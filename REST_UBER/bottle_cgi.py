@@ -30,10 +30,10 @@ else:
 #    rest_key = keys_Picloud_S3.picloud_api_key
 #    rest_secretkey = keys_Picloud_S3.picloud_api_secretkey
     ###########################################################################################
-    def check(user, passwd):
-        if user == rest_key and passwd == rest_secretkey:
-            return True
-        return False
+    # def check(user, passwd):
+    #     if user == rest_key and passwd == rest_secretkey:
+    #         return True
+    #     return False
 
 #bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 # (or whatever you want)
 
@@ -595,7 +595,7 @@ def insert_output_html():
     db[model_name].save(element)
 
 @route('/save_history', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def insert_model_obj():
     """
     Save model object to MongoDB as new document
