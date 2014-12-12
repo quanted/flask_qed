@@ -646,6 +646,6 @@ def get_przm_batch_output():
 
 if os.environ.has_key("eb_server"):
     debug(True)
-else:
-    # Not used with Apache / mod_wsgi (EB)
-    run(host=host_ip, port=80, server="gevent", debug=True)
+#else:
+#    # Not used with Apache / mod_wsgi (EB)
+#    run(host=host_ip, port=80, server="gevent", debug=True)
