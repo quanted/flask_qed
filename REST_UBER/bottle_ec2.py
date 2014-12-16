@@ -309,7 +309,7 @@ def myroute(jid):
             exec '%s = v' % k
         all_result.setdefault(jid,{}).setdefault('status','none')
 
-        from geneec import gfix
+        from geneec_rest import gfix
         # print request.json
         result = gfix.geneec2(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
         all_result[jid]['status']='done'
