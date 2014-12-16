@@ -606,9 +606,26 @@ def insert_model_obj():
     db[model_name].save(element)
     # logging.info("Save history test, _id = "+_id)
 
-##########update html field in mongodb#########################
+
+@route('/get_model_object', method='POST')
+@auth_basic(check)
+def get_model_object():
+    """
+        Return model object from MongoDB to be loaded into view (e.g. Django)
+    """
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+    # Cursor          Mongo collection     Document      Projection (fields to return)
+    model_object_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
+    for i in model_object_c:
+        # print i
+        model_object = i['model_object_dict']
+    logging.info({"model_object":model_object})
+    return {"model_object":model_object}
+
+
 @route('/update_html', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 def update_output_html():
     """
     DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB
@@ -619,15 +636,6 @@ def update_output_html():
         exec "%s = v" % k
     # print request.json
     db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
-
-###############Check History####################
-@route('/ubertool_history/<model_name>/<jid>')
-# @auth_basic(check)
-def get_document(model_name, jid):
-    entity = db[model_name].find_one({'_id':jid})
-    if not entity:
-        abort(404, 'No document with jid %s' % jid)
-    return entity
 
 
 @route('/user_history', method='POST')
