@@ -1,16 +1,19 @@
 
 class terrplant(object):
-    def __init__(self,version_terrplant,run_type,A,I,R,D,nms,lms,nds,lds,chemical_name,pc_code,use,application_method,application_form,solubility):
+    def __init__(self, version_terrplant, run_type, application_rate, incorporation_depth, runoff_fraction, 
+                    drift_fraction, EC25_for_nonlisted_seedling_emergence_monocot, EC25_for_nonlisted_seedling_emergence_dicot, 
+                    NOAEC_for_listed_seedling_emergence_monocot, NOAEC_for_listed_seedling_emergence_dicot, 
+                    chemical_name, pc_code, use, application_method, application_form, solubility):
         self.version_terrplant = version_terrplant
         self.run_type = run_type
-        self.A = A
-        self.I = I
-        self.R = R
-        self.D = D
-        self.nms = nms
-        self.lms = lms
-        self.nds = nds
-        self.lds = lds
+        self.application_rate = application_rate
+        self.incorporation_depth = incorporation_depth
+        self.runoff_fraction = runoff_fraction
+        self.drift_fraction = drift_fraction
+        self.EC25_for_nonlisted_seedling_emergence_monocot = EC25_for_nonlisted_seedling_emergence_monocot
+        self.EC25_for_nonlisted_seedling_emergence_dicot = EC25_for_nonlisted_seedling_emergence_dicot
+        self.NOAEC_for_listed_seedling_emergence_monocot = NOAEC_for_listed_seedling_emergence_monocot
+        self.NOAEC_for_listed_seedling_emergence_dicot = NOAEC_for_listed_seedling_emergence_dicot
         self.chemical_name = chemical_name
         self.pc_code = pc_code
         self.use = use
@@ -93,9 +96,9 @@ class terrplant(object):
     # EEC for runoff for dry areas
     def rundry(self):
         try:
-            self.A = float(self.A)
-            self.I = float(self.I)
-            self.R = float(self.R)
+            self.application_rate = float(self.application_rate)
+            self.incorporation_depth = float(self.incorporation_depth)
+            self.runoff_fraction = float(self.runoff_fraction)
         except ZeroDivisionError:
             raise ZeroDivisionError\
             ('The incorporation must be non-zero.')
@@ -108,28 +111,28 @@ class terrplant(object):
         except TypeError:
             raise TypeError\
             ('The application rate, incorporation, and/or runoff fraction must be an integer or string')
-        if self.A < 0:
+        if self.application_rate < 0:
             raise ValueError\
-            ('A must be positive.')
-        if self.I == 0:
+            ('application_rate must be positive.')
+        if self.incorporation_depth == 0:
             raise ZeroDivisionError\
-            ('I must not equal zero.')
-        if self.I < 0:
+            ('incorporation_depth must not equal zero.')
+        if self.incorporation_depth < 0:
             raise ValueError\
-            ('I must be positive.')
-        if self.R < 0:
+            ('incorporation_depth must be positive.')
+        if self.runoff_fraction < 0:
             raise ValueError\
-            ('R must be positive.')
+            ('runoff_fraction must be positive.')
         if self.rundry_results == -1:
-            self.rundry_results = (self.A/self.I) * self.R
+            self.rundry_results = (self.application_rate/self.incorporation_depth) * self.runoff_fraction
         return self.rundry_results
 
     # EEC for runoff to semi-aquatic areas
     def runsemi(self):
         try:
-            self.A = float(self.A)
-            self.I = float(self.I)
-            self.R = float(self.R)
+            self.application_rate = float(self.application_rate)
+            self.incorporation_depth = float(self.incorporation_depth)
+            self.runoff_fraction = float(self.runoff_fraction)
         except ZeroDivisionError:
             raise ZeroDivisionError\
             ('The incorporation must be non-zero.')
@@ -139,27 +142,27 @@ class terrplant(object):
         except ValueError:
             raise ValueError\
             ('The application rate, incorporation, and/or runoff fraction must be a real number')
-        if self.A < 0:
+        if self.application_rate < 0:
             raise ValueError\
-            ('A must be positive.')
-        if self.I == 0:
+            ('application_rate must be positive.')
+        if self.incorporation_depth == 0:
             raise ZeroDivisionError\
-            ('I must not equal zero.')
-        if self.I < 0:
+            ('incorporation_depth must not equal zero.')
+        if self.incorporation_depth < 0:
             raise ValueError\
-            ('I must be positive.')
-        if self.R < 0:
+            ('incorporation_depth must be positive.')
+        if self.runoff_fraction < 0:
             raise ValueError\
-            ('R must be positive.')
+            ('runoff_fraction must be positive.')
         if self.runsemi_results == -1:
-            self.runsemi_results = (self.A/self.I) * self.R * 10
+            self.runsemi_results = (self.application_rate/self.incorporation_depth) * self.runoff_fraction * 10
         return self.runsemi_results
 
     # EEC for spray drift
     def spray(self):
         try:
-            self.A = float(self.A)
-            self.D = float(self.D)
+            self.application_rate = float(self.application_rate)
+            self.drift_fraction = float(self.drift_fraction)
         except ZeroDivisionError:
             raise ZeroDivisionError\
             ('The incorporation must be non-zero.')
@@ -169,14 +172,14 @@ class terrplant(object):
         except ValueError:
             raise ValueError\
             ('The application rate, incorporation, and/or runoff fraction must be a real number')
-        if self.A < 0:
+        if self.application_rate < 0:
             raise ValueError\
-            ('A must be positive.')
-        if self.D < 0:
+            ('application_rate must be positive.')
+        if self.drift_fraction < 0:
             raise ValueError\
-            ('D must be positive.')
+            ('drift_fraction must be positive.')
         if self.spray_results == -1:
-            self.spray_results = self.A * self.D
+            self.spray_results = self.application_rate * self.drift_fraction
         return self.spray_results
 
     # EEC total for dry areas
@@ -220,14 +223,14 @@ class terrplant(object):
 
     # ALL USER INPUTS
 
-    # EC25 (Non-listed) Monocot Seedling (nms)
-    # NOAEC (Listed) Monocot Seedling (lms)
-    # EC25 (Non-listed) Dicot Seedling (nds)
-    # NOAEC (Listed) Dicot Seedling (lds)
-    # EC25 (Non-listed) Monocot Vegetative (nmv)
-    # NOAEC (Listed) Monocot Vegetative (lmv)
-    # EC25 (Non-listed) Dicot Vegetative (ndv)
-    # NOAEC (Listed) Dicot Vegetative (ldv)
+    # EC25 (Non-listed) Monocot Seedling (EC25_for_nonlisted_seedling_emergence_monocot)
+    # NOAEC (Listed) Monocot Seedling (EC25_for_nonlisted_seedling_emergence_dicot)
+    # EC25 (Non-listed) Dicot Seedling (NOAEC_for_listed_seedling_emergence_monocot)
+    # NOAEC (Listed) Dicot Seedling (NOAEC_for_listed_seedling_emergence_dicot)
+    # EC25 (Non-listed) Monocot Vegetative (EC25_for_nonlisted_vegetative_vigor_monocot)
+    # NOAEC (Listed) Monocot Vegetative (EC25_for_nonlisted_vegetative_vigor_dicot)
+    # EC25 (Non-listed) Dicot Vegetative (NOAEC_for_listed_vegetative_vigor_monocot)
+    # NOAEC (Listed) Dicot Vegetative (NOAEC_for_listed_vegetative_vigor_dicot)
 
 
     # Risk Quotient for NON-LISTED MONOCOT seedlings exposed to Pesticide X in a DRY area
@@ -235,7 +238,7 @@ class terrplant(object):
     def nmsRQdry(self):
         if self.nmsRQdry_results == -1:
             try:
-                self.nms = float(self.nms)
+                self.EC25_for_nonlisted_seedling_emergence_monocot = float(self.EC25_for_nonlisted_seedling_emergence_monocot)
                 self.totaldry_results = float(self.totaldry_results)
             except ValueError:
                 raise ValueError\
@@ -249,15 +252,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.nms < 0:
+            if self.EC25_for_nonlisted_seedling_emergence_monocot < 0:
                 raise ValueError\
-                ('nms=%g is a non-physical value' %self.nms)
+                ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_monocot)
             if self.totaldry_results == -1:
                 self.totaldry()
             if self.totaldry_results == None:
                 raise ValueError\
                 ('Either the totaldry_results variable equals None and therefor this function cannot be run.')
-            self.nmsRQdry_results = self.totaldry_results/self.nms
+            self.nmsRQdry_results = self.totaldry_results/self.EC25_for_nonlisted_seedling_emergence_monocot
         return self.nmsRQdry_results
 
 
@@ -291,7 +294,7 @@ class terrplant(object):
     def nmsRQsemi(self):
         if self.nmsRQsemi_results == -1:
             try:
-                self.nms = float(self.nms)
+                self.EC25_for_nonlisted_seedling_emergence_monocot = float(self.EC25_for_nonlisted_seedling_emergence_monocot)
                 self.totalsemi_results = float(self.totalsemi_results)
             except ValueError:
                 raise ValueError\
@@ -305,15 +308,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.nms < 0:
+            if self.EC25_for_nonlisted_seedling_emergence_monocot < 0:
                 raise ValueError\
-                ('nms=%g is a non-physical value' %self.nms)   
+                ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_monocot)   
             if self.totalsemi_results == -1:
                 self.totalsemi()
             if self.totalsemi_results == None:
                 raise ValueError\
                 ('Either the totaldry_results variable equals None and therefor this function cannot be run.')
-            self.nmsRQsemi_results = self.totalsemi_results/self.nms
+            self.nmsRQsemi_results = self.totalsemi_results/self.EC25_for_nonlisted_seedling_emergence_monocot
         return self.nmsRQsemi_results
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide X in a semi-aquatic area
@@ -341,7 +344,7 @@ class terrplant(object):
     def nmsRQspray(self):
         if self.nmsRQspray_results == -1:
             try:
-                self.nms = float(self.nms)
+                self.EC25_for_nonlisted_seedling_emergence_monocot = float(self.EC25_for_nonlisted_seedling_emergence_monocot)
                 self.spray_results = float(self.spray_results)
             except TypeError:
                 raise TypeError\
@@ -352,15 +355,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.nms < 0:
+            if self.EC25_for_nonlisted_seedling_emergence_monocot < 0:
                 raise ValueError\
-                ('nms=%g is a non-physical value' %self.nms)   
+                ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_monocot)   
             if self.spray_results == -1:
                 self.spray()
             if self.spray_results == None:
                 raise ValueError\
                 ('Either the spray_results variable equals None and therefor this function cannot be run.')
-            self.nmsRQspray_results = self.spray_results/self.nms
+            self.nmsRQspray_results = self.spray_results/self.EC25_for_nonlisted_seedling_emergence_monocot
         return self.nmsRQspray_results
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide via spray drift
@@ -388,7 +391,7 @@ class terrplant(object):
     def lmsRQdry(self):
         if self.lmsRQdry_results == -1:
             try:
-                self.lms = float(self.lms)
+                self.EC25_for_nonlisted_seedling_emergence_dicot = float(self.EC25_for_nonlisted_seedling_emergence_dicot)
                 self.totaldry_results = float(self.totaldry_results)
             except TypeError:
                 raise TypeError\
@@ -403,15 +406,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.lms < 0:
+            if self.EC25_for_nonlisted_seedling_emergence_dicot < 0:
                 raise ValueError\
-                ('lms=%g is a non-physical value' %self.lms)   
+                ('EC25_for_nonlisted_seedling_emergence_dicot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_dicot)   
             if self.totaldry_results == -1:
                 self.totaldry()
             if self.totaldry_results == None:
                 raise ValueError\
                 ('Either the spray_results variable equals None and therefor this function cannot be run.')
-            self.lmsRQdry_results = self.totaldry_results/self.lms
+            self.lmsRQdry_results = self.totaldry_results/self.EC25_for_nonlisted_seedling_emergence_dicot
         return self.lmsRQdry_results
 
     # Level of concern for listed monocot seedlings exposed to pesticide
@@ -440,7 +443,7 @@ class terrplant(object):
     def lmsRQsemi(self):
         if self.lmsRQsemi_results == -1:
             try:
-                self.lms = float(self.lms)
+                self.EC25_for_nonlisted_seedling_emergence_dicot = float(self.EC25_for_nonlisted_seedling_emergence_dicot)
                 self.totalsemi_results = float(self.totalsemi_results)
             except TypeError:
                 raise TypeError\
@@ -455,15 +458,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.lms < 0:
+            if self.EC25_for_nonlisted_seedling_emergence_dicot < 0:
                 raise ValueError\
-                ('nms=%g is a non-physical value' %self.lms)   
+                ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_dicot)   
             if self.totalsemi_results == -1:
                 self.totalsemi()
             if self.totalsemi_results == None:
                 raise ValueError\
                 ('Either the totalsemi_results variable equals None and therefor this function cannot be run.')
-            self.lmsRQsemi_results = self.totalsemi_results/self.lms
+            self.lmsRQsemi_results = self.totalsemi_results/self.EC25_for_nonlisted_seedling_emergence_dicot
         return self.lmsRQsemi_results
 
     # Level of concern for listed monocot seedlings exposed to pesticide X in semi-aquatic areas
@@ -491,7 +494,7 @@ class terrplant(object):
     def lmsRQspray(self):
         if self.lmsRQspray_results == -1:
             try:
-                self.lms = float(self.lms)
+                self.EC25_for_nonlisted_seedling_emergence_dicot = float(self.EC25_for_nonlisted_seedling_emergence_dicot)
                 self.spray_results = float(self.spray_results)
             except TypeError:
                 raise TypeError\
@@ -505,15 +508,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.lms < 0:
+            if self.EC25_for_nonlisted_seedling_emergence_dicot < 0:
                 raise ValueError\
-                ('nms=%g is a non-physical value' %self.lms)  
+                ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_dicot)  
             if self.spray_results == -1:
                 self.spray()
             if self.spray_results == None:
                 raise ValueError\
                 ('The spray_results variable equals None and therefor this function cannot be run.')
-            self.lmsRQspray_results = self.spray_results/self.lms
+            self.lmsRQspray_results = self.spray_results/self.EC25_for_nonlisted_seedling_emergence_dicot
         return self.lmsRQspray_results
 
     # Level of concern for listed monocot seedlings exposed to pesticide X via spray drift
@@ -541,7 +544,7 @@ class terrplant(object):
     def ndsRQdry(self):
         if self.ndsRQdry_results == -1:
             try:
-                self.nds = float(self.nds)
+                self.NOAEC_for_listed_seedling_emergence_monocot = float(self.NOAEC_for_listed_seedling_emergence_monocot)
                 self.totaldry_results = float(self.totaldry_results)
             except TypeError:
                 raise TypeError\
@@ -555,15 +558,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.nds < 0:
+            if self.NOAEC_for_listed_seedling_emergence_monocot < 0:
                 raise ValueError\
-                ('nds=%g is a non-physical value' %self.nds)  
+                ('NOAEC_for_listed_seedling_emergence_monocot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_monocot)  
             if self.totaldry_results == -1:
                 self.totaldry()
             if self.totaldry_results == None:
                 raise ValueError\
                 ('The totaldry_results variable equals None and therefor this function cannot be run.')
-            self.ndsRQdry_results = self.totaldry_results/self.nds
+            self.ndsRQdry_results = self.totaldry_results/self.NOAEC_for_listed_seedling_emergence_monocot
         return self.ndsRQdry_results
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X in dry areas
@@ -591,7 +594,7 @@ class terrplant(object):
     def ndsRQsemi(self):
         if self.ndsRQsemi_results == -1:
             try:
-                self.nds = float(self.nds)
+                self.NOAEC_for_listed_seedling_emergence_monocot = float(self.NOAEC_for_listed_seedling_emergence_monocot)
                 self.totalsemi_results = float(self.totalsemi_results)
             except TypeError:
                 raise TypeError\
@@ -605,15 +608,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.nds < 0:
+            if self.NOAEC_for_listed_seedling_emergence_monocot < 0:
                 raise ValueError\
-                ('nds=%g is a non-physical value' %self.nds)  
+                ('NOAEC_for_listed_seedling_emergence_monocot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_monocot)  
             if self.totaldry_results == -1:
                 self.totalsemi()
             if self.totaldry_results == None:
                 raise ValueError\
                 ('The totalsemi_results variable equals None and therefor this function cannot be run.')
-            self.ndsRQsemi_results = self.totalsemi_results/self.nds
+            self.ndsRQsemi_results = self.totalsemi_results/self.NOAEC_for_listed_seedling_emergence_monocot
         return self.ndsRQsemi_results
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X in semi-aquatic areas
@@ -640,7 +643,7 @@ class terrplant(object):
     def ndsRQspray(self):
         if self.ndsRQspray_results == -1:
             try:
-                self.nds = float(self.nds)
+                self.NOAEC_for_listed_seedling_emergence_monocot = float(self.NOAEC_for_listed_seedling_emergence_monocot)
                 self.spray_results = float(self.spray_results)
             except TypeError:
                 raise TypeError\
@@ -654,15 +657,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.nds < 0:
+            if self.NOAEC_for_listed_seedling_emergence_monocot < 0:
                 raise ValueError\
-                ('nds=%g is a non-physical value' %self.nds)
+                ('NOAEC_for_listed_seedling_emergence_monocot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_monocot)
             if self.spray_results == -1:
                 self.spray()
             if self.spray_results == None:
                 raise ValueError\
                 ('The spray_results variable equals None and therefor this function cannot be run.')
-            self.ndsRQspray_results = self.spray_results/self.nds
+            self.ndsRQspray_results = self.spray_results/self.NOAEC_for_listed_seedling_emergence_monocot
         return self.ndsRQspray_results
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X via spray drift
@@ -689,7 +692,7 @@ class terrplant(object):
     def ldsRQdry(self):
         if self.ldsRQdry_results == -1:
             try:
-                self.lds = float(self.lds)
+                self.NOAEC_for_listed_seedling_emergence_dicot = float(self.NOAEC_for_listed_seedling_emergence_dicot)
                 self.totaldry_results = float(self.totaldry_results)
             except TypeError:
                 raise TypeError\
@@ -703,15 +706,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.lds < 0:
+            if self.NOAEC_for_listed_seedling_emergence_dicot < 0:
                 raise ValueError\
-                ('lds=%g is a non-physical value' %self.lds)
+                ('NOAEC_for_listed_seedling_emergence_dicot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_dicot)
             if self.totaldry_results == -1:
                 self.totaldry()
             if self.totaldry_results == None:
                 raise ValueError\
                 ('The totaldry_results variable equals None and therefor this function cannot be run.')
-            self.ldsRQdry_results = self.totaldry_results/self.lds
+            self.ldsRQdry_results = self.totaldry_results/self.NOAEC_for_listed_seedling_emergence_dicot
         return self.ldsRQdry_results
 
     # Level of concern for listed dicot seedlings exposed to pesticideX in dry areas
@@ -738,7 +741,7 @@ class terrplant(object):
     def ldsRQsemi(self):
         if self.ldsRQsemi_results == -1:
             try:
-                self.lds = float(self.lds)
+                self.NOAEC_for_listed_seedling_emergence_dicot = float(self.NOAEC_for_listed_seedling_emergence_dicot)
                 self.totalsemi_results = float(self.totalsemi_results)
             except TypeError:
                 raise TypeError\
@@ -752,15 +755,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.lds < 0:
+            if self.NOAEC_for_listed_seedling_emergence_dicot < 0:
                 raise ValueError\
-                ('lds=%g is a non-physical value' %self.lds)
+                ('NOAEC_for_listed_seedling_emergence_dicot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_dicot)
             if self.totalsemi_results == -1:
                 self.totalsemi()
             if self.totalsemi_results == None:
                 raise ValueError\
                 ('The totalsemi_results variable equals None and therefor this function cannot be run.')
-            self.ldsRQsemi_results = self.totalsemi_results/self.lds
+            self.ldsRQsemi_results = self.totalsemi_results/self.NOAEC_for_listed_seedling_emergence_dicot
         return self.ldsRQsemi_results
 
     # Level of concern for listed dicot seedlings exposed to pesticide X in dry areas
@@ -787,7 +790,7 @@ class terrplant(object):
     def ldsRQspray(self):
         if self.ldsRQspray_results == -1:
             try:
-                self.lds = float(self.lds)
+                self.NOAEC_for_listed_seedling_emergence_dicot = float(self.NOAEC_for_listed_seedling_emergence_dicot)
                 self.spray_results = float(self.spray_results)
             except TypeError:
                 raise TypeError\
@@ -801,15 +804,15 @@ class terrplant(object):
             except ZeroDivisionError:
                 raise ZeroDivisionError\
                 ('The incorporation must be non-zero.')
-            if self.lds < 0:
+            if self.NOAEC_for_listed_seedling_emergence_dicot < 0:
                 raise ValueError\
-                ('lds=%g is a non-physical value' %self.lds)
+                ('NOAEC_for_listed_seedling_emergence_dicot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_dicot)
             if self.spray_results == -1:
                 self.spray()
             if self.spray_results == None:
                 raise ValueError\
                 ('The spray_results variable equals None and therefor this function cannot be run.')
-            self.ldsRQspray_results = self.spray_results/self.lds
+            self.ldsRQspray_results = self.spray_results/self.NOAEC_for_listed_seedling_emergence_dicot
         return self.ldsRQspray_results
 
     # Level of concern for listed dicot seedlings exposed to pesticide X via spray drift
