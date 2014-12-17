@@ -1,0 +1,7 @@
+numpy==1.8.0
+boto
+pymongo
+requests
+pytz
+bottle
+simplejson
