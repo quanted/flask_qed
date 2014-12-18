@@ -697,7 +697,7 @@ def get_user_model_hist():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
     hist_all = []
-    entity = db[model_name].find({'user_id':user_id}).sort("_id", 1)
+    entity = db[model_name].find({'user_id':user_id}).sort("_id", -1)
     for i in entity:
         hist_all.append(i)
     if not entity:
