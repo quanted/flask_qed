@@ -93,7 +93,10 @@ def terrplant_rest(jid):
         all_result.setdefault(jid,{}).setdefault('status','none')
 
         from terrplant_rest import terrplant_model_rest
-        result = terrplant_model_rest.terrplant(version_terrplant,run_type,A,I,R,D,nms,lms,nds,lds,chemical_name,pc_code,use,application_method,application_form,solubility)
+        result = terrplant_model_rest.terrplant(version_terrplant,run_type, application_rate, incorporation_depth, runoff_fraction, 
+            drift_fraction,EC25_for_nonlisted_seedling_emergence_monocot,EC25_for_nonlisted_seedling_emergence_dicot,
+            NOAEC_for_listed_seedling_emergence_monocot,NOAEC_for_listed_seedling_emergence_dicot,chemical_name,
+            pc_code,use,application_method,application_form,solubility)
         # if (result):
         #     all_result[jid]['status']='done'
         #     all_result[jid]['input']=request.json
@@ -114,7 +117,10 @@ def sip_rest(jid):
             exec '%s = v' % k
         all_result.setdefault(jid,{}).setdefault('status','none')
         from sip_rest import sip_model_rest
-        result = sip_model_rest.sip(chemical_name, bw_bird, bw_quail, bw_duck, bwb_other, bw_rat, bwm_other, b_species, m_species, bw_mamm, sol, ld50_a, ld50_m, aw_bird, mineau, aw_mamm, noaec, noael)
+        result = sip_model_rest.sip(chemical_name, bodyweight_tested_bird, bodyweight_quail, bodyweight_duck, bodyweight_bird_other, 
+                    bodyweight_rat, bodyweight_tested_mammal_other, species_tested_bird, species_tested_mammal, 
+                    bodyweight_tested_mammal, solubility, ld50_avian_water, ld50_mammal_water, bodyweight_assessed_bird, 
+                    mineau_scaling_factor, bodyweight_assessed_mammal, noael_avian_water, noael_mammal_water)
         # if (result):
         #     all_result[jid]['status']='done'
         #     all_result[jid]['input']=request.json
