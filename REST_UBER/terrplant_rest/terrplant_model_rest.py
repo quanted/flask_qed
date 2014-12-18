@@ -101,16 +101,16 @@ class terrplant(object):
             self.runoff_fraction = float(self.runoff_fraction)
         except ZeroDivisionError:
             raise ZeroDivisionError\
-            ('The incorporation must be non-zero.')
+            ('The incorporation_depth must be non-zero.')
         except IndexError:
             raise IndexError\
-            ('The application rate, incorporation, and/or runoff fraction must be supplied on the command line. ')
+            ('The application rate, incorporation_depth, and/or runoff fraction must be supplied on the command line. ')
         except ValueError:
             raise ValueError\
-            ('The application rate, incorporation, and/or runoff fraction must be a real number')
+            ('The application rate, incorporation_depth, and/or runoff fraction must be a real number')
         except TypeError:
             raise TypeError\
-            ('The application rate, incorporation, and/or runoff fraction must be an integer or string')
+            ('The application rate, incorporation_depth, and/or runoff fraction must be an integer or string')
         if self.application_rate < 0:
             raise ValueError\
             ('application_rate must be positive.')
@@ -135,13 +135,13 @@ class terrplant(object):
             self.runoff_fraction = float(self.runoff_fraction)
         except ZeroDivisionError:
             raise ZeroDivisionError\
-            ('The incorporation must be non-zero.')
+            ('The incorporation_depth must be non-zero.')
         except IndexError:
             raise IndexError\
-            ('The application rate, incorporation, and/or runoff fraction must be supplied on the command line. ')
+            ('The application rate, incorporation_depth, and/or runoff fraction must be supplied on the command line. ')
         except ValueError:
             raise ValueError\
-            ('The application rate, incorporation, and/or runoff fraction must be a real number')
+            ('The application rate, incorporation_depth, and/or runoff fraction must be a real number')
         if self.application_rate < 0:
             raise ValueError\
             ('application_rate must be positive.')
@@ -165,13 +165,13 @@ class terrplant(object):
             self.drift_fraction = float(self.drift_fraction)
         except ZeroDivisionError:
             raise ZeroDivisionError\
-            ('The incorporation must be non-zero.')
+            ('The incorporation_depth must be non-zero.')
         except IndexError:
             raise IndexError\
-            ('The application rate, incorporation, and/or runoff fraction must be supplied on the command line. ')
+            ('The application rate, incorporation_depth, and/or runoff fraction must be supplied on the command line. ')
         except ValueError:
             raise ValueError\
-            ('The application rate, incorporation, and/or runoff fraction must be a real number')
+            ('The application rate, incorporation_depth, and/or runoff fraction must be a real number')
         if self.application_rate < 0:
             raise ValueError\
             ('application_rate must be positive.')
@@ -196,7 +196,7 @@ class terrplant(object):
                 self.totaldry_results = self.rundry_results + self.spray_results
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
         return self.totaldry_results
 
 
@@ -214,7 +214,7 @@ class terrplant(object):
                 self.totalsemi_results = self.runsemi_results + self.spray_results
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
         return self.totalsemi_results
 
 
@@ -242,7 +242,7 @@ class terrplant(object):
                 self.totaldry_results = float(self.totaldry_results)
             except ValueError:
                 raise ValueError\
-                ('The application rate, incorporation, and/or runoff fraction must be a real number')
+                ('The application rate, incorporation_depth, and/or runoff fraction must be a real number')
             except TypeError:
                 raise TypeError\
                 ('totaldry equals None and therefor this function cannot be run.')
@@ -251,7 +251,7 @@ class terrplant(object):
                 ('The total amount of runoff and spray to semi-aquatic areas be supplied on the command line. ')
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.EC25_for_nonlisted_seedling_emergence_monocot < 0:
                 raise ValueError\
                 ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_monocot)
@@ -286,7 +286,7 @@ class terrplant(object):
                     ' the pesticide via runoff to a dry area indicates that potential risk is minimal.')
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
         return self.LOCnmsdry_results
 
     # Risk Quotient for NON-LISTED MONOCOT seedlings exposed to Pesticide X in a SEMI-AQUATIC area
@@ -298,7 +298,7 @@ class terrplant(object):
                 self.totalsemi_results = float(self.totalsemi_results)
             except ValueError:
                 raise ValueError\
-                ('The application rate, incorporation, and/or runoff fraction must be a real number')             
+                ('The application rate, incorporation_depth, and/or runoff fraction must be a real number')             
             except TypeError:
                 raise TypeError\
                 ('totaldry equals None and therefor this function cannot be run.')
@@ -307,7 +307,7 @@ class terrplant(object):
                 ('The total amount of runoff and spray to semi-aquatic areas be supplied on the command line. ')
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.EC25_for_nonlisted_seedling_emergence_monocot < 0:
                 raise ValueError\
                 ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_monocot)   
@@ -354,7 +354,7 @@ class terrplant(object):
                 ('The EEC for spray drift needs to be supplied on the command line. ')
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.EC25_for_nonlisted_seedling_emergence_monocot < 0:
                 raise ValueError\
                 ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_monocot)   
@@ -405,7 +405,7 @@ class terrplant(object):
                 ' not "%lbs ai/A"' %self.totaldry_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.EC25_for_nonlisted_seedling_emergence_dicot < 0:
                 raise ValueError\
                 ('EC25_for_nonlisted_seedling_emergence_dicot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_dicot)   
@@ -457,7 +457,7 @@ class terrplant(object):
                 ' not "%lbs ai/A"' %self.totalsemi_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.EC25_for_nonlisted_seedling_emergence_dicot < 0:
                 raise ValueError\
                 ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_dicot)   
@@ -507,7 +507,7 @@ class terrplant(object):
                 ('The amount of spray drift exposure must be a real number, not "%lbs ai/A"' %spray_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.EC25_for_nonlisted_seedling_emergence_dicot < 0:
                 raise ValueError\
                 ('EC25_for_nonlisted_seedling_emergence_monocot=%g is a non-physical value' %self.EC25_for_nonlisted_seedling_emergence_dicot)  
@@ -557,7 +557,7 @@ class terrplant(object):
                 ('The total amount of runoff and spray to dry areas must be a real number, not "%lbs ai/A"' %totaldry_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.NOAEC_for_listed_seedling_emergence_monocot < 0:
                 raise ValueError\
                 ('NOAEC_for_listed_seedling_emergence_monocot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_monocot)  
@@ -607,7 +607,7 @@ class terrplant(object):
                 ('The total amount of runoff and spray to semi-aquatic areas must be a real number, not "%lbs ai/A"' %totaldry_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.NOAEC_for_listed_seedling_emergence_monocot < 0:
                 raise ValueError\
                 ('NOAEC_for_listed_seedling_emergence_monocot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_monocot)  
@@ -656,7 +656,7 @@ class terrplant(object):
                 ('The the amount of spray drift exposure areas must be a real number, not "%lbs ai/A"' %spray_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.NOAEC_for_listed_seedling_emergence_monocot < 0:
                 raise ValueError\
                 ('NOAEC_for_listed_seedling_emergence_monocot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_monocot)
@@ -705,7 +705,7 @@ class terrplant(object):
                 ('The total amount of runoff and spray to dry areas must be a real number, not "%lbs ai/A"' %totaldry_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.NOAEC_for_listed_seedling_emergence_dicot < 0:
                 raise ValueError\
                 ('NOAEC_for_listed_seedling_emergence_dicot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_dicot)
@@ -754,7 +754,7 @@ class terrplant(object):
                 ('The total amount of runoff and spray to semi-aquatic areas must be a real number, not "%lbs ai/A"' %totaldry)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.NOAEC_for_listed_seedling_emergence_dicot < 0:
                 raise ValueError\
                 ('NOAEC_for_listed_seedling_emergence_dicot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_dicot)
@@ -803,7 +803,7 @@ class terrplant(object):
                 ('The amount of spray drift exposure must be a real number, not "%lbs ai/A"' %spray_results)
             except ZeroDivisionError:
                 raise ZeroDivisionError\
-                ('The incorporation must be non-zero.')
+                ('The incorporation_depth must be non-zero.')
             if self.NOAEC_for_listed_seedling_emergence_dicot < 0:
                 raise ValueError\
                 ('NOAEC_for_listed_seedling_emergence_dicot=%g is a non-physical value' %self.NOAEC_for_listed_seedling_emergence_dicot)
