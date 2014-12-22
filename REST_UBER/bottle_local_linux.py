@@ -1,5 +1,5 @@
 """
-    Backend server script runnig Bottle, a lightweight Python server. 
+    Backend server script running Bottle, a lightweight Python server. 
     All incoming requests to the backend server are handled here including 
     model run execution and MongoDB querying. 
 
@@ -76,7 +76,7 @@ def enable_cors(fn):
     return _enable_cors
 
 def errorMessage(error, jid):
-    """Returns exeption error message as valid JSON string to caller"""
+    """Returns exception error message as valid JSON string to caller"""
     logging.exception(error)
     e = str(error)
     return {'user_id':'admin', 'result': {'error': e}, '_id':jid}
@@ -97,6 +97,7 @@ def terrplant_rest(jid):
             drift_fraction,ec25_nonlisted_seedling_emergence_monocot,ec25_nonlisted_seedling_emergence_dicot,
             noaec_listed_seedling_emergence_monocot,noaec_listed_seedling_emergence_dicot,chemical_name,
             pc_code,use,application_method,application_form,solubility)
+        print result
         # if (result):
         #     all_result[jid]['status']='done'
         #     all_result[jid]['input']=request.json
