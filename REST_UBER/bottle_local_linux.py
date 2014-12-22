@@ -94,8 +94,8 @@ def terrplant_rest(jid):
 
         from terrplant_rest import terrplant_model_rest
         result = terrplant_model_rest.terrplant(version_terrplant,run_type, application_rate, incorporation_depth, runoff_fraction, 
-            drift_fraction,EC25_for_nonlisted_seedling_emergence_monocot,EC25_for_nonlisted_seedling_emergence_dicot,
-            NOAEC_for_listed_seedling_emergence_monocot,NOAEC_for_listed_seedling_emergence_dicot,chemical_name,
+            drift_fraction,ec25_nonlisted_seedling_emergence_monocot,ec25_nonlisted_seedling_emergence_dicot,
+            noaec_listed_seedling_emergence_monocot,noaec_listed_seedling_emergence_dicot,chemical_name,
             pc_code,use,application_method,application_form,solubility)
         # if (result):
         #     all_result[jid]['status']='done'
@@ -116,6 +116,7 @@ def sip_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid,{}).setdefault('status','none')
+        
         from sip_rest import sip_model_rest
         result = sip_model_rest.sip(chemical_name, bodyweight_tested_bird, bodyweight_quail, bodyweight_duck, bodyweight_bird_other, 
                     bodyweight_rat, bodyweight_tested_mammal_other, species_tested_bird, species_tested_mammal, 
