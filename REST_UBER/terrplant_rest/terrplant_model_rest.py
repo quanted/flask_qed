@@ -27,29 +27,29 @@ class terrplant(object):
         self.totaldry_results = -1
         self.totalsemi_results = -1
         self.spray_results = -1
-        self.nmsRQdry_results = -1
+        self.nms_rq_dry_results = -1
         self.LOCnmsdry_results = ''
-        self.nmsRQsemi_results = -1
+        self.nms_rq_semi_results = -1
         self.LOCnmssemi_results = ''
-        self.nmsRQspray_results = -1
+        self.nms_rq_spray_results = -1
         self.LOCnmsspray_results = ''
-        self.lmsRQdry_results = -1
+        self.lms_rq_dry_results = -1
         self.LOClmsdry_results = ''
-        self.lmsRQsemi_results = -1
+        self.lms_rq_semi_results = -1
         self.LOClmssemi_results = ''
-        self.lmsRQspray_results = -1
+        self.lms_rq_spray_results = -1
         self.LOClmsspray_results = ''
-        self.ndsRQdry_results = -1
+        self.nds_rq_dry_results = -1
         self.LOCndsdry_results = ''
-        self.ndsRQsemi_results = -1
+        self.nds_rq_semi_results = -1
         self.LOCndssemi_results = ''
-        self.ndsRQspray_results = -1
+        self.nds_rq_spray_results = -1
         self.LOCndsspray_results = ''
-        self.ldsRQdry_results = -1
+        self.lds_rq_dry_results = -1
         self.LOCldsdry_results = ''
-        self.ldsRQsemi_results = -1
+        self.lds_rq_semi_results = -1
         self.LOCldssemi_results = ''
-        self.ldsRQspray_results = -1
+        self.lds_rq_spray_results = -1
         self.LOCldsspray_results = ''
 
         self.rundry_results_expected = -1
@@ -57,18 +57,18 @@ class terrplant(object):
         self.spray_results_expected = -1
         self.totaldry_results_expected = -1
         self.totalsemi_results_expected = -1
-        self.nmsRQdry_results_expected = -1
-        self.nmsRQsemi_results_expected = -1
-        self.nmsRQspray_results_expected = -1
-        self.lmsRQdry_results_expected = -1
-        self.lmsRQsemi_results_expected = -1
-        self.lmsRQspray_results_expected = -1
-        self.ndsRQdry_results_expected = -1
-        self.ndsRQsemi_results_expected = -1
-        self.ndsRQspray_results_expected = -1
-        self.ldsRQdry_results_expected = -1
-        self.ldsRQsemi_results_expected = -1
-        self.ldsRQspray_results_expected = -1
+        self.nms_rq_dry_results_expected = -1
+        self.nms_rq_semi_results_expected = -1
+        self.nms_rq_spray_results_expected = -1
+        self.lms_rq_dry_results_expected = -1
+        self.lms_rq_semi_results_expected = -1
+        self.lms_rq_spray_results_expected = -1
+        self.nds_rq_dry_results_expected = -1
+        self.nds_rq_semi_results_expected = -1
+        self.nds_rq_spray_results_expected = -1
+        self.lds_rq_dry_results_expected = -1
+        self.lds_rq_semi_results_expected = -1
+        self.lds_rq_spray_results_expected = -1
         self.run_methods()
 
     def run_methods(self):
@@ -78,18 +78,18 @@ class terrplant(object):
             self.spray()
             self.totaldry()
             self.totalsemi()
-            self.nmsRQdry()
-            self.nmsRQsemi()
-            self.nmsRQspray()
-            self.lmsRQdry()
-            self.lmsRQsemi()
-            self.lmsRQspray()
-            self.ndsRQdry()
-            self.ndsRQsemi()
-            self.ndsRQspray()
-            self.ldsRQdry()
-            self.ldsRQsemi()
-            self.ldsRQspray()
+            self.nms_rq_dry()
+            self.nms_rq_semi()
+            self.nms_rq_spray()
+            self.lms_rq_dry()
+            self.lms_rq_semi()
+            self.lms_rq_spray()
+            self.nds_rq_dry()
+            self.nds_rq_semi()
+            self.nds_rq_spray()
+            self.lds_rq_dry()
+            self.lds_rq_semi()
+            self.lds_rq_spray()
         except TypeError:
             print "Type Error: Your variables are not set correctly."
 
@@ -235,8 +235,8 @@ class terrplant(object):
 
     # Risk Quotient for NON-LISTED MONOCOT seedlings exposed to Pesticide X in a DRY area
 
-    def nmsRQdry(self):
-        if self.nmsRQdry_results == -1:
+    def nms_rq_dry(self):
+        if self.nms_rq_dry_results == -1:
             try:
                 self.ec25_nonlisted_seedling_emergence_monocot = float(self.ec25_nonlisted_seedling_emergence_monocot)
                 self.totaldry_results = float(self.totaldry_results)
@@ -260,8 +260,8 @@ class terrplant(object):
             if self.totaldry_results == None:
                 raise ValueError\
                 ('Either the totaldry_results variable equals None and therefor this function cannot be run.')
-            self.nmsRQdry_results = self.totaldry_results/self.ec25_nonlisted_seedling_emergence_monocot
-        return self.nmsRQdry_results
+            self.nms_rq_dry_results = self.totaldry_results/self.ec25_nonlisted_seedling_emergence_monocot
+        return self.nms_rq_dry_results
 
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide X in a dry area
@@ -269,16 +269,16 @@ class terrplant(object):
     def LOCnmsdry(self):
         if self.LOCnmsdry_results == '':
             try:
-                if self.nmsRQdry_results == -1:
+                if self.nms_rq_dry_results == -1:
                     try:
-                        self.nmsRQdry()
+                        self.nms_rq_dry()
                     except TypeError:
                         raise TypeError\
                         ('totaldry equals None and therefor this function cannot be run.')
-                if self.nmsRQdry_results == None:
+                if self.nms_rq_dry_results == None:
                     raise ValueError\
-                    ('nmsRQdry variable equals None and therefor this function cannot be run.')
-                elif self.nmsRQdry_results >= 1.0:
+                    ('nms_rq_dry variable equals None and therefor this function cannot be run.')
+                elif self.nms_rq_dry_results >= 1.0:
                     self.LOCnmsdry_results = ('The risk quotient for non-listed monocot seedlings exposed to'\
                     ' the pesticide via runoff to a dry area indicates a potential risk.')
                 else:
@@ -291,8 +291,8 @@ class terrplant(object):
 
     # Risk Quotient for NON-LISTED MONOCOT seedlings exposed to Pesticide X in a SEMI-AQUATIC area
 
-    def nmsRQsemi(self):
-        if self.nmsRQsemi_results == -1:
+    def nms_rq_semi(self):
+        if self.nms_rq_semi_results == -1:
             try:
                 self.ec25_nonlisted_seedling_emergence_monocot = float(self.ec25_nonlisted_seedling_emergence_monocot)
                 self.totalsemi_results = float(self.totalsemi_results)
@@ -316,22 +316,22 @@ class terrplant(object):
             if self.totalsemi_results == None:
                 raise ValueError\
                 ('Either the totaldry_results variable equals None and therefor this function cannot be run.')
-            self.nmsRQsemi_results = self.totalsemi_results/self.ec25_nonlisted_seedling_emergence_monocot
-        return self.nmsRQsemi_results
+            self.nms_rq_semi_results = self.totalsemi_results/self.ec25_nonlisted_seedling_emergence_monocot
+        return self.nms_rq_semi_results
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide X in a semi-aquatic area
     def LOCnmssemi(self):
         if self.LOCnmssemi_results == '':
-            if self.nmsRQsemi_results == -1:
+            if self.nms_rq_semi_results == -1:
                 try:
-                    self.nmsRQsemi()
+                    self.nms_rq_semi()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.nmsRQsemi_results == None:
+            if self.nms_rq_semi_results == None:
                 raise ValueError\
-                ('nmsRQsemi variable equals None and therefor this function cannot be run.')
-            if self.nmsRQsemi_results >= 1.0:
+                ('nms_rq_semi variable equals None and therefor this function cannot be run.')
+            if self.nms_rq_semi_results >= 1.0:
                 self.LOCnmssemi_results = ('The risk quotient for non-listed monocot seedlings exposed to'\
             ' the pesticide via runoff to a semi-aquatic area indicates a potential risk.')
             else:
@@ -341,8 +341,8 @@ class terrplant(object):
 
 
     # Risk Quotient for NON-LISTED MONOCOT seedlings exposed to Pesticide X via SPRAY drift
-    def nmsRQspray(self):
-        if self.nmsRQspray_results == -1:
+    def nms_rq_spray(self):
+        if self.nms_rq_spray_results == -1:
             try:
                 self.ec25_nonlisted_seedling_emergence_monocot = float(self.ec25_nonlisted_seedling_emergence_monocot)
                 self.spray_results = float(self.spray_results)
@@ -363,22 +363,22 @@ class terrplant(object):
             if self.spray_results == None:
                 raise ValueError\
                 ('Either the spray_results variable equals None and therefor this function cannot be run.')
-            self.nmsRQspray_results = self.spray_results/self.ec25_nonlisted_seedling_emergence_monocot
-        return self.nmsRQspray_results
+            self.nms_rq_spray_results = self.spray_results/self.ec25_nonlisted_seedling_emergence_monocot
+        return self.nms_rq_spray_results
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide via spray drift
     def LOCnmsspray(self):
         if self.LOCnmsspray_results == '':
-            if self.nmsRQspray_results == -1:
+            if self.nms_rq_spray_results == -1:
                 try:
-                    self.nmsRQspray()
+                    self.nms_rq_spray()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.nmsRQspray_results == None:
+            if self.nms_rq_spray_results == None:
                 raise ValueError\
-                ('nmsRQspray_results variable equals None and therefor this function cannot be run.')
-            if self.nmsRQspray_results >= 1.0:
+                ('nms_rq_spray_results variable equals None and therefor this function cannot be run.')
+            if self.nms_rq_spray_results >= 1.0:
                 self.LOCnmsspray_results = ('The risk quotient for non-listed monocot seedlings exposed to'\
             ' the pesticide via spray drift indicates a potential risk.')
             else:
@@ -388,8 +388,8 @@ class terrplant(object):
 
 
     # Risk Quotient for LISTED MONOCOT seedlings exposed to Pesticide X in a DRY areas
-    def lmsRQdry(self):
-        if self.lmsRQdry_results == -1:
+    def lms_rq_dry(self):
+        if self.lms_rq_dry_results == -1:
             try:
                 self.ec25_nonlisted_seedling_emergence_dicot = float(self.ec25_nonlisted_seedling_emergence_dicot)
                 self.totaldry_results = float(self.totaldry_results)
@@ -414,23 +414,23 @@ class terrplant(object):
             if self.totaldry_results == None:
                 raise ValueError\
                 ('Either the spray_results variable equals None and therefor this function cannot be run.')
-            self.lmsRQdry_results = self.totaldry_results/self.ec25_nonlisted_seedling_emergence_dicot
-        return self.lmsRQdry_results
+            self.lms_rq_dry_results = self.totaldry_results/self.ec25_nonlisted_seedling_emergence_dicot
+        return self.lms_rq_dry_results
 
     # Level of concern for listed monocot seedlings exposed to pesticide
     #  via runoff in a dry area
     def LOClmsdry(self):
         if self.LOClmsdry_results == '':
-            if self.lmsRQdry_results == -1:
+            if self.lms_rq_dry_results == -1:
                 try:
-                    self.lmsRQdry()
+                    self.lms_rq_dry()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.lmsRQdry_results == None:
+            if self.lms_rq_dry_results == None:
                 raise ValueError\
-                ('lmsRQdry_results variable equals None and therefor this function cannot be run.')
-            if self.lmsRQdry_results >= 1.0:
+                ('lms_rq_dry_results variable equals None and therefor this function cannot be run.')
+            if self.lms_rq_dry_results >= 1.0:
                 self.LOClmsdry_results = ('The risk quotient for listed monocot seedlings exposed to'\
             ' the pesticide via runoff to a dry area indicates a potential risk.')
             else:
@@ -440,8 +440,8 @@ class terrplant(object):
 
 
     # Risk Quotient for LISTED MONOCOT seedlings exposed to Pesticide X in a SEMI-AQUATIC area
-    def lmsRQsemi(self):
-        if self.lmsRQsemi_results == -1:
+    def lms_rq_semi(self):
+        if self.lms_rq_semi_results == -1:
             try:
                 self.ec25_nonlisted_seedling_emergence_dicot = float(self.ec25_nonlisted_seedling_emergence_dicot)
                 self.totalsemi_results = float(self.totalsemi_results)
@@ -466,22 +466,22 @@ class terrplant(object):
             if self.totalsemi_results == None:
                 raise ValueError\
                 ('Either the totalsemi_results variable equals None and therefor this function cannot be run.')
-            self.lmsRQsemi_results = self.totalsemi_results/self.ec25_nonlisted_seedling_emergence_dicot
-        return self.lmsRQsemi_results
+            self.lms_rq_semi_results = self.totalsemi_results/self.ec25_nonlisted_seedling_emergence_dicot
+        return self.lms_rq_semi_results
 
     # Level of concern for listed monocot seedlings exposed to pesticide X in semi-aquatic areas
     def LOClmssemi(self):
         if self.LOClmssemi_results == '':
-            if self.lmsRQsemi_results == -1:
+            if self.lms_rq_semi_results == -1:
                 try:
-                    self.lmsRQsemi()
+                    self.lms_rq_semi()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.lmsRQsemi_results == None:
+            if self.lms_rq_semi_results == None:
                 raise ValueError\
-                ('lmsRQsemi variable equals None and therefor this function cannot be run.')
-            if self.lmsRQsemi_results >= 1.0:
+                ('lms_rq_semi variable equals None and therefor this function cannot be run.')
+            if self.lms_rq_semi_results >= 1.0:
                 self.LOClmssemi_results = ('The risk quotient for listed monocot seedlings exposed to'\
             ' the pesticide via runoff to a semi-aquatic area indicates a potential risk.')
             else:
@@ -491,8 +491,8 @@ class terrplant(object):
 
 
     # Risk Quotient for LISTED MONOCOT seedlings exposed to Pesticide X via SPRAY drift
-    def lmsRQspray(self):
-        if self.lmsRQspray_results == -1:
+    def lms_rq_spray(self):
+        if self.lms_rq_spray_results == -1:
             try:
                 self.ec25_nonlisted_seedling_emergence_dicot = float(self.ec25_nonlisted_seedling_emergence_dicot)
                 self.spray_results = float(self.spray_results)
@@ -516,22 +516,22 @@ class terrplant(object):
             if self.spray_results == None:
                 raise ValueError\
                 ('The spray_results variable equals None and therefor this function cannot be run.')
-            self.lmsRQspray_results = self.spray_results/self.ec25_nonlisted_seedling_emergence_dicot
-        return self.lmsRQspray_results
+            self.lms_rq_spray_results = self.spray_results/self.ec25_nonlisted_seedling_emergence_dicot
+        return self.lms_rq_spray_results
 
     # Level of concern for listed monocot seedlings exposed to pesticide X via spray drift
     def LOClmsspray(self):
         if self.LOClmsspray_results == '':
-            if self.lmsRQspray_results == -1:
+            if self.lms_rq_spray_results == -1:
                 try:
-                    self.lmsRQspray()
+                    self.lms_rq_spray()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.lmsRQspray_results == None:
+            if self.lms_rq_spray_results == None:
                 raise ValueError\
-                ('lmsRQspray variable equals None and therefor this function cannot be run.')
-            if self.lmsRQspray_results >= 1.0:
+                ('lms_rq_spray variable equals None and therefor this function cannot be run.')
+            if self.lms_rq_spray_results >= 1.0:
                 self.LOClmsspray_results = ('The risk quotient for listed monocot seedlings exposed to'\
             ' the pesticide via spray drift indicates a potential risk.')
             else:
@@ -541,8 +541,8 @@ class terrplant(object):
 
 
     # Risk Quotient for NON-LISTED DICOT seedlings exposed to Pesticide X in DRY areas
-    def ndsRQdry(self):
-        if self.ndsRQdry_results == -1:
+    def nds_rq_dry(self):
+        if self.nds_rq_dry_results == -1:
             try:
                 self.noaec_listed_seedling_emergence_monocot = float(self.noaec_listed_seedling_emergence_monocot)
                 self.totaldry_results = float(self.totaldry_results)
@@ -566,22 +566,22 @@ class terrplant(object):
             if self.totaldry_results == None:
                 raise ValueError\
                 ('The totaldry_results variable equals None and therefor this function cannot be run.')
-            self.ndsRQdry_results = self.totaldry_results/self.noaec_listed_seedling_emergence_monocot
-        return self.ndsRQdry_results
+            self.nds_rq_dry_results = self.totaldry_results/self.noaec_listed_seedling_emergence_monocot
+        return self.nds_rq_dry_results
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X in dry areas
     def LOCndsdry(self):
         if self.LOCndsdry_results == '':
-            if self.ndsRQdry_results == -1:
+            if self.nds_rq_dry_results == -1:
                 try:
-                    self.ndsRQdry()
+                    self.nds_rq_dry()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.ndsRQdry_results == None:
+            if self.nds_rq_dry_results == None:
                 raise ValueError\
-                ('ndsRQdry_results variable equals None and therefor this function cannot be run.')
-            if self.ndsRQdry_results >= 1.0:
+                ('nds_rq_dry_results variable equals None and therefor this function cannot be run.')
+            if self.nds_rq_dry_results >= 1.0:
                 self.LOCndsdry_results = ('The risk quotient for non-listed monocot seedlings exposed to'\
             ' the pesticide via runoff to dry areas indicates a potential risk.')
             else:
@@ -591,8 +591,8 @@ class terrplant(object):
 
 
     # Risk Quotient for NON-LISTED DICOT seedlings exposed to Pesticide X in SEMI-AQUATIC areas
-    def ndsRQsemi(self):
-        if self.ndsRQsemi_results == -1:
+    def nds_rq_semi(self):
+        if self.nds_rq_semi_results == -1:
             try:
                 self.noaec_listed_seedling_emergence_monocot = float(self.noaec_listed_seedling_emergence_monocot)
                 self.totalsemi_results = float(self.totalsemi_results)
@@ -616,22 +616,22 @@ class terrplant(object):
             if self.totaldry_results == None:
                 raise ValueError\
                 ('The totalsemi_results variable equals None and therefor this function cannot be run.')
-            self.ndsRQsemi_results = self.totalsemi_results/self.noaec_listed_seedling_emergence_monocot
-        return self.ndsRQsemi_results
+            self.nds_rq_semi_results = self.totalsemi_results/self.noaec_listed_seedling_emergence_monocot
+        return self.nds_rq_semi_results
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X in semi-aquatic areas
     def LOCndssemi(self):
         if self.LOCndssemi_results == '':
-            if self.ndsRQsemi_results == -1:
+            if self.nds_rq_semi_results == -1:
                 try:
-                    self.ndsRQsemi()
+                    self.nds_rq_semi()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.ndsRQsemi_results == None:
+            if self.nds_rq_semi_results == None:
                 raise ValueError\
-                ('ndsRQsemi_results variable equals None and therefor this function cannot be run.')
-            if self.ndsRQsemi_results >= 1.0:
+                ('nds_rq_semi_results variable equals None and therefor this function cannot be run.')
+            if self.nds_rq_semi_results >= 1.0:
                 self.LOCndssemi_results = ('The risk quotient for non-listed monocot seedlings exposed to'\
             ' the pesticide via runoff to semi-aquatic areas indicates a potential risk.')
             else:
@@ -640,8 +640,8 @@ class terrplant(object):
         return self.LOCndssemi_results
 
     # Risk Quotient for NON-LISTED DICOT seedlings exposed to Pesticide X via SPRAY drift
-    def ndsRQspray(self):
-        if self.ndsRQspray_results == -1:
+    def nds_rq_spray(self):
+        if self.nds_rq_spray_results == -1:
             try:
                 self.noaec_listed_seedling_emergence_monocot = float(self.noaec_listed_seedling_emergence_monocot)
                 self.spray_results = float(self.spray_results)
@@ -665,22 +665,22 @@ class terrplant(object):
             if self.spray_results == None:
                 raise ValueError\
                 ('The spray_results variable equals None and therefor this function cannot be run.')
-            self.ndsRQspray_results = self.spray_results/self.noaec_listed_seedling_emergence_monocot
-        return self.ndsRQspray_results
+            self.nds_rq_spray_results = self.spray_results/self.noaec_listed_seedling_emergence_monocot
+        return self.nds_rq_spray_results
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X via spray drift
     def LOCndsspray(self):
         if self.LOCndssemi_results == '':
-            if self.ndsRQspray_results == -1:
+            if self.nds_rq_spray_results == -1:
                 try:
-                    self.ndsRQspray()
+                    self.nds_rq_spray()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.ndsRQspray_results == None:
+            if self.nds_rq_spray_results == None:
                 raise ValueError\
-                ('ndsRQspray_results variable equals None and therefor this function cannot be run.')
-            if self.ndsRQspray_results >= 1.0:
+                ('nds_rq_spray_results variable equals None and therefor this function cannot be run.')
+            if self.nds_rq_spray_results >= 1.0:
                 self.LOCndssemi_results = ('The risk quotient for non-listed monocot seedlings exposed to'\
             ' the pesticide via spray drift indicates a potential risk.')
             else:
@@ -689,8 +689,8 @@ class terrplant(object):
         return self.LOCndssemi_results
 
     # Risk Quotient for LISTED DICOT seedlings exposed to Pesticide X in DRY areas
-    def ldsRQdry(self):
-        if self.ldsRQdry_results == -1:
+    def lds_rq_dry(self):
+        if self.lds_rq_dry_results == -1:
             try:
                 self.noaec_listed_seedling_emergence_dicot = float(self.noaec_listed_seedling_emergence_dicot)
                 self.totaldry_results = float(self.totaldry_results)
@@ -714,22 +714,22 @@ class terrplant(object):
             if self.totaldry_results == None:
                 raise ValueError\
                 ('The totaldry_results variable equals None and therefor this function cannot be run.')
-            self.ldsRQdry_results = self.totaldry_results/self.noaec_listed_seedling_emergence_dicot
-        return self.ldsRQdry_results
+            self.lds_rq_dry_results = self.totaldry_results/self.noaec_listed_seedling_emergence_dicot
+        return self.lds_rq_dry_results
 
     # Level of concern for listed dicot seedlings exposed to pesticideX in dry areas
     def LOCldsdry(self):
         if self.LOCldsdry_results == '':
-            if self.ldsRQdry_results == -1:
+            if self.lds_rq_dry_results == -1:
                 try:
-                    self.ldsRQdry()
+                    self.lds_rq_dry()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.ldsRQdry_results == None:
+            if self.lds_rq_dry_results == None:
                 raise ValueError\
-                ('ldsRQdry_results variable equals None and therefor this function cannot be run.')
-            if self.ldsRQdry_results >= 1.0:
+                ('lds_rq_dry_results variable equals None and therefor this function cannot be run.')
+            if self.lds_rq_dry_results >= 1.0:
                 self.LOCldsdry_results = ('The risk quotient for listed monocot seedlings exposed to'\
             ' the pesticide via runoff to dry areas indicates a potential risk.')
             else:
@@ -738,8 +738,8 @@ class terrplant(object):
         return self.LOCldsdry_results
 
     # Risk Quotient for LISTED DICOT seedlings exposed to Pesticide X in SEMI-AQUATIC areas
-    def ldsRQsemi(self):
-        if self.ldsRQsemi_results == -1:
+    def lds_rq_semi(self):
+        if self.lds_rq_semi_results == -1:
             try:
                 self.noaec_listed_seedling_emergence_dicot = float(self.noaec_listed_seedling_emergence_dicot)
                 self.totalsemi_results = float(self.totalsemi_results)
@@ -763,22 +763,22 @@ class terrplant(object):
             if self.totalsemi_results == None:
                 raise ValueError\
                 ('The totalsemi_results variable equals None and therefor this function cannot be run.')
-            self.ldsRQsemi_results = self.totalsemi_results/self.noaec_listed_seedling_emergence_dicot
-        return self.ldsRQsemi_results
+            self.lds_rq_semi_results = self.totalsemi_results/self.noaec_listed_seedling_emergence_dicot
+        return self.lds_rq_semi_results
 
     # Level of concern for listed dicot seedlings exposed to pesticide X in dry areas
     def LOCldssemi(self):
         if self.LOCldssemi_results == '':
-            if self.ldsRQsemi_results == -1:
+            if self.lds_rq_semi_results == -1:
                 try:
-                    self.ldsRQsemi()
+                    self.lds_rq_semi()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.ldsRQsemi_results == None:
+            if self.lds_rq_semi_results == None:
                 raise ValueError\
-                ('ldsRQsemi_results variable equals None and therefor this function cannot be run.')
-            if self.ldsRQsemi_results >= 1.0:
+                ('lds_rq_semi_results variable equals None and therefor this function cannot be run.')
+            if self.lds_rq_semi_results >= 1.0:
                 self.LOCldssemi_results = ('The risk quotient for listed monocot seedlings exposed to'\
             ' the pesticide via runoff to semi-aquatic areas indicates a potential risk.')
             else:
@@ -787,8 +787,8 @@ class terrplant(object):
         return self.LOCldssemi_results
 
     # Risk Quotient for LISTED DICOT seedlings exposed to Pesticide X via SPRAY drift
-    def ldsRQspray(self):
-        if self.ldsRQspray_results == -1:
+    def lds_rq_spray(self):
+        if self.lds_rq_spray_results == -1:
             try:
                 self.noaec_listed_seedling_emergence_dicot = float(self.noaec_listed_seedling_emergence_dicot)
                 self.spray_results = float(self.spray_results)
@@ -812,22 +812,22 @@ class terrplant(object):
             if self.spray_results == None:
                 raise ValueError\
                 ('The spray_results variable equals None and therefor this function cannot be run.')
-            self.ldsRQspray_results = self.spray_results/self.noaec_listed_seedling_emergence_dicot
-        return self.ldsRQspray_results
+            self.lds_rq_spray_results = self.spray_results/self.noaec_listed_seedling_emergence_dicot
+        return self.lds_rq_spray_results
 
     # Level of concern for listed dicot seedlings exposed to pesticide X via spray drift
     def LOCldsspray(self):
         if self.LOCldsspray_results == '':
-            if self.ldsRQspray_results == -1:
+            if self.lds_rq_spray_results == -1:
                 try:
-                    self.ldsRQspray()
+                    self.lds_rq_spray()
                 except TypeError:
                     raise TypeError\
                     ('totaldry equals None and therefor this function cannot be run.')
-            if self.ldsRQspray_results == None:
+            if self.lds_rq_spray_results == None:
                 raise ValueError\
-                ('ldsRQspray_results variable equals None and therefor this function cannot be run.')
-            if self.ldsRQspray_results >= 1.0:
+                ('lds_rq_spray_results variable equals None and therefor this function cannot be run.')
+            if self.lds_rq_spray_results >= 1.0:
                 self.LOCldsspray_results = ('The risk quotient for listed monocot seedlings exposed to'\
             ' the pesticide via spray drift indicates a potential risk.')
             else:
