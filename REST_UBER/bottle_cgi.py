@@ -1,3 +1,11 @@
+"""
+    Backend server script runnig Bottle, a lightweight Python server. 
+    All incoming requests to the backend server are handled here including 
+    model run execution and MongoDB querying. 
+
+    Requires MongoDB installed and running on its default port (27017).
+"""
+
 import bottle
 from bottle import route, run, debug, post, request, auth_basic, abort, error
 # Needed for apache/mod_wsgi/nginx/uwsgi
@@ -9,6 +17,7 @@ import os, sys
 import boto.utils
 import json
 import warnings
+import logging
 
 print repr(sys.path)
 
