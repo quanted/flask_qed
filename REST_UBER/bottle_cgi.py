@@ -18,6 +18,7 @@ import boto.utils
 import json
 import warnings
 import logging
+import pandas as pd
 
 print repr(sys.path)
 
