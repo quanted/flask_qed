@@ -66,20 +66,63 @@ def errorMessage(error, jid):
 @route('/terrplant/<jid>', method='POST') 
 # @auth_basic(check)
 def terrplant_rest(jid):
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #         # print k, v
+    #     all_result.setdefault(jid,{}).setdefault('status','none')
+
+    #     from terrplant_rest import terrplant_model_rest
+    #     result = terrplant_model_rest.terrplant(version_terrplant,run_type,A,I,R,D,nms,lms,nds,lds,chemical_name,pc_code,use,application_method,application_form,solubility)
+    #     if (result):
+    #         all_result[jid]['status']='done'
+    #         all_result[jid]['input']=request.json
+    #         all_result[jid]['result']=result
+
+    #     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+
     try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-            # print k, v
-        all_result.setdefault(jid,{}).setdefault('status','none')
-
         from terrplant_rest import terrplant_model_rest
-        result = terrplant_model_rest.terrplant(version_terrplant,run_type,A,I,R,D,nms,lms,nds,lds,chemical_name,pc_code,use,application_method,application_form,solubility)
-        if (result):
-            all_result[jid]['status']='done'
-            all_result[jid]['input']=request.json
-            all_result[jid]['result']=result
+        # for k, v in request.json.iteritems():
+        #     exec '%s = v' % k
+            # print k, v
+        # all_result.setdefault(jid,{}).setdefault('status','none')
+        logging.info(json.dumps(request.json))
+        logging.info(type(request.json))
 
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+        try:
+            run_type = request.json["run_type"]
+        except KeyError, e:
+            return errorMessage(e, jid)
+
+        if run_type == "qaqc":
+            logging.info('============= QAQC Run =============')
+
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+
+            result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, pd_obj_exp).json
+
+        elif run_type == "batch":
+            logging.info('============= Batch Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+
+        else:
+            logging.info('============= Single Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+
+        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+        inputs_json = json.loads(result_json_tuple[0])
+        outputs_json = json.loads(result_json_tuple[1])
+        exp_out_json = json.loads(result_json_tuple[2])
+
+        return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
     except Exception, e:
         return errorMessage(e, jid)
 
