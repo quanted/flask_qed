@@ -651,7 +651,7 @@ def insert_model_obj():
 
 
 @route('/get_model_object', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_model_object():
     """
         Return model object from MongoDB to be loaded into view (e.g. Django)
@@ -668,7 +668,7 @@ def get_model_object():
 
 
 @route('/update_html', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def update_output_html():
     """
     DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB
