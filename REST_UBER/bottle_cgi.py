@@ -206,7 +206,7 @@ def sip_rest(jid):
     #     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     # except Exception, e:
     #     return errorMessage(e, jid)
-    return return model_caller('sip', jid)
+    return model_caller('sip', jid)
 
 ##################################sip#############################################
 
