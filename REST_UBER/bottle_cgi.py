@@ -72,6 +72,56 @@ def errorMessage(error, jid):
     e = str(error)
     return {'user_id':'admin', 'result': {'error': e}, '_id':jid}
 
+
+def model_caller(model, jid):
+    """
+        Method to call the model Python modules
+    """
+    try:
+        import importlib
+        # Dynamically import the model Python module
+        model_module = importlib.import_module('.'+model+'_model_rest', model+'_rest')
+        # Set the model Object to a local variable (class name = model)
+        model_object = getattr(model_module, model)
+        
+        logging.info(json.dumps(request.json))
+        logging.info(type(request.json))
+
+        try:
+            run_type = request.json["run_type"]
+        except KeyError, e:
+            return errorMessage(e, jid)
+
+        if run_type == "qaqc":
+            logging.info('============= QAQC Run =============')
+
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, pd_obj_exp).json
+
+        elif run_type == "batch":
+            logging.info('============= Batch Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, None).json
+
+        else:
+            logging.info('============= Single Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, None).json
+
+        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+        inputs_json = json.loads(result_json_tuple[0])
+        outputs_json = json.loads(result_json_tuple[1])
+        exp_out_json = json.loads(result_json_tuple[2])
+
+        return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+
+    except Exception, e:
+        return errorMessage(e, jid)
+
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
 # @auth_basic(check)
@@ -93,48 +143,49 @@ def terrplant_rest(jid):
     # except Exception, e:
     #     return errorMessage(e, jid)
 
-    try:
-        from terrplant_rest import terrplant_model_rest
-        # for k, v in request.json.iteritems():
-        #     exec '%s = v' % k
-            # print k, v
-        # all_result.setdefault(jid,{}).setdefault('status','none')
-        logging.info(json.dumps(request.json))
-        logging.info(type(request.json))
+    # try:
+    #     from terrplant_rest import terrplant_model_rest
+    #     # for k, v in request.json.iteritems():
+    #     #     exec '%s = v' % k
+    #         # print k, v
+    #     # all_result.setdefault(jid,{}).setdefault('status','none')
+    #     logging.info(json.dumps(request.json))
+    #     logging.info(type(request.json))
 
-        try:
-            run_type = request.json["run_type"]
-        except KeyError, e:
-            return errorMessage(e, jid)
+    #     try:
+    #         run_type = request.json["run_type"]
+    #     except KeyError, e:
+    #         return errorMessage(e, jid)
 
-        if run_type == "qaqc":
-            logging.info('============= QAQC Run =============')
+    #     if run_type == "qaqc":
+    #         logging.info('============= QAQC Run =============')
 
-            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
-            pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+    #         pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
 
-            result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, pd_obj_exp).json
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, pd_obj_exp).json
 
-        elif run_type == "batch":
-            logging.info('============= Batch Run =============')
-            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+    #     elif run_type == "batch":
+    #         logging.info('============= Batch Run =============')
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
 
-            result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
 
-        else:
-            logging.info('============= Single Run =============')
-            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+    #     else:
+    #         logging.info('============= Single Run =============')
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
 
-            result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
 
-        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
-        inputs_json = json.loads(result_json_tuple[0])
-        outputs_json = json.loads(result_json_tuple[1])
-        exp_out_json = json.loads(result_json_tuple[2])
+    #     # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+    #     inputs_json = json.loads(result_json_tuple[0])
+    #     outputs_json = json.loads(result_json_tuple[1])
+    #     exp_out_json = json.loads(result_json_tuple[2])
 
-        return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
-    except Exception, e:
-        return errorMessage(e, jid)
+    #     return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('terrplant', jid)
 
 ##################################terrplant#############################################
 
@@ -142,19 +193,20 @@ def terrplant_rest(jid):
 @route('/sip/<jid>', method='POST') 
 # @auth_basic(check)
 def sip_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid,{}).setdefault('status','none')
-        from sip_rest import sip_model_rest
-        result = sip_model_rest.sip(chemical_name, bw_bird, bw_quail, bw_duck, bwb_other, bw_rat, bwm_other, b_species, m_species, bw_mamm, sol, ld50_a, ld50_m, aw_bird, mineau, aw_mamm, noaec, noael)
-        if (result):
-            all_result[jid]['status']='done'
-            all_result[jid]['input']=request.json
-            all_result[jid]['result']=result
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid,{}).setdefault('status','none')
+    #     from sip_rest import sip_model_rest
+    #     result = sip_model_rest.sip(chemical_name, bw_bird, bw_quail, bw_duck, bwb_other, bw_rat, bwm_other, b_species, m_species, bw_mamm, sol, ld50_a, ld50_m, aw_bird, mineau, aw_mamm, noaec, noael)
+    #     if (result):
+    #         all_result[jid]['status']='done'
+    #         all_result[jid]['input']=request.json
+    #         all_result[jid]['result']=result
+    #     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return return model_caller('sip', jid)
 
 ##################################sip#############################################
 

@@ -7,7 +7,6 @@ class terrplant(object):
         # logging.info(pd_obj)
 
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
-        # self.run_type = pd_obj['run_type'][0]
         self.run_type = run_type
         
         self.version_terrplant = pd_obj['version_terrplant']
@@ -64,7 +63,7 @@ class terrplant(object):
 
 
         # Now that the output member variables are defined, run the model methods
-        self.run_methods(pd_obj)
+        self.run_methods()
         
 
         # Create DataFrame containing output value Series
@@ -122,7 +121,7 @@ class terrplant(object):
 
 
     # Begin model methods
-    def run_methods(self, pd_obj):
+    def run_methods(self):
         
         try:
             self.rundry()
