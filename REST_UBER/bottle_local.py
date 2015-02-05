@@ -22,6 +22,7 @@ from boto.s3.bucket import Bucket
 import os
 import json
 import warnings
+import pandas as pd
 
 # Enable console logging
 bottle.debug(True)
@@ -82,26 +83,99 @@ def errorMessage(error, jid):
     return {'user_id':'admin', 'result': {'error': e}, '_id':jid}
 
 
+def model_caller(model, jid):
+    """
+        Method to call the model Python modules
+    """
+    try:
+        import importlib
+        # Dynamically import the model Python module
+        model_module = importlib.import_module('.'+model+'_model_rest', model+'_rest')
+        # Set the model Object to a local variable (class name = model)
+        model_object = getattr(model_module, model)
+        
+        logging.info(json.dumps(request.json))
+        logging.info(type(request.json))
+
+        try:
+            run_type = request.json["run_type"]
+        except KeyError, e:
+            return errorMessage(e, jid)
+
+        if run_type == "qaqc":
+            logging.info('============= QAQC Run =============')
+
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, pd_obj_exp).json
+
+        elif run_type == "batch":
+            logging.info('============= Batch Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, None).json
+
+        else:
+            logging.info('============= Single Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, None).json
+
+        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+        inputs_json = json.loads(result_json_tuple[0])
+        outputs_json = json.loads(result_json_tuple[1])
+        exp_out_json = json.loads(result_json_tuple[2])
+
+        return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+
+    except Exception, e:
+        return errorMessage(e, jid)
+
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
 @auth_basic(check)
 def terrplant_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-            # print k, v
-        all_result.setdefault(jid,{}).setdefault('status','none')
+    # try:
+    #     from terrplant_rest import terrplant_model_rest
+        
+    #     logging.info(json.dumps(request.json))
+    #     logging.info(type(request.json))
 
-        from terrplant_rest import terrplant_model_rest
-        result = terrplant_model_rest.terrplant(version_terrplant,run_type,A,I,R,D,nms,lms,nds,lds,chemical_name,pc_code,use,application_method,application_form,solubility)
-        # if (result):
-        #     all_result[jid]['status']='done'
-        #     all_result[jid]['input']=request.json
-        #     all_result[jid]['result']=result
+    #     try:
+    #         run_type = request.json["run_type"]
+    #     except KeyError, e:
+    #         return errorMessage(e, jid)
 
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    #     if run_type == "qaqc":
+    #         logging.info('============= QAQC Run =============')
+
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+    #         pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, pd_obj_exp).json
+
+    #     elif run_type == "batch":
+    #         logging.info('============= Batch Run =============')
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+
+    #     else:
+    #         logging.info('============= Single Run =============')
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+
+    #     # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+    #     inputs_json = json.loads(result_json_tuple[0])
+    #     outputs_json = json.loads(result_json_tuple[1])
+    #     exp_out_json = json.loads(result_json_tuple[2])
+
+    #     return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('terrplant', jid)
         
 ##################################terrplant#############################################
 
@@ -109,19 +183,20 @@ def terrplant_rest(jid):
 @route('/sip/<jid>', method='POST') 
 @auth_basic(check)
 def sip_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid,{}).setdefault('status','none')
-        from sip_rest import sip_model_rest
-        result = sip_model_rest.sip(chemical_name, bw_bird, bw_quail, bw_duck, bwb_other, bw_rat, bwm_other, b_species, m_species, bw_mamm, sol, ld50_a, ld50_m, aw_bird, mineau, aw_mamm, noaec, noael)
-        # if (result):
-        #     all_result[jid]['status']='done'
-        #     all_result[jid]['input']=request.json
-        #     all_result[jid]['result']=result
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid,{}).setdefault('status','none')
+    #     from sip_rest import sip_model_rest
+    #     result = sip_model_rest.sip(chemical_name, bw_bird, bw_quail, bw_duck, bwb_other, bw_rat, bwm_other, b_species, m_species, bw_mamm, sol, ld50_a, ld50_m, aw_bird, mineau, aw_mamm, noaec, noael)
+    #     # if (result):
+    #     #     all_result[jid]['status']='done'
+    #     #     all_result[jid]['input']=request.json
+    #     #     all_result[jid]['result']=result
+    #     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('sip', jid)
 
 ##################################sip#############################################
 
@@ -328,16 +403,18 @@ def geneec_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid,{}).setdefault('status','none')
-        from geneec_rest import gfix
-        # print request.json
-        result = gfix.geneec2(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
+        # from geneec_rest import gfix
+        # # print request.json
+        # result = gfix.geneec2(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
+        from geneec_rest import geneec_model_rest
+        result = geneec_model_rest.geneec(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
 
         # if (result):
             # all_result[jid]['status']='done'
             # all_result[jid]['input']=request.json
             # all_result[jid]['result']=result
 
-        return {'user_id':'admin', 'result': result, '_id':jid}
+        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
         return errorMessage(e, jid)
 
@@ -538,7 +615,7 @@ def pfam_rest(jid):
                noa,dd_out,mm_out,ma_out,sr_out,weather,wea_l,nof,date_f1,nod_out,fl_out,wl_out,ml_out,to_out,
                zero_height_ref,days_zero_full,days_zero_removal,max_frac_cov,mas_tras_cof,leak,ref_d,ben_d,
                ben_por,dry_bkd,foc_wat,foc_ben,ss,wat_c_doc,chl,dfac,q10,area_app)
-        return {'user_id':'admin', 'result': result, '_id':jid}
+        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     except Exception, e:
         return errorMessage(e, jid)
     
@@ -786,6 +863,45 @@ def ore_rest_query(query):
 
     # return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     return {"result": result}
+
+
+@route('/test/', method='POST') 
+def test_rest():
+
+    # PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+    # csv = os.path.join(PROJECT_ROOT, 'test_rest', 'pandas_test.csv')
+
+    import pandas as pd
+
+    # pd_obj = pd.read_csv(csv, header=None, index_col=0)
+
+    try:
+        # for k, v in request.json.iteritems():
+        #     exec '%s = v' % k
+
+        print request.json
+        print type(json.dumps(request.json))
+
+        pd_obj = pd.io.json.read_json(json.dumps(request.json), orient='index')
+
+        from test_rest import test_model_rest
+        result = test_model_rest.test(pd_obj)
+
+        print "================================="
+        print result.pd_obj
+        print "================================="
+
+        pd_obj_json = result.pd_obj.to_json(orient='index')
+
+        print "================================="
+        print pd_obj_json
+        print "================================="
+
+        # return {'result': result.__dict__}
+        return {'result': pd_obj_json}
+    except Exception, e:
+        return errorMessage(e, 'TEST_RUN')
+
 
 
 """
