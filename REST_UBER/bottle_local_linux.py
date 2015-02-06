@@ -103,10 +103,11 @@ def model_caller(model, jid):
 
         if run_type == "qaqc":
             logging.info('============= QAQC Run =============')
-
             pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            logging.info(pd_obj)
             pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
-
+            logging.info(pd_obj_exp)
+            logging.info(run_type)
             result_json_tuple = model_object(run_type, pd_obj, pd_obj_exp).json
 
         elif run_type == "batch":
@@ -130,6 +131,7 @@ def model_caller(model, jid):
 
     except Exception, e:
         logging.info("ERROR!!!!!!!!!!!!!!!!!")
+
         return errorMessage(e, jid)
 
 ##################################terrplant#############################################
@@ -204,22 +206,23 @@ def sip_rest(jid):
 @route('/stir/<jid>', method='POST') 
 # @auth_basic(check)
 def stir_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid,{}).setdefault('status','none')
-        from stir_rest import stir_model_rest
-        result = stir_model_rest.stir(run_type,chemical_name,application_rate,column_height,spray_drift_fraction,direct_spray_duration, 
-                                      molecular_weight,vapor_pressure,avian_oral_ld50,body_weight_assessed_bird,body_weight_tested_bird,mineau_scaling_factor, 
-                                      mammal_inhalation_lc50,duration_mammal_inhalation_study,body_weight_assessed_mammal,body_weight_tested_mammal, 
-                                      mammal_oral_ld50)
-        # if (result):
-        #     all_result[jid]['status']='done'
-        #     all_result[jid]['input']=request.json
-        #     all_result[jid]['result']=result
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid,{}).setdefault('status','none')
+    #     from stir_rest import stir_model_rest
+    #     result = stir_model_rest.stir(run_type,chemical_name,application_rate,column_height,spray_drift_fraction,direct_spray_duration, 
+    #                                   molecular_weight,vapor_pressure,avian_oral_ld50,body_weight_assessed_bird,body_weight_tested_bird,mineau_scaling_factor, 
+    #                                   mammal_inhalation_lc50,duration_mammal_inhalation_study,body_weight_assessed_mammal,body_weight_tested_mammal, 
+    #                                   mammal_oral_ld50)
+    #     # if (result):
+    #     #     all_result[jid]['status']='done'
+    #     #     all_result[jid]['input']=request.json
+    #     #     all_result[jid]['result']=result
+    #     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('stir', jid)
 
 ##################################sip#############################################
 
