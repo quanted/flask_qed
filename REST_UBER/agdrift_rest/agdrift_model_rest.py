@@ -23,12 +23,6 @@ class agdrift(object):
         self.x = x
         self.express_y = express_y
 
-        #Result variables
-        self.z_score_f_out = -1
-        self.F8_f_out = -1
-        self.chance_f_out = -1
-        self.run_methods()
-
     def run_methods(self):
         self.results()
         if (self.calculation_input == 'Distance'):

@@ -108,6 +108,21 @@ class stir(object):
         except TypeError:
             print "Type Error: Your variables are not set correctly."
 
+    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
+        """
+            Convert DataFrames to JSON, returning a tuple 
+            of JSON strings (inputs, outputs, exp_out)
+        """
+        
+        pd_obj_json = pd_obj.to_json()
+        pd_obj_out_json = pd_obj_out.to_json()
+        try:
+            pd_obj_exp_json = pd_obj_exp.to_json()
+        except:
+            pd_obj_exp_json = "{}"
+        
+        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
+
     #eq. 1 saturated air concentration in mg/m^3
     def CalcSatAirConc(self):
         #if self.sat_air_conc == -1:
@@ -195,7 +210,12 @@ class stir(object):
         #    self.spray_drift_fraction = float(self.spray_drift_fraction)
         #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
         self.sid_avian = (self.air_conc * self.inh_rate_avian * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_bird)
-        logging.info(self.sid_avian)
+        #logging.info("self.air_conc = " + self.air_conc)
+        #logging.info("self.inh_rate_avian = " + self.inh_rate_avian)
+        #logging.info("self.direct_spray_duration = " + self.direct_spray_duration)
+        #logging.info("self.spray_drift_fraction = " + self.spray_drift_fraction)
+        #logging.info("self.body_weight_assessed_bird = " + self.body_weight_assessed_bird)
+        #logging.info("self.sid_avian = " + self.sid_avian)
         return self.sid_avian
 
     #eq. 8 Mammalian spray droplet inhalation dose
@@ -290,12 +310,6 @@ class stir(object):
         #    self.sid_avian = float(self.sid_avian)
         #    self.adjusted_avian_inhalation_ld50 = float(self.adjusted_avian_inhalation_ld50)
         self.ratio_sid_avian = self.sid_avian/self.adjusted_avian_inhalation_ld50
-        exceed_boolean = self.ratio_sid_mammal < 0.1
-        self.ratio_sid_mammal = exceed_boolean.map(lambda x: 
-            'Exposure not Likely Significant' if x == True 
-            else 'Proceed to Refinements')
-        logging.info(self.loc_sid_mammal)
-        return self.loc_sid_mammal
         logging.info(self.ratio_sid_avian)
         return self.ratio_sid_avian
 
@@ -318,12 +332,6 @@ class stir(object):
         #    self.vid_mammal = float(self.vid_mammal)
         #    self.adjusted_mammal_inhalation_ld50 = float(self.adjusted_mammal_inhalation_ld50)
         self.ratio_vid_mammal = self.vid_mammal/self.adjusted_mammal_inhalation_ld50
-        exceed_boolean = self.ratio_sid_mammal < 0.1
-        self.ratio_sid_mammal = exceed_boolean.map(lambda x: 
-            'Exposure not Likely Significant' if x == True 
-            else 'Proceed to Refinements')
-        logging.info(self.loc_sid_mammal)
-        return self.loc_sid_mammal
         logging.info(self.ratio_vid_mammal)
         return self.ratio_vid_mammal
 
@@ -346,12 +354,6 @@ class stir(object):
         #    self.sid_mammal = float(self.sid_mammal)
         #    self.adjusted_mammal_inhalation_ld50 = float(self.adjusted_mammal_inhalation_ld50)
         self.ratio_sid_mammal = self.sid_mammal/self.adjusted_mammal_inhalation_ld50
-        exceed_boolean = self.ratio_sid_mammal < 0.1
-        self.ratio_sid_mammal = exceed_boolean.map(lambda x: 
-            'Exposure not Likely Significant' if x == True 
-            else 'Proceed to Refinements')
-        logging.info(self.loc_sid_mammal)
-        return self.loc_sid_mammal
         logging.info(self.ratio_sid_mammal)
         return self.ratio_sid_mammal
 
