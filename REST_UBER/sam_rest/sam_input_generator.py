@@ -65,8 +65,6 @@ def app_num_record(args):
 	firstapp_datetime_object = datetime.strptime(args['sim_date_1stapp'], "%m/%d/%Y")
 	firstapp_date_since1900 = convert_date_to_days_since_date2(firstapp_datetime_object.date(), date(1900, 1, 1))    # Equivalent to 'appcount' in VB code (SAMBeta.vb)
 
-	print firstapp_date_since1900
-
 	no_of_apps = int(args['apps_per_year']) * int(args['sim_no_of_years'])  # Number of applications each year X number of years in simulation
 
 	tspan = (args['sim_date_end_since1900'] - args['sim_date_start_since1900']) + 1   # Time span, number of simulation days
@@ -298,7 +296,7 @@ def app_refine_triangular(appcount, no_of_apps, application_rate, application_me
 		app_record_day_since_1900_list.append(app_record_day_since_1900)
 
 		# List 3: Application rate
-		app_rate = (0.5 * 1 * ((2 * appm) / float(time_window_1)) / float(thalf)
+		app_rate = 0.5 * 1 * ((2 * appm) / float(time_window_1)) / float(thalf)
 		app_rate_list.append(app_rate)
 		
 		# List 4: Application method
@@ -420,7 +418,11 @@ def generate_sam_input_file(args):
 	inputs = inputs_preprocessing(args)
 
 	####################Start writing input file###################
-	myfile = open('SAM.inp','w')
+	
+	curr_path = os.path.abspath(os.path.dirname(__file__))
+	sam_input_file_path = os.path.join(curr_path, 'SAM.inp')
+
+	myfile = open(sam_input_file_path,'w')
 	
 	try:
 		myfile.write(inputs['sim_type'] + "\n")

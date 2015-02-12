@@ -42,7 +42,7 @@ def sam(inputs_json, jid):
             import sam_input_generator
             sam_input_generator.generate_sam_input_file(args)
         except Exception, e:
-            logging.info(str(e))
+            logging.info("Error Msg: " + str(e))
             return {'user_id':'admin', 'result': {'error': str(e)}, '_id':jid}
     else:
         logging.info('++++++++++++ E L S E ++++++++++++')
