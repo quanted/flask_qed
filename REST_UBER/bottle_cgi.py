@@ -616,19 +616,57 @@ def przm_exams_rest(jid):
 ################################## SAM ##############################################
 @route('/sam/<jid>', method='POST')
 def sam_rest(jid):
+
+    # Old method
+
+    # try:
+    #     #import thread
+
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid,{}).setdefault('status','none')
+
+    #     #from sam_rest import sam_rest_model
+    #     # result = sam_rest_model.sam()
+    #     #thread.start_new_thread(sam_rest_model.sam, ())
+    #     # sam_rest_model.sam()
+    #     # return {'user_id':'admin', 'result': result, '_id':jid}
+    #     return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+
+    # New method
     try:
-        #import thread
+        import sam_rest.sam_rest_model as sam
 
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid,{}).setdefault('status','none')
+        try:
+            run_type = request.json["run_type"]
+        except KeyError, e:
+            return errorMessage(e, jid)
 
-        #from sam_rest import sam_rest_model
-        # result = sam_rest_model.sam()
-        #thread.start_new_thread(sam_rest_model.sam, ())
-        # sam_rest_model.sam()
-        # return {'user_id':'admin', 'result': result, '_id':jid}
-        return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
+        if run_type == "qaqc":
+            logging.info('============= QAQC Run =============')
+            
+
+        elif run_type == "batch":
+            logging.info('============= Batch Run =============')
+            
+
+        else:
+            logging.info('============= Single Run =============')
+            inputs_json = json.dumps(request.json["inputs"])
+
+            logging.info(inputs_json)
+
+            result_json_tuple = sam.sam(inputs_json, jid)
+
+        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+        # inputs_json = json.loads(result_json_tuple[0])
+        outputs_json = "Done"
+        exp_out_json = ""
+
+        return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+
     except Exception, e:
         return errorMessage(e, jid)
     

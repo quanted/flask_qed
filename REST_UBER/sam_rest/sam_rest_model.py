@@ -11,13 +11,15 @@ from boto.s3.bucket import Bucket
 import string
 import random
 import keys_Picloud_S3
+import json
+import logging
 
 # Generate a random ID for file save
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
 
-def sam():
+def sam(inputs_json, jid):
 
 ##########################################################################################
 #####AMAZON KEY, store output files. You might have to write your own import approach#####
@@ -28,11 +30,31 @@ def sam():
 ##########################################################################################
 ##########################################################################################
 
+    """
+        Custom or pre-canned run?
+    """
+    args = json.loads(inputs_json)
+
+    if args['scenario_selection'] == '0':
+        logging.info('++++++++++++ C U S T O M ++++++++++++')
+        # Run SAM, but first generate SAM input file
+        try:
+            import sam_input_generator
+            sam_input_generator.generate_sam_input_file(args)
+        except Exception, e:
+            logging.info(str(e))
+            return {'user_id':'admin', 'result': {'error': str(e)}, '_id':jid}
+    else:
+        logging.info('++++++++++++ E L S E ++++++++++++')
+        # Canned model run; do not run SAM
+        return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
+
     name_temp=id_generator()
     print name_temp
     
     curr_dir = os.path.dirname(os.path.realpath(__file__))
-    exe = "SuperPRZMpesticide.exe"
+    #exe = "SuperPRZMpesticide.exe"
+    exe = "SuperPRZMpesticide_win.exe"
     sam_path = os.path.join(curr_dir, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
     print sam_path
 
