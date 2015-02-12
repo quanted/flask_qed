@@ -1,5 +1,5 @@
 """
-    Backend server script runnig Bottle, a lightweight Python server. 
+    Backend server script running Bottle, a lightweight Python server. 
     All incoming requests to the backend server are handled here including 
     model run execution and MongoDB querying. 
 
@@ -22,6 +22,7 @@ from boto.s3.bucket import Bucket
 import os
 import json
 import warnings
+import pandas as pd
 
 # Enable console logging
 bottle.debug(True)
@@ -76,87 +77,158 @@ def enable_cors(fn):
     return _enable_cors
 
 def errorMessage(error, jid):
-    """Returns exeption error message as valid JSON string to caller"""
+    """Returns exception error message as valid JSON string to caller"""
     logging.exception(error)
     e = str(error)
     return {'user_id':'admin', 'result': {'error': e}, '_id':jid}
 
+def model_caller(model, jid):
+    """
+        Method to call the model Python modules
+    """
+    try:
+        import importlib
+        # Dynamically import the model Python module
+        model_module = importlib.import_module('.'+model+'_model_rest', model+'_rest')
+        # Set the model Object to a local variable (class name = model)
+        model_object = getattr(model_module, model)
+        
+        logging.info(json.dumps(request.json))
+        logging.info(type(request.json))
+
+        try:
+            run_type = request.json["run_type"]
+        except KeyError, e:
+            return errorMessage(e, jid)
+
+        if run_type == "qaqc":
+            logging.info('============= QAQC Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            logging.info(pd_obj)
+            pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+            logging.info(pd_obj_exp)
+            logging.info(run_type)
+            result_json_tuple = model_object(run_type, pd_obj, pd_obj_exp).json
+
+        elif run_type == "batch":
+            logging.info('============= Batch Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, None).json
+
+        else:
+            logging.info('============= Single Run =============')
+            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+            result_json_tuple = model_object(run_type, pd_obj, None).json
+
+        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+        inputs_json = json.loads(result_json_tuple[0])
+        outputs_json = json.loads(result_json_tuple[1])
+        exp_out_json = json.loads(result_json_tuple[2])
+
+        return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+
+    except Exception, e:
+        logging.info("ERROR!!!!!!!!!!!!!!!!!")
+
+        return errorMessage(e, jid)
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def terrplant_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-            # print k, v
-        all_result.setdefault(jid,{}).setdefault('status','none')
+    # try:
+    #     from terrplant_rest import terrplant_model_rest
+        
+    #     logging.info(json.dumps(request.json))
+    #     logging.info(type(request.json))
 
-        from terrplant_rest import terrplant_model_rest
-        result = terrplant_model_rest.terrplant(version_terrplant,run_type, application_rate, incorporation_depth, runoff_fraction, 
-            drift_fraction,EC25_for_nonlisted_seedling_emergence_monocot,EC25_for_nonlisted_seedling_emergence_dicot,
-            NOAEC_for_listed_seedling_emergence_monocot,NOAEC_for_listed_seedling_emergence_dicot,chemical_name,
-            pc_code,use,application_method,application_form,solubility)
-        # if (result):
-        #     all_result[jid]['status']='done'
-        #     all_result[jid]['input']=request.json
-        #     all_result[jid]['result']=result
+    #     try:
+    #         run_type = request.json["run_type"]
+    #     except KeyError, e:
+    #         return errorMessage(e, jid)
 
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    #     if run_type == "qaqc":
+    #         logging.info('============= QAQC Run =============')
+
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+    #         pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, pd_obj_exp).json
+
+    #     elif run_type == "batch":
+    #         logging.info('============= Batch Run =============')
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+
+    #     else:
+    #         logging.info('============= Single Run =============')
+    #         pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+
+    #         result_json_tuple = terrplant_model_rest.terrplant(run_type, pd_obj, None).json
+
+    #     # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+    #     inputs_json = json.loads(result_json_tuple[0])
+    #     outputs_json = json.loads(result_json_tuple[1])
+    #     exp_out_json = json.loads(result_json_tuple[2])
+
+    #     return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('terrplant', jid)
         
 ##################################terrplant#############################################
 
 ##################################sip#############################################
 @route('/sip/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def sip_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid,{}).setdefault('status','none')
-        from sip_rest import sip_model_rest
-        result = sip_model_rest.sip(chemical_name, bodyweight_tested_bird, bodyweight_quail, bodyweight_duck, bodyweight_bird_other, 
-                    bodyweight_rat, bodyweight_tested_mammal_other, species_tested_bird, species_tested_mammal, 
-                    bodyweight_tested_mammal, solubility, ld50_avian_water, ld50_mammal_water, bodyweight_assessed_bird, 
-                    mineau_scaling_factor, bodyweight_assessed_mammal, noael_avian_water, noael_mammal_water)
-        # if (result):
-        #     all_result[jid]['status']='done'
-        #     all_result[jid]['input']=request.json
-        #     all_result[jid]['result']=result
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid,{}).setdefault('status','none')
+    #     from sip_rest import sip_model_rest
+    #     result = sip_model_rest.sip(chemical_name, bw_bird, bw_quail, bw_duck, bwb_other, bw_rat, bwm_other, b_species, m_species, bw_mamm, sol, ld50_a, ld50_m, aw_bird, mineau, aw_mamm, noaec, noael)
+    #     # if (result):
+    #     #     all_result[jid]['status']='done'
+    #     #     all_result[jid]['input']=request.json
+    #     #     all_result[jid]['result']=result
+    #     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('sip', jid)
 
 ##################################sip#############################################
 
 ##################################stir#############################################
 @route('/stir/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def stir_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid,{}).setdefault('status','none')
-        from stir_rest import stir_model_rest
-        result = stir_model_rest.stir(run_type,chemical_name,application_rate,column_height,spray_drift_fraction,direct_spray_duration, 
-                                      molecular_weight,vapor_pressure,avian_oral_ld50,body_weight_assessed_bird,body_weight_tested_bird,mineau_scaling_factor, 
-                                      mammal_inhalation_lc50,duration_mammal_inhalation_study,body_weight_assessed_mammal,body_weight_tested_mammal, 
-                                      mammal_oral_ld50)
-        # if (result):
-        #     all_result[jid]['status']='done'
-        #     all_result[jid]['input']=request.json
-        #     all_result[jid]['result']=result
-        return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid,{}).setdefault('status','none')
+    #     from stir_rest import stir_model_rest
+    #     result = stir_model_rest.stir(run_type,chemical_name,application_rate,column_height,spray_drift_fraction,direct_spray_duration, 
+    #                                   molecular_weight,vapor_pressure,avian_oral_ld50,body_weight_assessed_bird,body_weight_tested_bird,mineau_scaling_factor, 
+    #                                   mammal_inhalation_lc50,duration_mammal_inhalation_study,body_weight_assessed_mammal,body_weight_tested_mammal, 
+    #                                   mammal_oral_ld50)
+    #     # if (result):
+    #     #     all_result[jid]['status']='done'
+    #     #     all_result[jid]['input']=request.json
+    #     #     all_result[jid]['result']=result
+    #     return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('stir', jid)
 
 ##################################sip#############################################
 
 ##################################dust#############################################
 @route('/dust/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def dust_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -177,7 +249,7 @@ def dust_rest(jid):
 
 ##################################trex2#############################################
 @route('/trex2/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def trex2_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -202,7 +274,7 @@ def trex2_rest(jid):
 
 ##################################therps#############################################
 @route('/therps/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def therps_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -227,7 +299,7 @@ def therps_rest(jid):
 
 ##################################iec#############################################
 @route('/iec/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def iec_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -247,7 +319,7 @@ def iec_rest(jid):
 
 ##################################agdrift#############################################
 @route('/agdrift/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def agdrift_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -267,7 +339,7 @@ def agdrift_rest(jid):
 
 ##################################earthworm#############################################
 @route('/earthworm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def earthworm_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -287,7 +359,7 @@ def earthworm_rest(jid):
 
 ##################################rice#############################################
 @route('/rice/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def rice_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -307,7 +379,7 @@ def rice_rest(jid):
 
 ##################################kabam#############################################
 @route('/kabam/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def kabam_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -328,7 +400,7 @@ def kabam_rest(jid):
 
 ##################################geneec#############################################
 @route('/geneec/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def geneec_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -352,7 +424,7 @@ def geneec_rest(jid):
 
 ##################################przm5#############################################
 @route('/przm5/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm5_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -399,7 +471,7 @@ def przm5_rest(jid):
 
 ################################# VVWM #############################################
 @route('/vvwm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def vvwm_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -432,7 +504,7 @@ def vvwm_rest(jid):
 
 ##################################przm##############################################
 @route('/przm/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 
 def przm_rest(jid):
     try:
@@ -452,7 +524,7 @@ def przm_rest(jid):
 # ##################################przm_batch##############################################
 # result_all=[]
 # @route('/przm_batch/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 # def przm_rest(jid):
 #     from przm_rest import PRZM_pi_new
 #     for k, v in request.json.iteritems():
@@ -475,7 +547,7 @@ def przm_rest(jid):
 
 ##################################przm_batch##############################################
 @route('/przm_batch/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm_rest(jid):
     try:
         from przm_rest import PRZM_pi_new
@@ -511,7 +583,7 @@ def przm_rest(jid):
 
 ##################################exams##############################################
 @route('/exams/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def exams_rest(jid):
     try:
         import time
@@ -529,7 +601,7 @@ def exams_rest(jid):
 
 ##################################pfam##############################################
 @route('/pfam/<jid>', method='POST') 
-# @auth_basic(check)
+@auth_basic(check)
 
 def pfam_rest(jid):
     try:
@@ -552,7 +624,7 @@ def pfam_rest(jid):
 
 ##################################przm_exams##############################################
 @route('/przm_exams/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm_exams_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -595,7 +667,7 @@ def sam_rest(jid):
 
 ##################File upload####################
 @route('/file_upload', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def file_upload():
     import shutil
     for k, v in request.json.iteritems():
@@ -624,7 +696,7 @@ def file_upload():
 
 ##########insert results into mongodb#########################
 @route('/save_history_html', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def insert_output_html():
     """
     DEPRECATED: Use save_model_object(model_object_dict, model_name, run_type) instead
@@ -640,7 +712,7 @@ def insert_output_html():
 
 
 @route('/save_history', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def insert_model_obj():
     """
     Save model object to MongoDB as new document
@@ -653,7 +725,7 @@ def insert_model_obj():
     
 
 @route('/get_model_object', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_model_object():
     """
         Return model object from MongoDB to be loaded into view (e.g. Django)
@@ -670,7 +742,7 @@ def get_model_object():
 
 
 @route('/update_html', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def update_output_html():
     """
     DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB
@@ -685,7 +757,7 @@ def update_output_html():
 
 ###############Check History####################
 @route('/ubertool_history/<model_name>/<jid>')
-@auth_basic(check)
+# @auth_basic(check)
 def get_document(model_name, jid):
     entity = db[model_name].find_one({'_id':jid})
     # print entity
@@ -695,7 +767,7 @@ def get_document(model_name, jid):
 
 
 @route('/user_history', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_user_model_hist():
     """
         Return python list of all model run entries from MongoDB
@@ -711,7 +783,7 @@ def get_user_model_hist():
     return {"hist_all":hist_all}
 
 @route('/get_html_output', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_html_output():
     """
     DEPRECATED: Use get_model_object(jid, model_name) instead
@@ -727,7 +799,7 @@ def get_html_output():
     return {"html_output":html_output}
 
 @route('/get_przm_batch_output', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_przm_batch_output():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -738,7 +810,7 @@ def get_przm_batch_output():
     return {"result":result}
 
 @route('/get_pdf', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_pdf():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -754,7 +826,7 @@ def get_pdf():
     return {"result":result}
 
 @route('/get_html', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_html():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -770,7 +842,7 @@ def get_html():
     return {"result":result}
 
 # @route('/ore/<query>', method=['OPTIONS', 'POST'])
-# @auth_basic(check)
+@auth_basic(check)
 # @enable_cors
 @route('/ore/<query>', method='GET')
 def ore_rest_query(query):
@@ -797,5 +869,5 @@ def ore_rest_query(query):
 """
     Execute command for Bottle server
 """
-run(host='localhost', port=80, debug=True)
+run(host='localhost', port=7777, debug=True)
 # run(host='localhost', port=7777, server='gevent', debug=True)
