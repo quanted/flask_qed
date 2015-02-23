@@ -35,12 +35,16 @@ def sam(inputs_json, jid):
     """
     args = json.loads(inputs_json)
 
+    # Generate random name for current run
+    name_temp=id_generator()
+    print name_temp
+
     if args['scenario_selection'] == '0':
         logging.info('++++++++++++ C U S T O M ++++++++++++')
         # Run SAM, but first generate SAM input file
         try:
             import sam_input_generator
-            sam_input_generator.generate_sam_input_file(args)
+            sam_input_file_path = sam_input_generator.generate_sam_input_file(args, name_temp)
         except Exception, e:
             logging.info("Error Msg: " + str(e))
             return {'user_id':'admin', 'result': {'error': str(e)}, '_id':jid}
@@ -48,9 +52,6 @@ def sam(inputs_json, jid):
         logging.info('++++++++++++ E L S E ++++++++++++')
         # Canned model run; do not run SAM
         return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
-
-    name_temp=id_generator()
-    print name_temp
     
     curr_dir = os.path.dirname(os.path.realpath(__file__))
     #exe = "SuperPRZMpesticide.exe"
@@ -58,14 +59,17 @@ def sam(inputs_json, jid):
     sam_path = os.path.join(curr_dir, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
     print sam_path
 
-    sam_arg1_curr_path = os.path.join(curr_dir, 'bin')
-    sam_arg2_out_path_unique = name_temp
+    sam_arg1 = os.path.join(curr_dir, 'bin')
+    sam_arg2 = sam_input_file_path
+    # sam_arg2_out_path_unique = name_temp
 
-    out_path_unique = os.path.join(sam_arg1_curr_path, name_temp)
+    # Unique output path to be passeed to FORTRAN ----- Not Currently Being Used
+    # out_path_unique = os.path.join(sam_arg1_curr_path, name_temp)
     # os.makedirs(out_path_unique)
     os.makedirs(os.path.join(out_path_unique, 'EcoPestOut_all', 'EcoPestOut_SoilGrps'))
 
-    a = subprocess.Popen(sam_path + " " + sam_arg1_curr_path + " " + sam_arg2_out_path_unique, shell=1)
+    # Call SuperPRZMpesticide.exe with arguments
+    a = subprocess.Popen(sam_path + " " + sam_arg1 + " " + sam_arg2, shell=1)
     a.wait()
     print "Done"
     
