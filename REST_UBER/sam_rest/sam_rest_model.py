@@ -90,7 +90,8 @@ def sam(inputs_json, jid):
             sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
             sam_arg2 = name_temp                          # Temp directory name for SAM run
             # Create list of args
-            args = [sam_path, sam_arg1, sam_arg2]
+            # args = [sam_path, sam_arg1, sam_arg2]
+            args = sam_path + " " + sam_arg1 + " " + sam_arg2]
 
             # Create ProcessPoolExecutor (as 'Pool') instance to run FORTRAN exe in separate process as a Future
             # pool = Pool(max_workers=1)
