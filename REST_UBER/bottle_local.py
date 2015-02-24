@@ -683,7 +683,7 @@ def sam_rest(jid):
 
         # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
         # inputs_json = json.loads(result_json_tuple[0])
-        outputs_json = "Done"
+        outputs_json = result_json_tuple
         exp_out_json = ""
 
         return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
