@@ -20,8 +20,10 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
 def sam_read_input_file(sam_input_file_path):
 
+    html = "<br><b>SAM.inp created:</b><br>"
+
     with open(sam_input_file_path) as f:
-        html = f.read().replace('\n', '<br>')
+        html += f.read().replace('\n', '<br>')
 
     return html
 
@@ -90,24 +92,20 @@ def sam(inputs_json, jid):
             sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
             sam_arg2 = name_temp                          # Temp directory name for SAM run
             # Create list of args
-            # args = [sam_path, sam_arg1, sam_arg2]
-            args = sam_path + " " + sam_arg1 + " " + sam_arg2
+            args = [sam_path, sam_arg1, sam_arg2]
+            # args = sam_path + " " + sam_arg1 + " " + sam_arg2
 
             # Create ProcessPoolExecutor (as 'Pool') instance to run FORTRAN exe in separate process as a Future
-            # pool = Pool(max_workers=1)
-            # future = pool.submit([subprocess.call, args], shell=1)
-            # future.add_done_callback(sam_callback(temp_sam_run_path))
-            # pool.shutdown(wait=False)
+            pool = Pool(max_workers=1)
+            future = pool.submit([subprocess.call, args], shell=1)
+            future.add_done_callback(sam_callback(temp_sam_run_path))
+            pool.shutdown(wait=False)
 
-            a = subprocess.Popen(args, shell=1)
+            # a = subprocess.Popen(args, shell=1)
             
-            """
-            Return value needs to be changed to returning the SAM.inp txt
-            """
+            input_file_string = sam_read_input_file(sam_input_file_path)
 
-            link = sam_read_input_file(sam_input_file_path)
-
-            return link, "Done!"
+            return input_file_string
 
 
         except Exception, e:
