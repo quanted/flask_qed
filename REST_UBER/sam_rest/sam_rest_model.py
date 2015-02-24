@@ -56,7 +56,7 @@ def sam(inputs_json, jid):
         logging.info('++++++++++++ C U S T O M ++++++++++++')
         # Run SAM, but first generate SAM input file
 
-        from concurrent.futures import ProcessPoolExecutor as Pool
+        # from concurrent.futures import ProcessPoolExecutor as Pool
 
         try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
@@ -92,16 +92,16 @@ def sam(inputs_json, jid):
             sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
             sam_arg2 = name_temp                          # Temp directory name for SAM run
             # Create list of args
-            args = [sam_path, sam_arg1, sam_arg2]
-            # args = sam_path + " " + sam_arg1 + " " + sam_arg2
+            # args = [sam_path, sam_arg1, sam_arg2]
+            args = sam_path + " " + sam_arg1 + " " + sam_arg2
 
             # Create ProcessPoolExecutor (as 'Pool') instance to run FORTRAN exe in separate process as a Future
-            pool = Pool(max_workers=1)
-            future = pool.submit([subprocess.call, args], shell=1)
-            future.add_done_callback(sam_callback(temp_sam_run_path))
-            pool.shutdown(wait=False)
+            # pool = Pool(max_workers=1)
+            # future = pool.submit([subprocess.call, args], shell=1)
+            # future.add_done_callback(sam_callback(temp_sam_run_path))
+            # pool.shutdown(wait=False)
 
-            # a = subprocess.Popen(args, shell=1)
+            subprocess.Popen(args, shell=1)
             
             input_file_string = sam_read_input_file(sam_input_file_path)
 
