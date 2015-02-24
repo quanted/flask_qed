@@ -18,6 +18,14 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
 
+def sam_read_input_file(sam_input_file_path):
+
+    with open(sam_input_file_path) as f:
+        html = f.read().replace('\n', '<br>')
+
+    return html
+
+
 def sam_callback(temp_sam_run_path):
     logging.info("sam_callback executed!")
     os.makedirs(os.path.join(temp_sam_run_path, 'callback'))
@@ -67,7 +75,8 @@ def sam(inputs_json, jid):
                 print "Linux OS"
                 # Linux / UNIX based OS
                 exe = "SuperPRZMpesticide.exe"
-                import subprocess32 as subprocess
+                #import subprocess32 as subprocess    # I want to use subprocess32 for Linux, but it will not compile on CGI
+                import subprocess
             else:
                 print "Windows (really NOT Linux) OS"
                 # Assuming Windows here, could be other tho and this will break
@@ -91,40 +100,11 @@ def sam(inputs_json, jid):
 
             # a = subprocess.Popen(args, shell=1)
             
-            ##zip the output files
-            #zout=zipfile.ZipFile("temp.zip", "w", zipfile.ZIP_DEFLATED)
-            
-            # dwr
-            # superPRZM_ouput = os.path.join(curr_path, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs', '1838_pestAvgConc_distrib.out')
-            # eco
-            # superPRZM_ouput = os.path.join(curr_path, 'bin', 'EcoPestOut_all', 'EcoPestOut_SoilGrps')
-            # # print superPRZM_ouput
-            # #zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
-            # #zout.close()
-            # zout = shutil.make_archive(os.path.join(temp_sam_run_path, 'temp'), "zip", root_dir=superPRZM_ouput)
-            # print "zout =", zout
+            """
+            Return value needs to be changed to returning the SAM.inp txt
+            """
 
-            # ##Create connection to S3
-            # conn = S3Connection(key, secretkey)
-            # bucket = Bucket(conn, 'super_przm')
-            # k=Key(bucket)
-
-            # ##Generate link to zip file
-            # name1='SAM_'+name_temp+'.zip'
-            # k.key=name1
-            # link='https://s3.amazonaws.com/super_przm/'+name1
-            # print link
-            
-            # ##Upload zip file to S3
-            # #k.set_contents_from_filename('temp.zip')
-            # k.set_contents_from_filename(zout)
-            # k.set_acl('public-read-write')
-            # print 'upload finished'
-
-            # # Delete zip
-            # shutil.rmtree(temp_sam_run_path)
-
-            link = 'TEST'
+            link = sam_read_input_file(sam_input_file_path)
 
             return link, "Done!"
 
