@@ -47,7 +47,7 @@ def sam(inputs_json, jid):
     args = json.loads(inputs_json)
 
     # Generate random name for current run
-    name_temp=id_generator()
+    name_temp = id_generator()
     print name_temp
 
     if args['scenario_selection'] == '0':
@@ -62,13 +62,13 @@ def sam(inputs_json, jid):
             temp_sam_run_path = os.path.join(curr_path, 'bin', name_temp)
             if not os.path.exists(temp_sam_run_path):
                 os.makedirs(temp_sam_run_path)
-                os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_SoilGrps'))
+                os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
 
             sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
 
             # Generate "SAM.inp" file
             import sam_input_generator
-            sam_input_file_path = sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
+            sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
             
             # Set "SuperPRZMpesticide.exe" based on OS
             if os.name == 'posix':
@@ -88,17 +88,17 @@ def sam(inputs_json, jid):
 
             # Define SuperPRZMpesticide.exe command line arguments
             sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
-            sam_arg2 = sam_input_file_path                # Absolute path of SAM.inp (generated above)
+            sam_arg2 = name_temp                          # Temp directory name for SAM run
             # Create list of args
             args = [sam_path, sam_arg1, sam_arg2]
 
             # Create ProcessPoolExecutor (as 'Pool') instance to run FORTRAN exe in separate process as a Future
-            pool = Pool(max_workers=1)
-            future = pool.submit([subprocess.call, args], shell=1)
-            future.add_done_callback(sam_callback(temp_sam_run_path))
-            pool.shutdown(wait=False)
+            # pool = Pool(max_workers=1)
+            # future = pool.submit([subprocess.call, args], shell=1)
+            # future.add_done_callback(sam_callback(temp_sam_run_path))
+            # pool.shutdown(wait=False)
 
-            # a = subprocess.Popen(args, shell=1)
+            a = subprocess.Popen(args, shell=1)
             
             """
             Return value needs to be changed to returning the SAM.inp txt
