@@ -571,7 +571,7 @@ def generate_sam_input_file(args, sam_input_file_path):
 		print str(e)
 		myfile.write(' ---ERROR--- \n')
 	try:
-		myfile.write("%s !Output format (1=table,2=map,3=plot/histogram) \n" % inputs['output_format'])   #This needs to be fixed to handle all combinations
+		myfile.write("1 !Output format (1=table,2=map,3=plot/histogram) \n")   #inputs['output_format'] This needs to be fixed to handle all combinations
 	except Exception, e:
 		print str(e)
 		myfile.write(' ---ERROR--- \n')
