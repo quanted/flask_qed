@@ -101,7 +101,13 @@ def sam(inputs_json, jid):
             # future.add_done_callback(sam_callback(temp_sam_run_path))
             # pool.shutdown(wait=False)
 
-            subprocess.Popen(args, shell=1)
+            # args = "timeout 10"
+
+            try:
+                subprocess.Popen(args, shell=1)
+            except Exception, e:
+                logging.info("Error Msg: " + str(e))
+                pass
             
             input_file_string = sam_read_input_file(sam_input_file_path)
 
