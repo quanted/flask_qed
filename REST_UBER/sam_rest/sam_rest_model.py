@@ -57,6 +57,7 @@ def sam(inputs_json, jid):
         # Run SAM, but first generate SAM input file
 
         # from concurrent.futures import ProcessPoolExecutor as Pool
+        from concurrent.futures import ThreadPoolExecutor as Pool
 
         try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
@@ -77,8 +78,8 @@ def sam(inputs_json, jid):
                 print "Linux OS"
                 # Linux / UNIX based OS
                 exe = "SuperPRZMpesticide.exe"
-                #import subprocess32 as subprocess    # I want to use subprocess32 for Linux, but it will not compile on CGI
-                import subprocess
+                import subprocess32 as subprocess    # Use subprocess32 for Linux (Python 3.2 backport)
+                #import subprocess
             else:
                 print "Windows (really NOT Linux) OS"
                 # Assuming Windows here, could be other tho and this will break
@@ -96,18 +97,17 @@ def sam(inputs_json, jid):
             args = sam_path + " " + sam_arg1 + " " + sam_arg2
 
             # Create ProcessPoolExecutor (as 'Pool') instance to run FORTRAN exe in separate process as a Future
-            # pool = Pool(max_workers=1)
-            # future = pool.submit([subprocess.call, args], shell=1)
-            # future.add_done_callback(sam_callback(temp_sam_run_path))
-            # pool.shutdown(wait=False)
+            pool = Pool(max_workers=1)
+            future = pool.submit(subprocess.call, args, shell=1)
+            future.add_done_callback(sam_callback(temp_sam_run_path))
+            pool.shutdown(wait=False)
 
-            # args = "timeout 10"
-
-            try:
-                subprocess.Popen(args, shell=1)
-            except Exception, e:
-                logging.info("Error Msg: " + str(e))
-                pass
+            #try:
+            #    p = subprocess.Popen(args, shell=1)
+                
+            #except Exception, e:
+            #    logging.info("Error Msg: " + str(e))
+            #    pass
             
             input_file_string = sam_read_input_file(sam_input_file_path)
 
