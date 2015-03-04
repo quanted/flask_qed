@@ -95,7 +95,6 @@ def model_caller(model, jid):
         model_object = getattr(model_module, model)
         
         logging.info(json.dumps(request.json))
-        logging.info(type(request.json))
 
         try:
             run_type = request.json["run_type"]
@@ -105,20 +104,23 @@ def model_caller(model, jid):
         if run_type == "qaqc":
             logging.info('============= QAQC Run =============')
 
-            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
-            pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+            # pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
+            # pd_obj_exp = pd.io.json.read_json(json.dumps(request.json["out_exp"]))
+            pd_obj_exp = pd.DataFrame.from_dict(request.json["out_exp"], dtype='float64')
 
             result_json_tuple = model_object(run_type, pd_obj, pd_obj_exp).json
 
         elif run_type == "batch":
             logging.info('============= Batch Run =============')
-            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            # pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
 
             result_json_tuple = model_object(run_type, pd_obj, None).json
 
         else:
             logging.info('============= Single Run =============')
-            pd_obj = pd.io.json.read_json(json.dumps(request.json["inputs"]))
+            pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
 
             result_json_tuple = model_object(run_type, pd_obj, None).json
 
@@ -127,10 +129,25 @@ def model_caller(model, jid):
         outputs_json = json.loads(result_json_tuple[1])
         exp_out_json = json.loads(result_json_tuple[2])
 
-        return {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+        model_obj_dict = {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
+
+        if model != 'sam':
+            save_to_mongo(model, {'user_id':'admin', 'inputs': json.dumps(inputs_json), 'outputs': json.dumps(outputs_json), 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type})
+
+        return model_obj_dict
 
     except Exception, e:
         return errorMessage(e, jid)
+
+
+def save_to_mongo(model, model_obj_dict):
+
+    logging.info("save_to_mongo() called")
+
+    logging.info(model_obj_dict)
+
+    db[model].save(model_obj_dict)
+    logging.info("Saved to mongo!")
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
@@ -679,7 +696,7 @@ def sam_rest(jid):
 
             logging.info(inputs_json)
 
-            result_json_tuple = sam.sam(inputs_json, jid)
+            result_json_tuple = sam.sam(inputs_json, jid, run_type)
 
         # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
         # inputs_json = json.loads(result_json_tuple[0])
@@ -765,12 +782,12 @@ def get_model_object():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
     # Cursor          Mongo collection     Document      Projection (fields to return)
-    model_object_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
+    model_object_c = db[model_name].find({"_id": jid}, {"model_object_dict": 1, "_id": 0})
     for i in model_object_c:
         # print i
         model_object = i['model_object_dict']
-    logging.info({"model_object":model_object})
-    return {"model_object":model_object}
+    logging.info({"model_object": model_object})
+    return {"model_object": model_object}
 
 
 @route('/update_html', method='POST') 
