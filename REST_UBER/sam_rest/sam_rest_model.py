@@ -162,7 +162,7 @@ def sam(inputs_json, jid, run_type):
                 # Store execution of Fortran exe as a Future object, allowing the Python code to continue executing
                 future = pool.submit(subprocess.call, args, shell=1)
                 # When the Fortran exe finishes call "sam_callback" callback function
-                future.add_done_callback(sam_callback(temp_sam_run_path, run_type))
+                future.add_done_callback(sam_callback(temp_sam_run_path, run_type, jid))
                 # Destroy the Pool object which hosts the threads
                 pool.shutdown(wait=False)
 
