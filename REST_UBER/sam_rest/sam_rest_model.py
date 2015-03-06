@@ -176,7 +176,7 @@ def sam(inputs_json, jid, run_type):
                 sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
                 sam_arg2 = name_temp                          # Temp directory name for SAM run
                 # Create list of args
-                args = sam_path + " " + sam_arg1 + " " + sam_arg2
+                args = [sam_path, sam_arg1, sam_arg2]
 
                 future = pool.submit(subprocess.call, args)
                 # When the Fortran exe finishes call "sam_callback" callback function
