@@ -839,9 +839,29 @@ def get_przm_batch_output():
     return {"result":result}
 
 
-# if os.environ.has_key("eb_server"):
-    # debug(True)
-# else:
-    # Not used with Apache / mod_wsgi (EB)
-#    run(host=host_ip, port=80, server="gevent", debug=True)
-    # run(host=host_ip, port=80, debug=True)
+"""
+=============================================================================================
+                              O R E  T E S T I N G
+=============================================================================================
+"""
+
+@route('/ore/<query>', method='GET')
+def ore_rest_query(query):
+    # for k, v in request.json.iteritems():
+    #     exec '%s = v' % k
+        # print k, v
+    # all_result.setdefault(jid,{}).setdefault('status','none')
+
+    from ore_rest import ore_db
+    print query
+    result = ore_db.loadChoices(query)
+    print result
+    # print type(result)
+    # result = test
+    # if (result):
+    #     all_result[jid]['status']='done'
+    #     all_result[jid]['input']=request.json
+    #     all_result[jid]['result']=result
+
+    # return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    return {"result": result}
