@@ -890,7 +890,13 @@ def get_html():
     result=generatehtml_pi.generatehtml_pi(final_str)
     return {"result":result}
 
-# @route('/ore/<query>', method=['OPTIONS', 'POST'])
+
+"""
+=============================================================================================
+                              O R E  T E S T I N G
+=============================================================================================
+"""
+
 # @auth_basic(check)
 # @enable_cors
 @route('/ore/<query>', method='GET')
@@ -901,7 +907,7 @@ def ore_rest_query(query):
     # all_result.setdefault(jid,{}).setdefault('status','none')
 
     from ore_rest import ore_db
-    print query
+    # print query
     result = ore_db.loadChoices(query)
     print result
     # print type(result)
@@ -914,43 +920,21 @@ def ore_rest_query(query):
     # return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     return {"result": result}
 
+@route('/ore/category', method='GET')
+def ore_rest_query():
 
-@route('/test/', method='POST') 
-def test_rest():
+    category = request.json['category']
+    print category
+    from ore_rest import ore_db
+    result = ore_db.oreWorkerActivities(category)
 
-    # PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-    # csv = os.path.join(PROJECT_ROOT, 'test_rest', 'pandas_test.csv')
+    # exposure_scenario = []
+    # for item in result:
+    #     exposure_scenario.append(item[0])
 
-    import pandas as pd
+    print result
 
-    # pd_obj = pd.read_csv(csv, header=None, index_col=0)
-
-    try:
-        # for k, v in request.json.iteritems():
-        #     exec '%s = v' % k
-
-        print request.json
-        print type(json.dumps(request.json))
-
-        pd_obj = pd.io.json.read_json(json.dumps(request.json), orient='index')
-
-        from test_rest import test_model_rest
-        result = test_model_rest.test(pd_obj)
-
-        print "================================="
-        print result.pd_obj
-        print "================================="
-
-        pd_obj_json = result.pd_obj.to_json(orient='index')
-
-        print "================================="
-        print pd_obj_json
-        print "================================="
-
-        # return {'result': result.__dict__}
-        return {'result': pd_obj_json}
-    except Exception, e:
-        return errorMessage(e, 'TEST_RUN')
+    return {"result": result}
 
 
 

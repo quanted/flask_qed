@@ -865,3 +865,19 @@ def ore_rest_query(query):
 
     # return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
     return {"result": result}
+
+@route('/ore/category', method='GET')
+def ore_rest_query():
+
+    category = request.json['category']
+    print category
+    from ore_rest import ore_db
+    result = ore_db.oreWorkerActivities(category)
+
+    # exposure_scenario = []
+    # for item in result:
+    #     exposure_scenario.append(item[0])
+
+    print result
+
+    return {"result": result}
