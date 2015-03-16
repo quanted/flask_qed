@@ -9,7 +9,6 @@
 *~
 *.py~
 *.pptx
-*.py~
 .elasticbeanstalk/config
 GA2.tif
 .VolumeIcon.icns
@@ -22,6 +21,7 @@ Thumbs.db
 *.pem
 env/*
 build/*
+.idea/*
 *.mod
 fort.*
 *.pid
