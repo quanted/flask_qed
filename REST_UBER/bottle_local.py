@@ -51,9 +51,13 @@ class NumPyArangeEncoder(json.JSONEncoder):
             return obj.tolist() # or map(int, obj)
         return json.JSONEncoder.default(self, obj)
 
-import pymongo
-client = pymongo.MongoClient('localhost', 27017)
-db = client.ubertool
+try:
+    import pymongo
+    client = pymongo.MongoClient('localhost', 27017)
+    db = client.ubertool
+except Exception:
+    logging.exception(Exception)
+
 
 def check(user, passwd):
     if user == keys_Picloud_S3.picloud_api_key and passwd == keys_Picloud_S3.picloud_api_secretkey:
