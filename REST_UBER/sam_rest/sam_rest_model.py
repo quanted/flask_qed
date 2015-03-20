@@ -254,13 +254,15 @@ def sam(inputs_json, jid, run_type):
                 sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
                 sam_arg2 = name_temp                          # Temp directory name for SAM run
                 # Create list of args
-                args = [sam_path, sam_arg1, sam_arg2]
+                args = [sam_path, sam_arg1, sam_arg2, " 1"]
 
                 split_csv(no_of_workers, curr_path)
 
                 i = 1
                 while i <= no_of_workers:
-                    pool.submit(subprocess.call, args + " " + str(i)).add_done_callback(
+                    args[3] = " " + str(i)
+                    print args
+                    pool.submit(subprocess.call, args).add_done_callback(
                         partial(sam_callback, temp_sam_run_path, jid, run_type)
                     )
                     i += 1
