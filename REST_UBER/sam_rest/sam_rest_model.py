@@ -254,13 +254,13 @@ def sam(inputs_json, jid, run_type):
                 sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
                 sam_arg2 = name_temp                          # Temp directory name for SAM run
                 # Create list of args
-                args = [sam_path, sam_arg1, sam_arg2, " 1"]
+                args = [sam_path, sam_arg1, sam_arg2, "1"]
 
                 split_csv(no_of_workers, curr_path)
 
                 i = 1
                 while i <= no_of_workers:
-                    args[3] = " " + str(i)
+                    args[3] = str(i)
                     print args
                     pool.submit(subprocess.call, args).add_done_callback(
                         partial(sam_callback, temp_sam_run_path, jid, run_type)
@@ -291,16 +291,33 @@ def sam(inputs_json, jid, run_type):
                     # sam_arg3 = "2"
                     # Create list of args
                     # args = sam_path + " " + sam_arg1 + " " + sam_arg2# + " " + sam_arg3
-                    args = sam_path + " " + sam_arg1 + " " + sam_arg2
+                    # args = sam_path + " " + sam_arg1 + " " + sam_arg2
+                    args = [sam_path, sam_arg1, sam_arg2, "1"]
 
                     split_csv(no_of_workers, curr_path)
 
-                    i = 1
-                    while i <= no_of_workers:
-                        pool.submit(subprocess.call, args + " " + str(i)).add_done_callback(
+
+                    args_dict = {}
+
+                    for x in range(no_of_workers):
+
+                        args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
+
+                        # args[3] = str(x + 1)
+                        # args_dict[x + 1] = args
+                        # print args
+                        print args_dict[x + 1]
+                    # print args_dict
+                    j = 1
+                    while j <= no_of_workers:
+                        pool.submit(subprocess.call, args_dict[j]).add_done_callback(
                             partial(sam_callback, temp_sam_run_path, jid, run_type)
                         )
-                        i += 1
+                        j += 1
+                        # pool.submit(subprocess.call, args + " " + str(i)).add_done_callback(
+                        #     partial(sam_callback, temp_sam_run_path, jid, run_type)
+                        # )
+                        # i += 1
 
                     # future1 = pool.submit(subprocess.call, args + " 1")
                     # future2 = pool.submit(subprocess.call, args + " 2")
