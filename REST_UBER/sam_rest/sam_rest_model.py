@@ -23,6 +23,25 @@ secretkey = keys_Picloud_S3.amazon_s3_secretkey
 ##########################################################################################
 
 
+from functools import wraps
+import time
+def timefn(fn):
+    """
+    Decorator to time methods
+    :rtype : object
+    :param fn:
+    :return:
+    """
+    @wraps(fn)
+    def measure_time(*args, **kwargs):
+        t1 = time.time()
+        result = fn(*args, **kwargs)
+        t2 = time.time()
+        print ("@timefn:" + fn.func_name + " took " + str(t2 - t1) + " seconds")
+        return result
+    return measure_time
+
+
 # Generate a random ID for file save
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
@@ -91,6 +110,58 @@ def update_mongo(temp_sam_run_path, jid, run_type):
     db['sam'].save(document)
 
 
+def split_csv(number, curr_path):
+    """
+    Load master CSV for SuperPRZM run as Pandas DataFrame and slice it
+    based on the number of Futures objects created to execute it.
+    (Currently Fortran is set to accept only a 1 char digit; therefore,
+    the max number here is 9)
+    :param number: int (1 - 9)
+    :param curr_path: String; absolute path to this module
+    :return: None
+    """
+
+    print "number = ", number
+    import pandas as pd
+    df = pd.read_csv(os.path.join(
+        curr_path, 'bin', 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'
+    ))
+
+    if number > 9:
+        number = 9
+    if number < 1:
+        number = 1
+
+    try:
+        rows_per_sect = df.shape[0] / number
+        print rows_per_sect
+        print type(rows_per_sect)
+    except:
+        number = 1
+        rows_per_sect = df.shape[0] / number
+
+    i = 1
+    while i <= number:
+        if i == 1:
+            print 1
+            # First slice
+            df_slice = df[:rows_per_sect]
+        elif i == number:
+            print str(i) + " (last)"
+            # End slice: slice to the end of the DataFrame
+            df_slice = df[((i - 1) * rows_per_sect):]
+        else:
+            print i
+            # Middle slices (not first or last)
+            df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
+
+        df_slice.to_csv(os.path.join(
+            curr_path, 'bin', 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + str(i) + '.csv'
+        ), index=False)
+
+        i += 1
+
+
 def sam_callback(temp_sam_run_path, jid, run_type, future):
     """
     temp_sam_run_path: String; Absolute path to SAM output temporary directory
@@ -106,11 +177,11 @@ def sam_callback(temp_sam_run_path, jid, run_type, future):
     logging.info("jid = %s" %jid)
     logging.info("run_type = %s" %run_type)
 
-    update_mongo(temp_sam_run_path, jid, run_type)
+    # update_mongo(temp_sam_run_path, jid, run_type)
 
-    shutil.rmtree(temp_sam_run_path)
+    # shutil.rmtree(temp_sam_run_path)
 
-
+@timefn
 def sam(inputs_json, jid, run_type):
     """
     inputs_json; String (JSON); 
@@ -144,6 +215,13 @@ def sam(inputs_json, jid, run_type):
         # Run SAM, but first generate SAM input file        
 
         try:
+            no_of_workers = int(args['workers'])
+        except:
+            no_of_workers = 1
+
+        print no_of_workers
+
+        try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
             curr_path = os.path.abspath(os.path.dirname(__file__))
             temp_sam_run_path = os.path.join(curr_path, 'bin', name_temp)
@@ -168,7 +246,7 @@ def sam(inputs_json, jid, run_type):
                 from functools import partial
 
                 # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                pool = Pool(max_workers=1)
+                pool = Pool(max_workers=no_of_workers)
 
                 sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
                 print sam_path
@@ -178,9 +256,15 @@ def sam(inputs_json, jid, run_type):
                 # Create list of args
                 args = [sam_path, sam_arg1, sam_arg2]
 
-                future = pool.submit(subprocess.call, args)
-                # When the Fortran exe finishes call "sam_callback" callback function
-                future.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                split_csv(no_of_workers, curr_path)
+
+                i = 1
+                while i <= no_of_workers:
+                    pool.submit(subprocess.call, args + " " + str(i)).add_done_callback(
+                        partial(sam_callback, temp_sam_run_path, jid, run_type)
+                    )
+                    i += 1
+
                 # Destroy the Pool object which hosts the threads
                 pool.shutdown(wait=False)
 
@@ -195,20 +279,48 @@ def sam(inputs_json, jid, run_type):
                     from functools import partial
 
                     # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                    pool = Pool(max_workers=1)
+                    pool = Pool(max_workers=no_of_workers)
 
                     sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
                     print sam_path
                     # Define SuperPRZMpesticide.exe command line arguments
                     sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
                     sam_arg2 = name_temp                          # Temp directory name for SAM run
+                    # sam_arg3 = "2"
                     # Create list of args
+                    # args = sam_path + " " + sam_arg1 + " " + sam_arg2# + " " + sam_arg3
                     args = sam_path + " " + sam_arg1 + " " + sam_arg2
 
-                    future = pool.submit(subprocess.call, args)
-                    # When the Fortran exe finishes call "sam_callback" callback function
-                    future.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # Destroy the Pool object which hosts the threads
+                    split_csv(no_of_workers, curr_path)
+
+                    i = 1
+                    while i <= no_of_workers:
+                        pool.submit(subprocess.call, args + " " + str(i)).add_done_callback(
+                            partial(sam_callback, temp_sam_run_path, jid, run_type)
+                        )
+                        i += 1
+
+                    # future1 = pool.submit(subprocess.call, args + " 1")
+                    # future2 = pool.submit(subprocess.call, args + " 2")
+                    # future3 = pool.submit(subprocess.call, args + " 3")
+                    # future4 = pool.submit(subprocess.call, args + " 4")
+                    # future5 = pool.submit(subprocess.call, args + " 5")
+                    # future6 = pool.submit(subprocess.call, args + " 6")
+                    # future7 = pool.submit(subprocess.call, args + " 7")
+                    # future8 = pool.submit(subprocess.call, args + " 8")
+                    # future9 = pool.submit(subprocess.call, args + " 9")
+                    # # When the Fortran exe finishes call "sam_callback" callback function
+                    # future1.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future2.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future3.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future4.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future5.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future6.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future7.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future8.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+                    # future9.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
+
+                    # Destroy the Pool object which hosts the threads, but do not wait for the threads to finish
                     pool.shutdown(wait=False)
 
                 except Exception, e:
