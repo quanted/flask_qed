@@ -110,7 +110,7 @@ def update_mongo(temp_sam_run_path, jid, run_type):
     db['sam'].save(document)
 
 
-def split_csv(number, curr_path):
+def split_csv(number, curr_path, name_temp):
     """
     Load master CSV for SuperPRZM run as Pandas DataFrame and slice it
     based on the number of Futures objects created to execute it.
@@ -140,6 +140,7 @@ def split_csv(number, curr_path):
         number = 1
         rows_per_sect = df.shape[0] / number
 
+    os.makedirs(os.path.join(curr_path, 'bin', name_temp, 'EcoRecipes_huc12', 'recipe_combos2012'))
     i = 1
     while i <= number:
         if i == 1:
@@ -156,7 +157,7 @@ def split_csv(number, curr_path):
             df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
         df_slice.to_csv(os.path.join(
-            curr_path, 'bin', 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + str(i) + '.csv'
+            curr_path, 'bin', name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + str(i) + '.csv'
         ), index=False)
 
         i += 1
@@ -224,8 +225,10 @@ def sam(inputs_json, jid, run_type):
             no_of_workers = int(args['workers'])
         except:
             no_of_workers = 1
-
-        print no_of_workers
+        try:
+            no_of_processes = no_of_workers * int(args['processes'])
+        except:
+            no_of_processes = 1
 
         try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
@@ -255,7 +258,7 @@ def sam(inputs_json, jid, run_type):
                 from functools import partial
 
                 # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                pool = Pool(max_workers=16)
+                pool = Pool(max_workers=no_of_workers)
 
                 sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
                 print sam_path
@@ -265,26 +268,16 @@ def sam(inputs_json, jid, run_type):
                 # Create list of args
                 # args = [sam_path, sam_arg1, sam_arg2, "1"]
 
-                split_csv(no_of_workers, curr_path)
+                # Divide master HUC CSV into subsets for current run
+                split_csv(no_of_processes, curr_path, name_temp)
 
-                args_dict = {}
-                import time
-                for x in range(no_of_workers):
-
-                    args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
-
-                    # args[3] = str(x + 1)
-                    # args_dict[x + 1] = args
-                    # print args
-                    print args_dict[x + 1]
-                # print args_dict
-                j = 1
-                while j <= no_of_workers:
-                    pool.submit(subprocess.call, args_dict[j]).add_done_callback(
+                for x in range(no_of_processes):
+                    # args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
+                    # print args_dict[x + 1]
+                    print [sam_path, sam_arg1, sam_arg2, str(x + 1)]
+                    pool.submit(subprocess.call, [sam_path, sam_arg1, sam_arg2, str(x + 1)]).add_done_callback(
                         partial(sam_callback, temp_sam_run_path, jid, run_type)
                     )
-                    # time.sleep(3)
-                    j += 1
 
                 # Destroy the Pool object which hosts the threads
                 pool.shutdown(wait=False)
@@ -300,63 +293,24 @@ def sam(inputs_json, jid, run_type):
                     from functools import partial
 
                     # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                    pool = Pool(max_workers=16)
+                    pool = Pool(max_workers=no_of_workers)
 
                     sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
                     print sam_path
                     # Define SuperPRZMpesticide.exe command line arguments
                     sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
                     sam_arg2 = name_temp                          # Temp directory name for SAM run
-                    # sam_arg3 = "2"
-                    # Create list of args
-                    # args = sam_path + " " + sam_arg1 + " " + sam_arg2# + " " + sam_arg3
-                    # args = sam_path + " " + sam_arg1 + " " + sam_arg2
-                    args = [sam_path, sam_arg1, sam_arg2, "1"]
 
-                    split_csv(no_of_workers, curr_path)
+                    # Divide master HUC CSV into subsets for current run
+                    split_csv(no_of_processes, curr_path, name_temp)
 
-
-                    args_dict = {}
-
-                    for x in range(no_of_workers):
-
-                        args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
-
-                        # args[3] = str(x + 1)
-                        # args_dict[x + 1] = args
-                        # print args
-                        print args_dict[x + 1]
-                    # print args_dict
-                    j = 1
-                    while j <= no_of_workers:
-                        pool.submit(subprocess.call, args_dict[j]).add_done_callback(
+                    for x in range(no_of_processes):
+                        # args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
+                        # print args_dict[x + 1]
+                        print [sam_path, sam_arg1, sam_arg2, str(x + 1)]
+                        pool.submit(subprocess.call, [sam_path, sam_arg1, sam_arg2, str(x + 1)]).add_done_callback(
                             partial(sam_callback, temp_sam_run_path, jid, run_type)
                         )
-                        j += 1
-                        # pool.submit(subprocess.call, args + " " + str(i)).add_done_callback(
-                        #     partial(sam_callback, temp_sam_run_path, jid, run_type)
-                        # )
-                        # i += 1
-
-                    # future1 = pool.submit(subprocess.call, args + " 1")
-                    # future2 = pool.submit(subprocess.call, args + " 2")
-                    # future3 = pool.submit(subprocess.call, args + " 3")
-                    # future4 = pool.submit(subprocess.call, args + " 4")
-                    # future5 = pool.submit(subprocess.call, args + " 5")
-                    # future6 = pool.submit(subprocess.call, args + " 6")
-                    # future7 = pool.submit(subprocess.call, args + " 7")
-                    # future8 = pool.submit(subprocess.call, args + " 8")
-                    # future9 = pool.submit(subprocess.call, args + " 9")
-                    # # When the Fortran exe finishes call "sam_callback" callback function
-                    # future1.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future2.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future3.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future4.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future5.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future6.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future7.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future8.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
-                    # future9.add_done_callback(partial(sam_callback, temp_sam_run_path, jid, run_type))
 
                     # Destroy the Pool object which hosts the threads, but do not wait for the threads to finish
                     pool.shutdown(wait=False)
@@ -367,7 +321,7 @@ def sam(inputs_json, jid, run_type):
                     """
                     Don't actually run SAM, just delay a few seconds...
                     """
-                    future = pool.submit(subprocess.Popen, "timeout 3")
+                    pool.submit(subprocess.Popen, "timeout 3")
 
 
             input_file_html = convert_text_to_html(sam_input_file_path)
