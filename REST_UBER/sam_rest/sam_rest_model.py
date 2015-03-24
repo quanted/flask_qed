@@ -127,8 +127,8 @@ def split_csv(number, curr_path):
         curr_path, 'bin', 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'
     ))
 
-    if number > 9:
-        number = 9
+    if number > 99:
+        number = 99
     if number < 1:
         number = 1
 
@@ -173,6 +173,12 @@ def sam_callback(temp_sam_run_path, jid, run_type, future):
     Calls update_mongo() to insert output file into MongoDB. 
     Deletes SAM output temporary directory.
     """
+
+    logging.info(future.cancelled())
+    logging.info(future.result())
+    logging.info(future.done())
+    logging.info(future.exception())
+
     logging.info("temp_sam_run_path = %s" %temp_sam_run_path)
     logging.info("jid = %s" %jid)
     logging.info("run_type = %s" %run_type)
@@ -234,6 +240,9 @@ def sam(inputs_json, jid, run_type):
             # Generate "SAM.inp" file
             import sam_input_generator
             sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
+
+            for x in range(no_of_workers):
+                shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + str((x + 1)) + '.inp'))
             
             # Set "SuperPRZMpesticide.exe" based on OS
             if os.name == 'posix':
@@ -246,7 +255,7 @@ def sam(inputs_json, jid, run_type):
                 from functools import partial
 
                 # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                pool = Pool(max_workers=no_of_workers)
+                pool = Pool(max_workers=16)
 
                 sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
                 print sam_path
@@ -259,7 +268,7 @@ def sam(inputs_json, jid, run_type):
                 split_csv(no_of_workers, curr_path)
 
                 args_dict = {}
-
+                import time
                 for x in range(no_of_workers):
 
                     args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
@@ -274,6 +283,7 @@ def sam(inputs_json, jid, run_type):
                     pool.submit(subprocess.call, args_dict[j]).add_done_callback(
                         partial(sam_callback, temp_sam_run_path, jid, run_type)
                     )
+                    # time.sleep(3)
                     j += 1
 
                 # Destroy the Pool object which hosts the threads
@@ -290,7 +300,7 @@ def sam(inputs_json, jid, run_type):
                     from functools import partial
 
                     # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                    pool = Pool(max_workers=no_of_workers)
+                    pool = Pool(max_workers=16)
 
                     sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
                     print sam_path
