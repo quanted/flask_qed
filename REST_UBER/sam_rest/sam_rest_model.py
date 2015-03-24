@@ -228,7 +228,7 @@ def sam(inputs_json, jid, run_type):
         try:
             no_of_processes = no_of_workers * int(args['processes'])
         except:
-            no_of_processes = 1
+            no_of_processes = no_of_workers
 
         try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
