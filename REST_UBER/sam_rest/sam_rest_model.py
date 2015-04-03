@@ -15,7 +15,6 @@ import logging
 
 
 done_list = []
-two_digit = lambda x: "0" + str(x + 1) if x < 9 else str(x + 1)   # Convert "1" to "01", etc., up to 9
 huc_output = {} # Dictionary to hold output data
 
 ##########################################################################################
@@ -25,6 +24,20 @@ key = keys_Picloud_S3.amazon_s3_key
 secretkey = keys_Picloud_S3.amazon_s3_secretkey
 ##########################################################################################    
 ##########################################################################################
+
+def two_digit(x):
+    """
+    Convert "1" to "01", etc., up to 9
+    :param x:
+    :return: String, two digit representation of int
+    """
+    if x < 9:
+        number_string = "0" + str(x + 1)
+    else:
+        number_string = str(x + 1)
+
+    return number_string
+
 
 from functools import wraps
 import time
