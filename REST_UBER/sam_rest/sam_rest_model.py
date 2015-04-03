@@ -14,6 +14,10 @@ import json
 import logging
 
 
+done_list = []
+two_digit = lambda x: "0" + str(x + 1) if x < 9 else str(x + 1)   # Convert "1" to "01", etc., up to 9
+huc_output = {} # Dictionary to hold output data
+
 ##########################################################################################
 #####AMAZON KEY, store output files. You might have to write your own import approach#####
 ##########################################################################################
@@ -21,7 +25,6 @@ key = keys_Picloud_S3.amazon_s3_key
 secretkey = keys_Picloud_S3.amazon_s3_secretkey
 ##########################################################################################    
 ##########################################################################################
-
 
 from functools import wraps
 import time
@@ -64,7 +67,16 @@ def convert_text_to_html(sam_input_file_path):
     return html
 
 
-def update_mongo(temp_sam_run_path, jid, run_type):
+def stitch_output_files(temp_sam_run_path):
+    path = os.path.join(temp_sam_run_path, "EcoPestOut_all", "EcoPestOut_UpdatedGUI", "Test1")
+    file_list = os.listdir(path)
+
+    for file in file_list:
+        # logging.info(file)
+        pass
+
+
+def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last):
     """
     sam_input_file_path: String; Absolute path to SAM output temporary directory
     jid: String; SAM run jid
@@ -74,40 +86,130 @@ def update_mongo(temp_sam_run_path, jid, run_type):
     """
 
     logging.info("update_mongo() executed!")
-    import pymongo
-    client = pymongo.MongoClient('localhost', 27017)
-    db = client.ubertool
+
+    # Connect to MongoDB server
+    try:
+        import pymongo
+        client = pymongo.MongoClient('localhost', 27017)
+        db = client.ubertool
+    except:
+        return None
+
+    # Create Mongo document for "jid" if it doesn't exist
+    count = db['sam'].find({"_id": jid}, {"_id": 1}).limit(1).count()
+    if count == 0:
+        document = {
+            "user_id": "admin",
+            "_id": jid,
+            "run_type": run_type,
+            "model_object_dict": {
+                'filename': "Eco_mth_avgdur.out",
+                'output': '',
+                'input': ''
+            }
+        }
+        try:
+            db['sam'].insert(document)
+        except:
+            logging.exception(Exception)
+
+    try:
+        """ Set the path to output files based on output preferences
+            This should really be handled in the FORTRAN code more reasonably,
+            but for now....
+        """
+
+
+        if output_pref['reporting'] == '4': # Avg Duration of Exceed (days), by month
+
+            logging.info("About to update MongoDB...")
+
+            f_out = open(os.path.join(
+                temp_sam_run_path,
+                "EcoPestOut_all",
+                "EcoPestOut_UpdatedGUI",
+                "Test1",
+                "Eco_mth_avgdur_" + section + ".out"), 'r')
+
+            f_out.next() # Skip first line
+
+            for line in f_out:
+                line_list = line.split(',')
+                if line_list[0][0] == " ": # If 1st char in first item (HUC #) is "space", replace it with a "0"
+                    line_list[0] = '0' + line_list[0][1:]
+                i = 0
+                for item in line_list:
+                    line_list[i] = item.lstrip() # Remove whitespace from beginning of string
+                    i += 1
+
+                # logging.info(line_list)
+                try:
+                    huc_output[line_list[0]] = [
+                        line_list[1],
+                        line_list[2],
+                        line_list[3],
+                        line_list[4],
+                        line_list[5],
+                        line_list[6],
+                        line_list[7],
+                        line_list[8],
+                        line_list[9],
+                        line_list[10],
+                        line_list[11],
+                        line_list[12]
+                    ]
+                except IndexError, e:
+                    logging.info(line_list)
+                    logging.exception(e)
+
+            f_out.close()
+
+            print len(huc_output.keys())
+
+            logging.info("MongoDB updated...")
+
+
+        if is_last == True:
+            db.sam.update(
+                { "_id": jid },
+                { '$set': { "model_object_dict.output": huc_output }}
+            )
+
+        else:
+            pass
+    except Exception:
+        logging.exception(Exception)
 
     """
         This needs to be updated to handle all Output Post-Processing types
     """
-    try:
-        logging.info("Trying to open Eco_mth_avgdur.out file")
-        f_out = open(os.path.join(temp_sam_run_path, "EcoPestOut_all", "EcoPestOut_UpdatedGUI", "Test1", "Eco_mth_avgdur.out"), 'r')
-        logging.info("Eco_mth_avgdur.out opened!")
-        sam_output = f_out.read()
-
-        logging.info("Trying to open SAM.inp file")
-        f_input = open(os.path.join(temp_sam_run_path, "SAM.inp"), 'r')
-        logging.info("SAM.inp opened!")
-        sam_input = f_input.read()
-
-    except Exception, e:
-        logging.exception(e)
-        sam_output = "Error reading SAM output file"
-        sam_input = "Error reading SAM input file"
-   
-    document = {
-        "user_id": "admin",
-        "_id": jid,
-        "run_type": run_type,
-        "model_object_dict": {
-            'filename': "Eco_mth_avgdur.out",
-            'output': sam_output,
-            'input': sam_input
-        }
-    }
-    db['sam'].save(document)
+    # try:
+    #     logging.info("Trying to open Eco_mth_avgdur.out file")
+    #     f_out = open(os.path.join(temp_sam_run_path, "EcoPestOut_all", "EcoPestOut_UpdatedGUI", "Test1", "Eco_mth_avgdur.out"), 'r')
+    #     logging.info("Eco_mth_avgdur.out opened!")
+    #     sam_output = f_out.read()
+    #
+    #     logging.info("Trying to open SAM.inp file")
+    #     f_input = open(os.path.join(temp_sam_run_path, "SAM.inp"), 'r')
+    #     logging.info("SAM.inp opened!")
+    #     sam_input = f_input.read()
+    #
+    # except Exception, e:
+    #     logging.exception(e)
+    #     sam_output = "Error reading SAM output file"
+    #     sam_input = "Error reading SAM input file"
+    #
+    # document = {
+    #     "user_id": "admin",
+    #     "_id": jid,
+    #     "run_type": run_type,
+    #     "model_object_dict": {
+    #         'filename': "Eco_mth_avgdur.out",
+    #         'output': sam_output,
+    #         'input': sam_input
+    #     }
+    # }
+    # db['sam'].save(document)
 
 
 def split_csv(number, curr_path, name_temp):
@@ -157,13 +259,13 @@ def split_csv(number, curr_path, name_temp):
             df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
         df_slice.to_csv(os.path.join(
-            curr_path, 'bin', name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + str(i) + '.csv'
+            curr_path, 'bin', name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + two_digit(i - 1) + '.csv'
         ), index=False)
 
         i += 1
 
 
-def sam_callback(temp_sam_run_path, jid, run_type, future):
+def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, output_pref, section, future):
     """
     temp_sam_run_path: String; Absolute path to SAM output temporary directory
     jid: String; SAM run jid
@@ -175,18 +277,27 @@ def sam_callback(temp_sam_run_path, jid, run_type, future):
     Deletes SAM output temporary directory.
     """
 
-    logging.info(future.cancelled())
-    logging.info(future.result())
-    logging.info(future.done())
-    logging.info(future.exception())
+    if future.done():
+        logging.info("Future is done")
+        if future.cancelled():
+            logging.info("but was cancelled")
+        else:
+            done_list.append("Done")
+            logging.info("Appended 'Done' to list with len = %s", len(done_list))
 
-    logging.info("temp_sam_run_path = %s" %temp_sam_run_path)
-    logging.info("jid = %s" %jid)
-    logging.info("run_type = %s" %run_type)
+            if len(done_list) == no_of_processes:
+                # Last SAM run has completed or was cancelled
+                update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last=True)
 
-    # update_mongo(temp_sam_run_path, jid, run_type)
+                logging.info("jid = %s" %jid)
+                logging.info("run_type = %s" %run_type)
+                logging.info("Last SuperPRZMpesticide process completed")
 
-    # shutil.rmtree(temp_sam_run_path)
+                # Remove temporary SAM run directory upon completion
+                # shutil.rmtree(temp_sam_run_path)
+            else:
+                update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, False)
+
 
 @timefn
 def sam(inputs_json, jid, run_type):
@@ -222,6 +333,14 @@ def sam(inputs_json, jid, run_type):
         # Run SAM, but first generate SAM input file        
 
         try:
+            """ More Output Preferences could be added to this dictionary """
+            output_pref = {
+                'output': args['output_type'],
+                'reporting': args['output_tox_thres_exceed']
+            }
+        except:
+            output_pref = {"4"}
+        try:
             no_of_workers = int(args['workers'])
         except:
             no_of_workers = 1
@@ -245,7 +364,7 @@ def sam(inputs_json, jid, run_type):
             sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
 
             for x in range(no_of_workers):
-                shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + str((x + 1)) + '.inp'))
+                shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
             
             # Set "SuperPRZMpesticide.exe" based on OS
             if os.name == 'posix':
@@ -274,12 +393,14 @@ def sam(inputs_json, jid, run_type):
                 for x in range(no_of_processes):
                     # args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
                     # print args_dict[x + 1]
-                    print [sam_path, sam_arg1, sam_arg2, str(x + 1)]
-                    pool.submit(subprocess.call, [sam_path, sam_arg1, sam_arg2, str(x + 1)]).add_done_callback(
-                        partial(sam_callback, temp_sam_run_path, jid, run_type)
+                    print [sam_path, sam_arg1, sam_arg2, two_digit[x]]
+                    pool.submit(subprocess.call,
+                        [sam_path, sam_arg1, sam_arg2, two_digit[x]]
+                    ).add_done_callback(
+                        partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes)
                     )
 
-                # Destroy the Pool object which hosts the threads
+                # Destroy the Pool object which hosts the threads when the pending Futures objects are finished
                 pool.shutdown(wait=False)
 
             else:
@@ -305,14 +426,15 @@ def sam(inputs_json, jid, run_type):
                     split_csv(no_of_processes, curr_path, name_temp)
 
                     for x in range(no_of_processes):
-                        # args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
-                        # print args_dict[x + 1]
-                        print [sam_path, sam_arg1, sam_arg2, str(x + 1)]
-                        pool.submit(subprocess.call, [sam_path, sam_arg1, sam_arg2, str(x + 1)]).add_done_callback(
-                            partial(sam_callback, temp_sam_run_path, jid, run_type)
+
+                        print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
+                        pool.submit(subprocess.call,
+                            [sam_path, sam_arg1, sam_arg2, two_digit(x)]
+                        ).add_done_callback(
+                            partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, output_pref, two_digit(x))
                         )
 
-                    # Destroy the Pool object which hosts the threads, but do not wait for the threads to finish
+                    # Destroy the Pool object which hosts the threads when the pending Futures objects are finished
                     pool.shutdown(wait=False)
 
                 except Exception, e:
@@ -324,9 +446,9 @@ def sam(inputs_json, jid, run_type):
                     pool.submit(subprocess.Popen, "timeout 3")
 
 
-            input_file_html = convert_text_to_html(sam_input_file_path)
+            # input_file_html = convert_text_to_html(sam_input_file_path)
 
-            return input_file_html
+            return jid
 
 
         except Exception, e:

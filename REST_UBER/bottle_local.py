@@ -136,7 +136,10 @@ def model_caller(model, jid):
         model_obj_dict = {'user_id':'admin', 'inputs': inputs_json, 'outputs': outputs_json, 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type}
 
         if model != 'sam':
-            save_to_mongo(model, {'user_id':'admin', 'inputs': json.dumps(inputs_json), 'outputs': json.dumps(outputs_json), 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type})
+            try:
+                save_to_mongo(model, {'user_id':'admin', 'inputs': json.dumps(inputs_json), 'outputs': json.dumps(outputs_json), 'exp_out': exp_out_json, '_id':jid, 'run_type': run_type})
+            except:
+                pass
 
         return model_obj_dict
 
@@ -748,7 +751,7 @@ def file_upload():
 """
 
 ##########insert results into mongodb#########################
-@route('/save_history_html', method='POST') 
+@route('/save_history_html', method='POST')
 @auth_basic(check)
 def insert_output_html():
     """
@@ -764,7 +767,7 @@ def insert_output_html():
     print _id
 
 
-@route('/save_history', method='POST') 
+@route('/save_history', method='POST')
 @auth_basic(check)
 def insert_model_obj():
     """
@@ -785,16 +788,51 @@ def get_model_object():
     """
     for k, v in request.json.iteritems():
         exec '%s = v' % k
-    # Cursor          Mongo collection     Document      Projection (fields to return)
-    model_object_c = db[model_name].find({"_id": jid}, {"model_object_dict": 1, "_id": 0})
-    for i in model_object_c:
-        # print i
-        model_object = i['model_object_dict']
-    logging.info({"model_object": model_object})
-    return {"model_object": model_object}
+
+    try:
+        # Cursor          Mongo collection     Document      Projection (fields to return)
+        model_object_c = db[model_name].find(
+            { "_id": jid },
+            { "model_object_dict": 1, "_id": 0 }
+        )
+        for i in model_object_c:
+            # print i
+            model_object = i['model_object_dict']
+        logging.info({"model_object": model_object})
+        return {"model_object": model_object}
+
+    except Exception, e:
+        return {"model_object": None, "error": str(e)}
 
 
-@route('/update_html', method='POST') 
+@route('/get_sam_huc_output', method='POST')
+@auth_basic(check)
+def get_model_object():
+    """
+        Return model object from MongoDB to be loaded into view (e.g. Django)
+    """
+    for k, v in request.json.iteritems():
+        exec '%s = v' % k
+
+    try:
+        # Cursor          Mongo collection
+        cursor = db.sam.aggregate([
+            { '$match': { "_id": jid } },             # Filter document by "jid" / Mongo "_id"
+            { '$project' : { "model_object_dict.output": {huc12: 1 }} }  # Return only desired HUC
+        ])
+        # print cursor
+        # print type(cursor)
+        # for i in cursor['result']:
+        #     print i
+        #     huc12_output = i[huc12]
+        logging.info({"huc12_output": cursor['result']})
+        return {"huc12_output": cursor['result']}
+
+    except Exception, e:
+        return {"huc12_output": None, "error": str(e)}
+
+
+@route('/update_html', method='POST')
 @auth_basic(check)
 def update_output_html():
     """
