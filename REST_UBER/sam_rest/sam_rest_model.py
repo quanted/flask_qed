@@ -397,20 +397,17 @@ def sam(inputs_json, jid, run_type):
                 # Define SuperPRZMpesticide.exe command line arguments
                 sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
                 sam_arg2 = name_temp                          # Temp directory name for SAM run
-                # Create list of args
-                # args = [sam_path, sam_arg1, sam_arg2, "1"]
 
                 # Divide master HUC CSV into subsets for current run
                 split_csv(no_of_processes, curr_path, name_temp)
 
                 for x in range(no_of_processes):
-                    # args_dict[x + 1] = [sam_path, sam_arg1, sam_arg2, str(x + 1)]
-                    # print args_dict[x + 1]
-                    print [sam_path, sam_arg1, sam_arg2, two_digit[x]]
+
+                    print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
                     pool.submit(subprocess.call,
-                        [sam_path, sam_arg1, sam_arg2, two_digit[x]]
+                        [sam_path, sam_arg1, sam_arg2, two_digit(x)]
                     ).add_done_callback(
-                        partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes)
+                        partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, output_pref, two_digit(x))
                     )
 
                 # Destroy the Pool object which hosts the threads when the pending Futures objects are finished
