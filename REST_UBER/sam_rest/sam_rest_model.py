@@ -97,7 +97,8 @@ def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last
 
     Saves SAM output and SAM.inp to MongoDB.
     """
-
+    global huc_output  # Use global instance of "huc_output" dictionary
+    global done_list  # Use global instance of "done_list" list
     logging.info("update_mongo() executed!")
 
     # Connect to MongoDB server
@@ -137,45 +138,52 @@ def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last
 
             logging.info("About to update MongoDB...")
 
-            f_out = open(os.path.join(
-                temp_sam_run_path,
-                "EcoPestOut_all",
-                "EcoPestOut_UpdatedGUI",
-                "Test1",
-                "Eco_mth_avgdur_" + section + ".out"), 'r')
+            try: # Some output files will not be created if there is no crop cover there
+                f_out = open(os.path.join(
+                    temp_sam_run_path,
+                    "EcoPestOut_all",
+                    "EcoPestOut_UpdatedGUI",
+                    "Test1",
+                    "Eco_mth_avgdur_" + section + ".out"), 'r')
 
-            f_out.next() # Skip first line
+                f_out.next() # Skip first line
 
-            for line in f_out:
-                line_list = line.split(',')
-                if line_list[0][0] == " ": # If 1st char in first item (HUC #) is "space", replace it with a "0"
-                    line_list[0] = '0' + line_list[0][1:]
-                i = 0
-                for item in line_list:
-                    line_list[i] = item.lstrip() # Remove whitespace from beginning of string
-                    i += 1
+                for line in f_out:
+                    line_list = line.split(',')
+                    if line_list[0][0] == " ": # If 1st char in first item (HUC #) is "space", replace it with a "0"
+                        line_list[0] = '0' + line_list[0][1:]
+                    i = 0
+                    for item in line_list:
+                        line_list[i] = item.lstrip() # Remove whitespace from beginning of string
+                        i += 1
 
-                # logging.info(line_list)
-                try:
-                    huc_output[line_list[0]] = [
-                        line_list[1],
-                        line_list[2],
-                        line_list[3],
-                        line_list[4],
-                        line_list[5],
-                        line_list[6],
-                        line_list[7],
-                        line_list[8],
-                        line_list[9],
-                        line_list[10],
-                        line_list[11],
-                        line_list[12]
-                    ]
-                except IndexError, e:
-                    logging.info(line_list)
-                    logging.exception(e)
+                    # logging.info(line_list)
+                    try:
+                        huc_output[line_list[0]] = [
+                            line_list[1],
+                            line_list[2],
+                            line_list[3],
+                            line_list[4],
+                            line_list[5],
+                            line_list[6],
+                            line_list[7],
+                            line_list[8],
+                            line_list[9],
+                            line_list[10],
+                            line_list[11],
+                            line_list[12]
+                        ]
+                    except IndexError, e:
+                        logging.info(line_list)
+                        logging.exception(e)
 
-            f_out.close()
+                f_out.close()
+
+            except IOError, e:
+                logging.exception(e)
+
+            except Exception, e:
+                logging.exception(e)
 
             print len(huc_output.keys())
 
@@ -307,7 +315,7 @@ def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, output_pref,
                 logging.info("Last SuperPRZMpesticide process completed")
 
                 # Remove temporary SAM run directory upon completion
-                # shutil.rmtree(temp_sam_run_path)
+                shutil.rmtree(temp_sam_run_path)
             else:
                 update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, False)
 
@@ -362,12 +370,31 @@ def sam(inputs_json, jid, run_type):
         except:
             no_of_processes = no_of_workers
 
+
+        # Empty output dictionary if needed
+        global huc_output
+        if len(huc_output.keys()) is not 0:
+            print "huc_output contains keys....it should not, removing them"
+            huc_output = {}
+        else:
+            print "huc_output is an empty dictionary....proceed normally"
+
+        # Empty done_list holder if needed
+        global done_list
+        if len(done_list) is not 0:
+            print "done_list is not empty....it should be, making empty now"
+            done_list = []
+        else:
+            print "done_list is an empty list....proceed normally"
+
         try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
             curr_path = os.path.abspath(os.path.dirname(__file__))
             temp_sam_run_path = os.path.join(curr_path, 'bin', name_temp)
             if not os.path.exists(temp_sam_run_path):
+                print "Creating SAM run temporary directory: ",str(temp_sam_run_path)
                 os.makedirs(temp_sam_run_path)
+                print "Creating SAM run temporary sub-directory: ",str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
                 os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
 
             sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
