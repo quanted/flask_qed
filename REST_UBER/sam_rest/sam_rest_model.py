@@ -216,10 +216,8 @@ def update_postgres(jid):
         conn = pg.connect(
             host="172.20.100.14",
             database="sam",
-            # user=keys_Picloud_S3.postgres_user,
-            # password=keys_Picloud_S3.postgres_pwd
-            user="postgres",
-            password="postgres"
+            user=keys_Picloud_S3.postgres_user,
+            password=keys_Picloud_S3.postgres_pwd
         )
     except Exception, e:
         logging.exception(e)
@@ -227,9 +225,16 @@ def update_postgres(jid):
 
     cur = conn.cursor()
 
-    # Create table with name=jid
-    cur.execute("CREATE TABLE " + str(jid) + " (huc12 varchar, data varchar);")
-    cur.executemany("INSERT INTO testLocal (huc12, data) VALUES (%s, %s);", data_list)
+    try:
+        # Create table with name=jid
+        cur.execute("CREATE TABLE jid_" + jid + " (huc12 varchar, sam_output decimal(5, 2) ARRAY);")
+        cur.executemany("INSERT INTO jid_" + jid + " (huc12, sam_output) VALUES (%s, %s);", data_list)
+
+        conn.commit()
+
+    except:
+        # Rollback bad statement
+        conn.rollback()
 
     return True
 
