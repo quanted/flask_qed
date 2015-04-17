@@ -38,30 +38,9 @@ def two_digit(x):
 
     return number_string
 
-
-from functools import wraps
-import time
-def timefn(fn):
-    """
-    Decorator to time methods
-    :rtype : object
-    :param fn:
-    :return:
-    """
-    @wraps(fn)
-    def measure_time(*args, **kwargs):
-        t1 = time.time()
-        result = fn(*args, **kwargs)
-        t2 = time.time()
-        print ("@timefn:" + fn.func_name + " took " + str(t2 - t1) + " seconds")
-        return result
-    return measure_time
-
-
 # Generate a random ID for file save
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
-
 
 def convert_text_to_html(sam_input_file_path):
     """
@@ -78,16 +57,6 @@ def convert_text_to_html(sam_input_file_path):
         html += f.read().replace('\n', '<br>')
 
     return html
-
-
-def stitch_output_files(temp_sam_run_path):
-    path = os.path.join(temp_sam_run_path, "EcoPestOut_all", "EcoPestOut_UpdatedGUI", "Test1")
-    file_list = os.listdir(path)
-
-    for file in file_list:
-        # logging.info(file)
-        pass
-
 
 def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last):
     """
@@ -189,15 +158,19 @@ def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last
 
             logging.info("MongoDB updated...")
 
-
         if is_last == True:
             db.sam.update(
                 { "_id": jid },
                 { '$set': { "model_object_dict.output": huc_output }}
             )
 
-        else:
-            pass
+            if os.name == 'posix':
+                # Only try to update Postgres DB if running on Linux, which is most likely the production server
+                try:
+                    update_postgres(jid)
+                except Exception, e:
+                    logging.exception(e)
+
     except Exception:
         logging.exception(Exception)
 
@@ -231,6 +204,34 @@ def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last
     #     }
     # }
     # db['sam'].save(document)
+
+
+def update_postgres(jid):
+    import psycopg2 as pg
+
+    data_list = huc_output.items()
+    # print data_list
+
+    try:
+        conn = pg.connect(
+            host="172.20.100.14",
+            database="sam",
+            # user=keys_Picloud_S3.postgres_user,
+            # password=keys_Picloud_S3.postgres_pwd
+            user="postgres",
+            password="postgres"
+        )
+    except Exception, e:
+        logging.exception(e)
+        return None
+
+    cur = conn.cursor()
+
+    # Create table with name=jid
+    cur.execute("CREATE TABLE " + str(jid) + " (huc12 varchar, data varchar);")
+    cur.executemany("INSERT INTO testLocal (huc12, data) VALUES (%s, %s);", data_list)
+
+    return True
 
 
 def split_csv(number, curr_path, name_temp):
@@ -320,7 +321,6 @@ def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, output_pref,
                 update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, False)
 
 
-@timefn
 def sam(inputs_json, jid, run_type):
     """
     inputs_json; String (JSON); 
@@ -411,8 +411,18 @@ def sam(inputs_json, jid, run_type):
                 print "Linux OS"
                 # Linux / UNIX based OS
                 exe = "SuperPRZMpesticide.exe"
-                
+            else:
+                print "Windows (really NOT Linux/POSIX) OS"
+                # Assuming Windows here, could be other tho and this will break
+                exe = "SuperPRZMpesticide_win.exe"
+
+            try:
                 import subprocess32 as subprocess    # Use subprocess32 for Linux (Python 3.2 backport)
+            except ImportError:
+                import subprocess
+
+            try:
+
                 from concurrent.futures import ThreadPoolExecutor as Pool
                 from functools import partial
 
@@ -440,50 +450,14 @@ def sam(inputs_json, jid, run_type):
                 # Destroy the Pool object which hosts the threads when the pending Futures objects are finished
                 pool.shutdown(wait=False)
 
-            else:
-                print "Windows (really NOT Linux) OS"
-                # Assuming Windows here, could be other tho and this will break
-                exe = "SuperPRZMpesticide_win.exe"
-                import subprocess
+            except Exception, e:
+                logging.exception(e)
 
-                try:
-                    from concurrent.futures import ThreadPoolExecutor as Pool
-                    from functools import partial
+                """
+                Don't actually run SAM, just delay a few seconds...
+                """
+                pool.submit(subprocess.Popen, "timeout 3")
 
-                    # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                    pool = Pool(max_workers=no_of_workers)
-
-                    sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
-                    print sam_path
-                    # Define SuperPRZMpesticide.exe command line arguments
-                    sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
-                    sam_arg2 = name_temp                          # Temp directory name for SAM run
-
-                    # Divide master HUC CSV into subsets for current run
-                    split_csv(no_of_processes, curr_path, name_temp)
-
-                    for x in range(no_of_processes):
-
-                        print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
-                        pool.submit(subprocess.call,
-                            [sam_path, sam_arg1, sam_arg2, two_digit(x)]
-                        ).add_done_callback(
-                            partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, output_pref, two_digit(x))
-                        )
-
-                    # Destroy the Pool object which hosts the threads when the pending Futures objects are finished
-                    pool.shutdown(wait=False)
-
-                except Exception, e:
-                    logging.exception(e)
-
-                    """
-                    Don't actually run SAM, just delay a few seconds...
-                    """
-                    pool.submit(subprocess.Popen, "timeout 3")
-
-
-            # input_file_html = convert_text_to_html(sam_input_file_path)
 
             return jid
 
