@@ -251,9 +251,10 @@ def update_global_output_holder(temp_sam_run_path, args, section):
         try: # Some output files will not be created if there is no crop cover there
             f_out = open(os.path.join(
                 temp_sam_run_path,
-                "EcoPestOut_all",
-                "EcoPestOut_UpdatedGUI",
-                "Test1",
+                'output',
+                # "EcoPestOut_all",
+                # "EcoPestOut_UpdatedGUI",
+                # "Test1",
                 "Eco_mth_avgdur_" + section + ".out"), 'r')
 
             f_out.next() # Skip first line
@@ -397,8 +398,10 @@ def sam(inputs_json, jid, run_type):
                     str(temp_sam_run_path)
                 os.makedirs(temp_sam_run_path)
                 print "Creating SAM run temporary sub-directory: ",\
-                    str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
-                os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
+                    str(os.path.join(temp_sam_run_path, 'output'))
+                os.makedirs(os.path.join(temp_sam_run_path, 'output'))
+                #     str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
+                # os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
 
             sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
 
