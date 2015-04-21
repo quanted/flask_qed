@@ -58,17 +58,12 @@ def convert_text_to_html(sam_input_file_path):
 
     return html
 
-def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last):
+def create_mongo_document(jid, run_type):
     """
-    sam_input_file_path: String; Absolute path to SAM output temporary directory
-    jid: String; SAM run jid
-    run_type: String; SAM run type ('single', 'qaqc', or 'batch')
-
-    Saves SAM output and SAM.inp to MongoDB.
+    Create MongoDB document skeleton for SAM run output
+    :param jid, run_type:
+    :return: None
     """
-    global huc_output  # Use global instance of "huc_output" dictionary
-    global done_list  # Use global instance of "done_list" list
-    logging.info("update_mongo() executed!")
 
     # Connect to MongoDB server
     try:
@@ -96,114 +91,47 @@ def update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last
         except:
             logging.exception(Exception)
 
+
+def update_mongo(temp_sam_run_path, jid, run_type, args, section):
+    """
+    Saves SAM output to MongoDB.
+
+    :param sam_input_file_path: String; Absolute path to SAM output temporary directory
+    :param jid: String; SAM run jid
+    :param run_type: String; SAM run type ('single', 'qaqc', or 'batch')
+    :param args
+    :param section
+
+    :return: None
+    """
+
+    # Connect to MongoDB server
     try:
-        """ Set the path to output files based on output preferences
-            This should really be handled in the FORTRAN code more reasonably,
-            but for now....
-        """
+        import pymongo
+        client = pymongo.MongoClient('localhost', 27017)
+        db = client.ubertool
+    except:
+        return None
 
+    global huc_output  # Use global instance of "huc_output" dictionary
+    logging.info("update_mongo() executed!")
 
-        if output_pref['reporting'] == '4': # Avg Duration of Exceed (days), by month
-
-            logging.info("About to update MongoDB...")
-
-            try: # Some output files will not be created if there is no crop cover there
-                f_out = open(os.path.join(
-                    temp_sam_run_path,
-                    "EcoPestOut_all",
-                    "EcoPestOut_UpdatedGUI",
-                    "Test1",
-                    "Eco_mth_avgdur_" + section + ".out"), 'r')
-
-                f_out.next() # Skip first line
-
-                for line in f_out:
-                    line_list = line.split(',')
-                    if line_list[0][0] == " ": # If 1st char in first item (HUC #) is "space", replace it with a "0"
-                        line_list[0] = '0' + line_list[0][1:]
-                    i = 0
-                    for item in line_list:
-                        line_list[i] = item.lstrip() # Remove whitespace from beginning of string
-                        i += 1
-
-                    # logging.info(line_list)
-                    try:
-                        huc_output[line_list[0]] = [
-                            line_list[1],
-                            line_list[2],
-                            line_list[3],
-                            line_list[4],
-                            line_list[5],
-                            line_list[6],
-                            line_list[7],
-                            line_list[8],
-                            line_list[9],
-                            line_list[10],
-                            line_list[11],
-                            line_list[12]
-                        ]
-                    except IndexError, e:
-                        logging.info(line_list)
-                        logging.exception(e)
-
-                f_out.close()
-
-            except IOError, e:
-                logging.exception(e)
-
+    try:
+        logging.info("About to update MongoDB...")
+        db.sam.update(
+            { "_id": jid },
+            { '$set': { "model_object_dict.output": huc_output }}
+        )
+        logging.info("MongoDB updated...")
+        if os.name == 'posix':
+            # Only try to update Postgres DB if running on Linux, which is most likely the production server
+            try:
+                update_postgres(jid, args['output_tox_thres_exceed'])
             except Exception, e:
                 logging.exception(e)
 
-            print len(huc_output.keys())
-
-            logging.info("MongoDB updated...")
-
-        if is_last == True:
-            db.sam.update(
-                { "_id": jid },
-                { '$set': { "model_object_dict.output": huc_output }}
-            )
-
-            if os.name == 'posix':
-                # Only try to update Postgres DB if running on Linux, which is most likely the production server
-                try:
-                    update_postgres(jid)
-                except Exception, e:
-                    logging.exception(e)
-
     except Exception:
         logging.exception(Exception)
-
-    """
-        This needs to be updated to handle all Output Post-Processing types
-    """
-    # try:
-    #     logging.info("Trying to open Eco_mth_avgdur.out file")
-    #     f_out = open(os.path.join(temp_sam_run_path, "EcoPestOut_all", "EcoPestOut_UpdatedGUI", "Test1", "Eco_mth_avgdur.out"), 'r')
-    #     logging.info("Eco_mth_avgdur.out opened!")
-    #     sam_output = f_out.read()
-    #
-    #     logging.info("Trying to open SAM.inp file")
-    #     f_input = open(os.path.join(temp_sam_run_path, "SAM.inp"), 'r')
-    #     logging.info("SAM.inp opened!")
-    #     sam_input = f_input.read()
-    #
-    # except Exception, e:
-    #     logging.exception(e)
-    #     sam_output = "Error reading SAM output file"
-    #     sam_input = "Error reading SAM input file"
-    #
-    # document = {
-    #     "user_id": "admin",
-    #     "_id": jid,
-    #     "run_type": run_type,
-    #     "model_object_dict": {
-    #         'filename': "Eco_mth_avgdur.out",
-    #         'output': sam_output,
-    #         'input': sam_input
-    #     }
-    # }
-    # db['sam'].save(document)
 
 
 def update_postgres(jid):
@@ -227,7 +155,8 @@ def update_postgres(jid):
 
     try:
         # Create table with name=jid
-        cur.execute("CREATE TABLE jid_" + jid + " (huc12 varchar, sam_output decimal(5, 2) ARRAY);")
+        # cur.execute("CREATE TABLE jid_" + jid + " (huc12 varchar, sam_output decimal(5, 2) ARRAY);")
+        cur.execute("CREATE TABLE jid_" + jid + " (huc12 varchar, sam_output varchar ARRAY);")
         cur.executemany("INSERT INTO jid_" + jid + " (huc12, sam_output) VALUES (%s, %s);", data_list)
 
         conn.commit()
@@ -292,7 +221,83 @@ def split_csv(number, curr_path, name_temp):
         i += 1
 
 
-def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, output_pref, section, future):
+def empty_global_output_holders():
+    # Empty output dictionary if needed
+    global huc_output
+    if len(huc_output.keys()) is not 0:
+        print "huc_output contains keys....it should not, removing them"
+        huc_output = {}
+    else:
+        print "huc_output is an empty dictionary....proceed normally"
+
+    # Empty done_list holder if needed
+    global done_list
+    if len(done_list) is not 0:
+        print "done_list is not empty....it should be, making empty now"
+        done_list = []
+    else:
+        print "done_list is an empty list....proceed normally"
+
+
+def update_global_output_holder(temp_sam_run_path, args, section):
+
+    """ Set the path to output files based on output preferences
+        This should really be handled in the FORTRAN code more reasonably,
+        but for now....
+    """
+
+    if args['output_tox_thres_exceed'] == '4': # Avg Duration of Exceed (days), by month
+
+        try: # Some output files will not be created if there is no crop cover there
+            f_out = open(os.path.join(
+                temp_sam_run_path,
+                "EcoPestOut_all",
+                "EcoPestOut_UpdatedGUI",
+                "Test1",
+                "Eco_mth_avgdur_" + section + ".out"), 'r')
+
+            f_out.next() # Skip first line
+
+            for line in f_out:
+                line_list = line.split(',')
+                if line_list[0][0] == " ": # If 1st char in first item (HUC #) is "space", replace it with a "0"
+                    line_list[0] = '0' + line_list[0][1:]
+                i = 0
+                for item in line_list:
+                    line_list[i] = item.lstrip() # Remove whitespace from beginning of string
+                    i += 1
+
+                # logging.info(line_list)
+                try:
+                    huc_output[line_list[0]] = [
+                        line_list[1],
+                        line_list[2],
+                        line_list[3],
+                        line_list[4],
+                        line_list[5],
+                        line_list[6],
+                        line_list[7],
+                        line_list[8],
+                        line_list[9],
+                        line_list[10],
+                        line_list[11],
+                        line_list[12]
+                    ]
+                except IndexError, e:
+                    logging.info(line_list)
+                    logging.exception(e)
+
+            f_out.close()
+
+        except IOError, e:
+            logging.exception(e)
+
+        except Exception, e:
+            logging.exception(e)
+
+        print len(huc_output.keys())
+
+def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
     """
     temp_sam_run_path: String; Absolute path to SAM output temporary directory
     jid: String; SAM run jid
@@ -314,7 +319,8 @@ def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, output_pref,
 
             if len(done_list) == no_of_processes:
                 # Last SAM run has completed or was cancelled
-                update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, is_last=True)
+                update_global_output_holder(temp_sam_run_path, args, section)
+                update_mongo(temp_sam_run_path, jid, run_type, args, section)
 
                 logging.info("jid = %s" %jid)
                 logging.info("run_type = %s" %run_type)
@@ -323,7 +329,7 @@ def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, output_pref,
                 # Remove temporary SAM run directory upon completion
                 shutil.rmtree(temp_sam_run_path)
             else:
-                update_mongo(temp_sam_run_path, jid, run_type, output_pref, section, False)
+                update_global_output_holder(temp_sam_run_path, args, section)
 
 
 def sam(inputs_json, jid, run_type):
@@ -339,7 +345,7 @@ def sam(inputs_json, jid, run_type):
     returns: dict; Filled with dummy values.
 
     If actual run:
-    returns: String (HTML); SAM.inp formatted in HTML.
+    returns: String; "jid"
 
     Actual run launches SuperPRZMPesticide after determining which OS is being used 
     in a separate process.  A Futures object is created and when the process is finished 
@@ -358,14 +364,19 @@ def sam(inputs_json, jid, run_type):
         logging.info('++++++++++++ C U S T O M ++++++++++++')
         # Run SAM, but first generate SAM input file        
 
-        try:
-            """ More Output Preferences could be added to this dictionary """
-            output_pref = {
-                'output': args['output_type'],
-                'reporting': args['output_tox_thres_exceed']
-            }
-        except:
-            output_pref = {"4"}
+        # try:
+        #     """ Create 'output_pref' dictionary """
+        #     output_pref = {
+        #         'output': args['output_type'],
+        #     }
+        #     if output_pref['output'] == '2':
+        #         output_pref['avg_output_pref'] = ['output_time_avg_option']
+        #         output_pref['reporting'] = args['output_tox_thres_exceed']
+        # except:
+        #     output_pref = {
+        #         'output': "2",
+        #         'reporting': "4"
+        #     }
         try:
             no_of_workers = int(args['workers'])
         except:
@@ -375,31 +386,18 @@ def sam(inputs_json, jid, run_type):
         except:
             no_of_processes = no_of_workers
 
-
-        # Empty output dictionary if needed
-        global huc_output
-        if len(huc_output.keys()) is not 0:
-            print "huc_output contains keys....it should not, removing them"
-            huc_output = {}
-        else:
-            print "huc_output is an empty dictionary....proceed normally"
-
-        # Empty done_list holder if needed
-        global done_list
-        if len(done_list) is not 0:
-            print "done_list is not empty....it should be, making empty now"
-            done_list = []
-        else:
-            print "done_list is an empty list....proceed normally"
+        empty_global_output_holders()
 
         try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
             curr_path = os.path.abspath(os.path.dirname(__file__))
             temp_sam_run_path = os.path.join(curr_path, 'bin', name_temp)
             if not os.path.exists(temp_sam_run_path):
-                print "Creating SAM run temporary directory: ",str(temp_sam_run_path)
+                print "Creating SAM run temporary directory: ",\
+                    str(temp_sam_run_path)
                 os.makedirs(temp_sam_run_path)
-                print "Creating SAM run temporary sub-directory: ",str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
+                print "Creating SAM run temporary sub-directory: ",\
+                    str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
                 os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
 
             sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
@@ -449,7 +447,7 @@ def sam(inputs_json, jid, run_type):
                     pool.submit(subprocess.call,
                         [sam_path, sam_arg1, sam_arg2, two_digit(x)]
                     ).add_done_callback(
-                        partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, output_pref, two_digit(x))
+                        partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
                     )
 
                 # Destroy the Pool object which hosts the threads when the pending Futures objects are finished
@@ -463,14 +461,16 @@ def sam(inputs_json, jid, run_type):
                 """
                 pool.submit(subprocess.Popen, "timeout 3")
 
+            # Create MongoDB document skeleton for SAM run output
+            create_mongo_document(jid, run_type)
 
             return jid
 
 
         except Exception, e:
             logging.exception(e)
-            return {'user_id':'admin', 'result': {'error': str(e)}, '_id':jid}
+            return {'user_id': 'admin', 'result': {'error': str(e)}, '_id': jid}
     else:
         logging.info('++++++++++++ E L S E ++++++++++++')
         # Canned model run; do not run SAM
-        return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
+        return {'user_id': 'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id': jid}
