@@ -173,11 +173,12 @@ def update_postgres(jid, args, huc_output):
 
     else: # Time-Averaged Results
 
-        for x in huc_output.items():
-            x_tup = tuple(x[1])
-            huc_output[x[0]] = x_tup
+        data_list = huc_output.items()  # Convert dict to list of tuples -> [ ( k, (v) ), ... ]
 
-        data_list = huc_output.items()
+        i = 0
+        for item in data_list:  # Concatenate list items into 1 single tuple = (k, v1, v2, v3, etc..)
+            data_list[i] = tuple(item[0]) + tuple(item[1])
+            i += 1
 
         if args['output_tox_thres_exceed'] in ('1', '3'): # By year
 
