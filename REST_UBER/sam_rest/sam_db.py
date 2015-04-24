@@ -178,9 +178,9 @@ def update_postgres(jid, args, huc_output):
         i = 0
         for item in data_list:  # Concatenate list items into 1 single tuple = (k, v1, v2, v3, etc..)
             data_list[i] = tuple(item[0]) + tuple(item[1])
-            i += 1
             print data_list[i]
             print len(data_list[i])
+            i += 1
 
 
 
