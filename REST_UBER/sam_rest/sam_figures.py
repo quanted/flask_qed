@@ -69,7 +69,7 @@ def GenerateSAM_StreakBoxplot(self, mongokey):
 	ax1 = fig.add_subplot(111)
 
 	# Create a boxplot
-	bp = ax.boxplot(sam, notch=0, sym='+', vert=1, whis=1.5, patch_artist = True)
+	bp = ax.boxplot(sam_vector, notch=0, sym='+', vert=1, whis=1.5, patch_artist = True)
 	plt.setp(bp['boxes'], color='black')
 	plt.setp(bp['whiskers'], color='black')
 	plt.setp(bp['fliers'], color='red', marker='+')

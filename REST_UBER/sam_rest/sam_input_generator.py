@@ -5,8 +5,7 @@ Created on Thu Nov 14 10:18:30 2013
 @author: Jon F
 """
 
-import os, logging
-import datetime
+import copy
 from datetime import date, datetime, timedelta
 
 
@@ -400,37 +399,37 @@ def output_time_avg_options(output_time_avg_option):
 
     return options
 
-def inputs_preprocessing(args):
+def inputs_preprocessing(inputs):
  
-    start_datetime_object = datetime.strptime(args['sim_date_start'], "%m/%d/%Y")
-    end_datetime_object = datetime.strptime(args['sim_date_end'], "%m/%d/%Y")
+    start_datetime_object = datetime.strptime(inputs['sim_date_start'], "%m/%d/%Y")
+    end_datetime_object = datetime.strptime(inputs['sim_date_end'], "%m/%d/%Y")
 
-    args['sim_date_start_index'] = convert_date_to_days_since_date2(start_datetime_object.date(), date(1984, 1, 1))
-    args['sim_date_start_since1900'] = convert_date_to_days_since_date2(start_datetime_object.date(), date(1900, 1, 1))
-    args['sim_date_end_since1900'] = convert_date_to_days_since_date2(end_datetime_object.date(), date(1900, 1, 1))
-    args['sim_date_1st_year'] = start_datetime_object.year
-    args['sim_date_1st_month'] = start_datetime_object.month
-    args['sim_date_1st_day'] = start_datetime_object.day
-    args['sim_date_last_year'] = end_datetime_object.year
-    args['sim_no_of_years'] = args['sim_date_last_year'] - args['sim_date_1st_year'] + 1
-    args['sim_no_of_days'] = args['sim_date_end_since1900'] - args['sim_date_start_since1900'] + 1
+    inputs['sim_date_start_index'] = convert_date_to_days_since_date2(start_datetime_object.date(), date(1984, 1, 1))
+    inputs['sim_date_start_since1900'] = convert_date_to_days_since_date2(start_datetime_object.date(), date(1900, 1, 1))
+    inputs['sim_date_end_since1900'] = convert_date_to_days_since_date2(end_datetime_object.date(), date(1900, 1, 1))
+    inputs['sim_date_1st_year'] = start_datetime_object.year
+    inputs['sim_date_1st_month'] = start_datetime_object.month
+    inputs['sim_date_1st_day'] = start_datetime_object.day
+    inputs['sim_date_last_year'] = end_datetime_object.year
+    inputs['sim_no_of_years'] = inputs['sim_date_last_year'] - inputs['sim_date_1st_year'] + 1
+    inputs['sim_no_of_days'] = inputs['sim_date_end_since1900'] - inputs['sim_date_start_since1900'] + 1
 
-    sim_day_lists = sim_date_index_list(args['sim_date_start_since1900'], args['sim_date_end_since1900'], start_datetime_object)
-    args['sim_day_index_list'] = sim_day_lists[0]
-    args['sim_day_date_list'] = sim_day_lists[1]
+    sim_day_lists = sim_date_index_list(inputs['sim_date_start_since1900'], inputs['sim_date_end_since1900'], start_datetime_object)
+    inputs['sim_day_index_list'] = sim_day_lists[0]
+    inputs['sim_day_date_list'] = sim_day_lists[1]
 
-    args['crop_list_no'] = args['crop_list_no'].split(',')
+    inputs['crop_list_no'] = inputs['crop_list_no'].split(',')
 
-    app_num_record_list = app_num_record(args)
-    args['app_num_record'] = app_num_record_list[0]
-    args['app_record_day_since_1900'] = app_num_record_list[1]
-    args['app_rate'] = app_num_record_list[2]
-    args['app_method'] = app_num_record_list[3]
-    args['total_no_of_apps'] = app_num_record_list[4]
+    app_num_record_list = app_num_record(inputs)
+    inputs['app_num_record'] = app_num_record_list[0]
+    inputs['app_record_day_since_1900'] = app_num_record_list[1]
+    inputs['app_rate'] = app_num_record_list[2]
+    inputs['app_method'] = app_num_record_list[3]
+    inputs['total_no_of_apps'] = app_num_record_list[4]
 
-    args['output_time_avg_conc'] = output_time_avg_options(args['output_time_avg_option'])
+    inputs['output_time_avg_conc'] = output_time_avg_options(inputs['output_time_avg_option'])
 
-    return args
+    return inputs
 
 def generate_sam_input_file(args, sam_input_file_path):
     """
@@ -441,10 +440,7 @@ def generate_sam_input_file(args, sam_input_file_path):
         returns: nothing
     """
 
-    # for item in args:
-    # 	logging.info(item + ' : ' + args[item])
-
-    inputs = inputs_preprocessing(args)
+    inputs = inputs_preprocessing(copy.deepcopy(args))  # Create a new copy of args dict to not mess with the original POSTed 'args'
 
     ####################Start writing input file###################
 

@@ -12,7 +12,7 @@ import random
 import keys_Picloud_S3
 import json
 import logging
-
+import sam_db
 
 done_list = []
 huc_output = {} # Dictionary to hold output data
@@ -22,7 +22,201 @@ huc_output = {} # Dictionary to hold output data
 ##########################################################################################
 key = keys_Picloud_S3.amazon_s3_key
 secretkey = keys_Picloud_S3.amazon_s3_secretkey
-##########################################################################################    
+##########################################################################################
+##########################################################################################
+
+
+def sam(inputs_json, jid, run_type):
+    """
+    inputs_json; String (JSON);
+    jid: String; SAM run jid
+    run_type: String; SAM run type ('single', 'qaqc', or 'batch')
+
+    SAM model run entry point.  Determines if run is to be pre-canned (demo)
+    or an actual SuperPRZMpesticide.exe run.
+
+    If pre-canned:
+    returns: dict; Filled with dummy values.
+
+    If actual run:
+    returns: String; "jid"
+
+    Actual run launches SuperPRZMPesticide after determining which OS is being used
+    in a separate process.  A Futures object is created and when the process is finished
+    executing (SAM completes or is killed) a callback function is fired (sam_callback()).
+    The callback function stores the output and input file into MongoDB for later
+    retrieval.
+    """
+    args = json.loads(inputs_json)
+
+    # Generate random name for current run
+    name_temp = id_generator()
+    print name_temp
+
+    # Custom or pre-canned run?
+    if args['scenario_selection'] == '0':
+        logging.info('++++++++++++ C U S T O M ++++++++++++')
+        # Run SAM
+        try:
+            no_of_workers = int(args['workers'])
+        except:
+            no_of_workers = 1
+        try:
+            no_of_processes = no_of_workers * int(args['processes'])
+        except:
+            no_of_processes = no_of_workers
+
+        empty_global_output_holders()
+
+        try:
+            # Create temporary dir based on "name_temp" to store SAM run input file and outputs
+            curr_path = os.path.abspath(os.path.dirname(__file__))
+            temp_sam_run_path = os.path.join(curr_path, 'bin', name_temp)
+            if not os.path.exists(temp_sam_run_path):
+                print "Creating SAM run temporary directory: ",\
+                    str(temp_sam_run_path)
+                os.makedirs(temp_sam_run_path)
+                print "Creating SAM run temporary sub-directory: ",\
+                    str(os.path.join(temp_sam_run_path, 'output'))
+                os.makedirs(os.path.join(temp_sam_run_path, 'output'))
+                #     str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
+                # os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
+
+            sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
+
+            # Generate "SAM.inp" file
+            import sam_input_generator
+            sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
+
+            for x in range(no_of_workers):
+                shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
+
+            # Set "SuperPRZMpesticide.exe" based on OS
+            if os.name == 'posix':
+                print "Linux OS"
+                # Linux / UNIX based OS
+                exe = "SuperPRZMpesticide.exe"
+            else:
+                print "Windows (really NOT Linux/POSIX) OS"
+                # Assuming Windows here, could be other tho and this will break
+                exe = "SuperPRZMpesticide_win.exe"
+
+            try:
+                import subprocess32 as subprocess    # Use subprocess32 for Linux (Python 3.2 backport)
+            except ImportError:
+                import subprocess
+
+            try:
+
+                from concurrent.futures import ThreadPoolExecutor as Pool
+                from functools import partial
+
+                # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
+                pool = Pool(max_workers=no_of_workers)
+
+                sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
+                print sam_path
+                # Define SuperPRZMpesticide.exe command line arguments
+                sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
+                sam_arg2 = name_temp                          # Temp directory name for SAM run
+
+                # Divide master HUC CSV into subsets for current run
+                split_csv(no_of_processes, curr_path, name_temp)
+
+                for x in range(no_of_processes):
+
+                    print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
+                    pool.submit(subprocess.call,
+                        [sam_path, sam_arg1, sam_arg2, two_digit(x)]
+                    ).add_done_callback(
+                        partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
+                    )
+
+                # Destroy the Pool object which hosts the threads when the pending Futures objects are finished,
+                # but do not wait until all Futures are done to have this function return
+                pool.shutdown(wait=False)
+
+            except ImportError, e:
+                logging.exception(e)
+
+                """
+                Don't actually run SAM, just delay a few seconds...
+                """
+                pool.submit(subprocess.Popen, "timeout 3")
+
+            # Create MongoDB document skeleton for SAM run output
+            sam_db.create_mongo_document(jid, run_type, args)
+
+            return jid
+
+
+        except Exception, e:
+            logging.exception(e)
+            return { 'user_id': 'admin', 'result': { 'error': str(e) }, '_id': jid }
+    else:
+        logging.info('++++++++++++ E L S E ++++++++++++')
+        # Canned model run; do not run SAM
+        return  {'user_id': 'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id': jid }
+
+
+def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
+    """
+    temp_sam_run_path: String; Absolute path to SAM output temporary directory
+    jid: String; SAM run jid
+    run_type: String; SAM run type ('single', 'qaqc', or 'batch')
+    future: concurrent.Future object; automatically passed in from concurrent.Future.add_done_callback()
+
+    Callback function for when SuperPRZMPestide.exe has completed.
+    Calls update_mongo() to insert output file into MongoDB.
+    Deletes SAM output temporary directory.
+    """
+
+    if future.done():
+        logging.info("Future is done")
+        if future.cancelled():
+            logging.info("but was cancelled")
+        else:
+            global huc_output  # Use global (module) variable 'huc_output'
+            done_list.append("Done")
+            logging.info("Appended 'Done' to list with len = %s", len(done_list))
+
+            if args['output_type'] == '1': # Daily Concentrations
+                if len(done_list) == no_of_processes:
+                    # Read output files
+                    update_global_output_holder(temp_sam_run_path, args, section)
+                    sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
+
+                    logging.info("jid = %s" %jid)
+                    logging.info("run_type = %s" %run_type)
+                    logging.info("Last SuperPRZMpesticide process completed")
+
+                    # Remove temporary SAM run directory upon completion
+                    shutil.rmtree(temp_sam_run_path)
+                    empty_global_output_holders()
+                else:
+                    pass # Do nothing, wait until all runs are done
+
+            else: # Time-Averaged Concentrations
+                if len(done_list) == no_of_processes:
+                    # Last SAM run has completed or was cancelled
+                    update_global_output_holder(temp_sam_run_path, args, section)
+                    sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
+
+                    logging.info("jid = %s" %jid)
+                    logging.info("run_type = %s" %run_type)
+                    logging.info("Last SuperPRZMpesticide process completed")
+
+                    # Remove temporary SAM run directory upon completion
+                    shutil.rmtree(temp_sam_run_path)
+                    empty_global_output_holders()
+                else:
+                    update_global_output_holder(temp_sam_run_path, args, section)
+
+
+##########################################################################################
+##########################################################################################
+################################# SAM HELPER FUNCTIONS ###################################
+##########################################################################################
 ##########################################################################################
 
 def two_digit(x):
@@ -57,116 +251,6 @@ def convert_text_to_html(sam_input_file_path):
         html += f.read().replace('\n', '<br>')
 
     return html
-
-def create_mongo_document(jid, run_type):
-    """
-    Create MongoDB document skeleton for SAM run output
-    :param jid, run_type:
-    :return: None
-    """
-
-    # Connect to MongoDB server
-    try:
-        import pymongo
-        client = pymongo.MongoClient('localhost', 27017)
-        db = client.ubertool
-    except:
-        return None
-
-    # Create Mongo document for "jid" if it doesn't exist
-    count = db['sam'].find({"_id": jid}, {"_id": 1}).limit(1).count()
-    if count == 0:
-        document = {
-            "user_id": "admin",
-            "_id": jid,
-            "run_type": run_type,
-            "model_object_dict": {
-                'filename': "Eco_mth_avgdur.out",
-                'output': '',
-                'input': ''
-            }
-        }
-        try:
-            db['sam'].insert(document)
-        except:
-            logging.exception(Exception)
-
-
-def update_mongo(temp_sam_run_path, jid, run_type, args, section):
-    """
-    Saves SAM output to MongoDB.
-
-    :param sam_input_file_path: String; Absolute path to SAM output temporary directory
-    :param jid: String; SAM run jid
-    :param run_type: String; SAM run type ('single', 'qaqc', or 'batch')
-    :param args
-    :param section
-
-    :return: None
-    """
-
-    # Connect to MongoDB server
-    try:
-        import pymongo
-        client = pymongo.MongoClient('localhost', 27017)
-        db = client.ubertool
-    except:
-        return None
-
-    global huc_output  # Use global instance of "huc_output" dictionary
-    logging.info("update_mongo() executed!")
-
-    try:
-        logging.info("About to update MongoDB...")
-        db.sam.update(
-            { "_id": jid },
-            { '$set': { "model_object_dict.output": huc_output }}
-        )
-        logging.info("MongoDB updated...")
-        if os.name == 'posix':
-            # Only try to update Postgres DB if running on Linux, which is most likely the production server
-            try:
-                update_postgres(jid, args['output_tox_thres_exceed'])
-            except Exception, e:
-                logging.exception(e)
-
-    except Exception:
-        logging.exception(Exception)
-
-
-def update_postgres(jid):
-    import psycopg2 as pg
-
-    data_list = huc_output.items()
-    # print data_list
-
-    try:
-        conn = pg.connect(
-            host="172.20.100.14",
-            database="sam",
-            user=keys_Picloud_S3.postgres_user,
-            password=keys_Picloud_S3.postgres_pwd
-        )
-    except Exception, e:
-        logging.exception(e)
-        return None
-
-    cur = conn.cursor()
-
-    try:
-        # Create table with name=jid
-        # cur.execute("CREATE TABLE jid_" + jid + " (huc12 varchar, sam_output decimal(5, 2) ARRAY);")
-        cur.execute("CREATE TABLE jid_" + jid + " (huc12 varchar, sam_output varchar ARRAY);")
-        cur.executemany("INSERT INTO jid_" + jid + " (huc12, sam_output) VALUES (%s, %s);", data_list)
-
-        conn.commit()
-
-    except:
-        # Rollback bad statement
-        conn.rollback()
-
-    return True
-
 
 def split_csv(number, curr_path, name_temp):
     """
@@ -220,7 +304,6 @@ def split_csv(number, curr_path, name_temp):
 
         i += 1
 
-
 def empty_global_output_holders():
     # Empty output dictionary if needed
     global huc_output
@@ -238,7 +321,6 @@ def empty_global_output_holders():
     else:
         print "done_list is an empty list....proceed normally"
 
-
 def update_global_output_holder(temp_sam_run_path, args, section):
 
     """ Set the path to output files based on output preferences
@@ -246,234 +328,80 @@ def update_global_output_holder(temp_sam_run_path, args, section):
         but for now....
     """
 
-    if args['output_tox_thres_exceed'] == '4': # Avg Duration of Exceed (days), by month
+    if args['output_type'] == '1': # Daily Concentrations
 
-        try: # Some output files will not be created if there is no crop cover there
+        output_file_path = os.path.join(
+            temp_sam_run_path,
+            'output',
+        )
+        output_files = os.listdir(output_file_path)
+
+        print len(output_files)
+
+        for file in output_files:
+            # Read each file in the output directory
+
+            huc_id = file.split('_')[1]
+            huc_output[huc_id] = {} # Create empty dictionary for 'huc_id' key in 'huc_output'
+
             f_out = open(os.path.join(
-                temp_sam_run_path,
-                'output',
-                # "EcoPestOut_all",
-                # "EcoPestOut_UpdatedGUI",
-                # "Test1",
-                "Eco_mth_avgdur_" + section + ".out"), 'r')
+                output_file_path,
+                file
+            ), 'r')
 
             f_out.next() # Skip first line
 
-            for line in f_out:
-                line_list = line.split(',')
-                if line_list[0][0] == " ": # If 1st char in first item (HUC #) is "space", replace it with a "0"
-                    line_list[0] = '0' + line_list[0][1:]
-                i = 0
-                for item in line_list:
-                    line_list[i] = item.lstrip() # Remove whitespace from beginning of string
-                    i += 1
-
-                # logging.info(line_list)
-                try:
-                    huc_output[line_list[0]] = [
-                        line_list[1],
-                        line_list[2],
-                        line_list[3],
-                        line_list[4],
-                        line_list[5],
-                        line_list[6],
-                        line_list[7],
-                        line_list[8],
-                        line_list[9],
-                        line_list[10],
-                        line_list[11],
-                        line_list[12]
-                    ]
-                except IndexError, e:
-                    logging.info(line_list)
-                    logging.exception(e)
+            for line in f_out: # Loop over lines in output file
+                out = [x for x in line.split(' ') if x not in ('', '\n')] # List comprehension: remove '' & '\n'
+                huc_output[huc_id][out[0]] = out[1] # Update dictionary with desired line values
 
             f_out.close()
 
-        except IOError, e:
-            logging.exception(e)
+    else: # Time-Averaged Results
 
-        except Exception, e:
-            logging.exception(e)
+        if args['output_time_avg_option'] == '2': # Toxicity threshold exceedances
 
-        print len(huc_output.keys())
+            if args['output_tox_thres_exceed'] == '1': # Avg Duration of Exceed (days), by year
+                file_out = "Eco_ann_toxfreq_" + section + ".out"
 
-def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
-    """
-    temp_sam_run_path: String; Absolute path to SAM output temporary directory
-    jid: String; SAM run jid
-    run_type: String; SAM run type ('single', 'qaqc', or 'batch')
-    future: concurrent.Future object; automatically passed in from concurrent.Future.add_done_callback()
+            elif args['output_tox_thres_exceed'] == '2': # Avg Duration of Exceed (days), by year
+                file_out = "Eco_mth_toxfreq_" + section + ".out"
 
-    Callback function for when SuperPRZMPestide.exe has completed. 
-    Calls update_mongo() to insert output file into MongoDB. 
-    Deletes SAM output temporary directory.
-    """
+            elif args['output_tox_thres_exceed'] == '3': # Avg Duration of Exceed (days), by year
+                file_out = "Eco_ann_avgdur_" + section + ".out"
 
-    if future.done():
-        logging.info("Future is done")
-        if future.cancelled():
-            logging.info("but was cancelled")
-        else:
-            done_list.append("Done")
-            logging.info("Appended 'Done' to list with len = %s", len(done_list))
+            else: # '4'  Avg Duration of Exceed (days), by month
+                file_out = "Eco_mth_avgdur_" + section + ".out"
 
-            if len(done_list) == no_of_processes:
-                # Last SAM run has completed or was cancelled
-                update_global_output_holder(temp_sam_run_path, args, section)
-                update_mongo(temp_sam_run_path, jid, run_type, args, section)
+            try: # Some output files will not be created if there is no crop cover there
 
-                logging.info("jid = %s" %jid)
-                logging.info("run_type = %s" %run_type)
-                logging.info("Last SuperPRZMpesticide process completed")
+                f_out = open(os.path.join(
+                    temp_sam_run_path,
+                    'output',
+                    file_out), 'r')
 
-                # Remove temporary SAM run directory upon completion
-                shutil.rmtree(temp_sam_run_path)
-            else:
-                update_global_output_holder(temp_sam_run_path, args, section)
+                f_out.next() # Skip first line
 
+                for line in f_out:
+                    line_list = line.split(',')
+                    if line_list[0][0] == " ": # If 1st char in first item (HUC #) is "space", replace it with a "0"
+                        line_list[0] = '0' + line_list[0][1:]
+                    i = 0
+                    for item in line_list:
+                        line_list[i] = item.lstrip() # Remove whitespace from beginning of string
+                        i += 1
 
-def sam(inputs_json, jid, run_type):
-    """
-    inputs_json; String (JSON); 
-    jid: String; SAM run jid
-    run_type: String; SAM run type ('single', 'qaqc', or 'batch')
+                    # Assign HUC id as key and output values as values (list)
+                    try:
+                        huc_output[line_list[0]] = line_list[1:]
 
-    SAM model run entry point.  Determines if run is to be pre-canned (demo) 
-    or an actual SuperPRZMpesticide.exe run.
+                    except IndexError, e:
+                        logging.info(line_list)
+                        logging.exception(e)
 
-    If pre-canned:
-    returns: dict; Filled with dummy values.
+                f_out.close()
 
-    If actual run:
-    returns: String; "jid"
-
-    Actual run launches SuperPRZMPesticide after determining which OS is being used 
-    in a separate process.  A Futures object is created and when the process is finished 
-    executing (SAM completes or is killed) a callback function is fired (sam_callback()).  
-    The callback function stores the output and input file into MongoDB for later 
-    retrieval.
-    """
-    args = json.loads(inputs_json)
-
-    # Generate random name for current run
-    name_temp = id_generator()
-    print name_temp
-
-    # Custom or pre-canned run?
-    if args['scenario_selection'] == '0':
-        logging.info('++++++++++++ C U S T O M ++++++++++++')
-        # Run SAM, but first generate SAM input file        
-
-        # try:
-        #     """ Create 'output_pref' dictionary """
-        #     output_pref = {
-        #         'output': args['output_type'],
-        #     }
-        #     if output_pref['output'] == '2':
-        #         output_pref['avg_output_pref'] = ['output_time_avg_option']
-        #         output_pref['reporting'] = args['output_tox_thres_exceed']
-        # except:
-        #     output_pref = {
-        #         'output': "2",
-        #         'reporting': "4"
-        #     }
-        try:
-            no_of_workers = int(args['workers'])
-        except:
-            no_of_workers = 1
-        try:
-            no_of_processes = no_of_workers * int(args['processes'])
-        except:
-            no_of_processes = no_of_workers
-
-        empty_global_output_holders()
-
-        try:
-            # Create temporary dir based on "name_temp" to store SAM run input file and outputs
-            curr_path = os.path.abspath(os.path.dirname(__file__))
-            temp_sam_run_path = os.path.join(curr_path, 'bin', name_temp)
-            if not os.path.exists(temp_sam_run_path):
-                print "Creating SAM run temporary directory: ",\
-                    str(temp_sam_run_path)
-                os.makedirs(temp_sam_run_path)
-                print "Creating SAM run temporary sub-directory: ",\
-                    str(os.path.join(temp_sam_run_path, 'output'))
-                os.makedirs(os.path.join(temp_sam_run_path, 'output'))
-                #     str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
-                # os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
-
-            sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
-
-            # Generate "SAM.inp" file
-            import sam_input_generator
-            sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
-
-            for x in range(no_of_workers):
-                shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
-            
-            # Set "SuperPRZMpesticide.exe" based on OS
-            if os.name == 'posix':
-                print "Linux OS"
-                # Linux / UNIX based OS
-                exe = "SuperPRZMpesticide.exe"
-            else:
-                print "Windows (really NOT Linux/POSIX) OS"
-                # Assuming Windows here, could be other tho and this will break
-                exe = "SuperPRZMpesticide_win.exe"
-
-            try:
-                import subprocess32 as subprocess    # Use subprocess32 for Linux (Python 3.2 backport)
-            except ImportError:
-                import subprocess
-
-            try:
-
-                from concurrent.futures import ThreadPoolExecutor as Pool
-                from functools import partial
-
-                # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                pool = Pool(max_workers=no_of_workers)
-
-                sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
-                print sam_path
-                # Define SuperPRZMpesticide.exe command line arguments
-                sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
-                sam_arg2 = name_temp                          # Temp directory name for SAM run
-
-                # Divide master HUC CSV into subsets for current run
-                split_csv(no_of_processes, curr_path, name_temp)
-
-                for x in range(no_of_processes):
-
-                    print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
-                    pool.submit(subprocess.call,
-                        [sam_path, sam_arg1, sam_arg2, two_digit(x)]
-                    ).add_done_callback(
-                        partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
-                    )
-
-                # Destroy the Pool object which hosts the threads when the pending Futures objects are finished
-                pool.shutdown(wait=False)
-
-            except Exception, e:
+            except IOError, e:
                 logging.exception(e)
 
-                """
-                Don't actually run SAM, just delay a few seconds...
-                """
-                pool.submit(subprocess.Popen, "timeout 3")
-
-            # Create MongoDB document skeleton for SAM run output
-            create_mongo_document(jid, run_type)
-
-            return jid
-
-
-        except Exception, e:
-            logging.exception(e)
-            return {'user_id': 'admin', 'result': {'error': str(e)}, '_id': jid}
-    else:
-        logging.info('++++++++++++ E L S E ++++++++++++')
-        # Canned model run; do not run SAM
-        return {'user_id': 'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id': jid}
+    print len(huc_output.keys())
