@@ -152,8 +152,6 @@ def update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output):
 def update_postgres(jid, args, huc_output):
     import psycopg2 as pg
     logging.info("update_postgres() called")
-    data_list = huc_output.items()
-    # print data_list
 
     try:
         conn = pg.connect(
@@ -174,6 +172,12 @@ def update_postgres(jid, args, huc_output):
         pass
 
     else: # Time-Averaged Results
+
+        for x in huc_output.items():
+            x_tup = tuple(x[1])
+            huc_output[x[0]] = x_tup
+
+        data_list = huc_output.items()
 
         if args['output_tox_thres_exceed'] in ('1', '3'): # By year
 
@@ -215,11 +219,11 @@ def update_postgres(jid, args, huc_output):
                                                         "year27 decimal(5, 2), " +
                                                         "year28 decimal(5, 2), " +
                                                         "year29 decimal(5, 2), " +
-                                                        "year30 decimal(5, 2), );")
+                                                        "year30 decimal(5, 2));")
                 cur.executemany("INSERT INTO jid_" + jid + " (huc12, sam_output) " +
                                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " +
                                         "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " +
-                                        "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, );", data_list)
+                                        "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", data_list)
 
                 conn.commit()
 
@@ -247,10 +251,10 @@ def update_postgres(jid, args, huc_output):
                                                 "sep decimal(5, 2), " +
                                                 "oct decimal(5, 2), " +
                                                 "nov decimal(5, 2), " +
-                                                "dece decimal(5, 2) );"
+                                                "dece decimal(5, 2));"
                 )
                 cur.executemany("INSERT INTO jid_" + jid + " (huc12, sam_output) " +
-                                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", data_list)
+                                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", data_list)
 
                 conn.commit()
 
