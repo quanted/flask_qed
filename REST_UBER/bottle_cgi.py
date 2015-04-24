@@ -869,7 +869,7 @@ def get_user_model_hist():
 
     if model_name == 'sam':  # SAM changed "_id" to "jid" Mongo key
 
-        entity = db[model_name].find( { 'user_id':user_id } ).sort("jid", -1)
+        entity = db[model_name].find( { 'user_id': user_id } ).sort("jid", -1)
 
         for i in entity:
             i.pop('_id', None)  # Remove '_id' key, which is a Mongo ObjectId, bc it cannot be serialized
@@ -880,7 +880,7 @@ def get_user_model_hist():
         return { "hist_all": hist_all }
 
     else:
-        entity = db[model_name].find( { 'user_id':user_id } ).sort("_id", -1)
+        entity = db[model_name].find( { 'user_id': user_id } ).sort("_id", -1)
         for i in entity:
             hist_all.append(i)
         if not entity:

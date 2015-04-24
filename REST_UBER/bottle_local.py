@@ -761,11 +761,11 @@ def insert_output_html():
 
     for k, v in request.json.iteritems():
         exec "%s = v" % k
-    element = { "user_id":"admin",
-                "_id":_id,
-                "run_type":run_type,
-                "output_html":output_html,
-                "model_object_dict":model_object_dict
+    element = { "user_id": "admin",
+                "_id": _id,
+                "run_type": run_type,
+                "output_html": output_html,
+                "model_object_dict": model_object_dict
                 }
     db[model_name].save(element)
     logging.info("Save history, _id = "+_id)
@@ -780,10 +780,10 @@ def insert_model_obj():
     """
     for k, v in request.json.iteritems():
         exec "%s = v" % k
-    element = { "user_id":"admin",
-                "_id":_id,
-                "run_type":run_type,
-                "model_object_dict":model_object_dict
+    element = { "user_id": "admin",
+                "_id": _id,
+                "run_type": run_type,
+                "model_object_dict": model_object_dict
                 }
     db[model_name].save(element)
     # logging.info("Save history test, _id = "+_id)
@@ -834,7 +834,7 @@ def get_model_object():
         # Cursor          Mongo collection
         cursor = db.sam.aggregate([
             { '$match': { "jid": jid } },             # Filter document by "jid" / Mongo "_id"
-            { '$project' : { "model_object_dict.output": {huc12: 1 } } }  # Return only desired HUC
+            { '$project' : { "model_object_dict.output": { huc12: 1 } } }  # Return only desired HUC
         ])
         # print cursor
         # print type(cursor)
@@ -859,7 +859,7 @@ def update_output_html():
     for k, v in request.json.iteritems():
         exec "%s = v" % k
     # print request.json
-    db[model_name].update( { "_id" :_id }, { '$set': { "output_html": output_html } } )
+    db[model_name].update( { "_id" : _id }, { '$set': { "output_html": output_html } } )
 
 
 ###############Check History####################
@@ -885,7 +885,7 @@ def get_user_model_hist():
 
     if model_name == 'sam':  # SAM changed "_id" to "jid" Mongo key
 
-        entity = db[model_name].find( { 'user_id':user_id } ).sort("jid", -1)
+        entity = db[model_name].find( { 'user_id': user_id } ).sort("jid", -1)
 
         for i in entity:
             i.pop('_id', None)  # Remove '_id' key, which is a Mongo ObjectId, bc it cannot be serialized
@@ -896,7 +896,7 @@ def get_user_model_hist():
         return { "hist_all": hist_all }
 
     else:
-        entity = db[model_name].find( { 'user_id':user_id } ).sort("_id", -1)
+        entity = db[model_name].find( { 'user_id': user_id } ).sort("_id", -1)
         for i in entity:
             hist_all.append(i)
         if not entity:

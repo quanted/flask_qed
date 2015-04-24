@@ -20,21 +20,22 @@ def create_mongo_document(jid, run_type, args):
 
     if args['output_type'] == '1': # Daily Concentrations
 
-        pass
-        # # Insert document to store info about the multiple Mongo documents that make up Daily Conc output
-        # document = {
-        #     "user_id": "admin",
-        #     "jid": jid,
-        #     "run_type": run_type,
-        #     "model_object_dict": {
-        #         'filename': filename,
-        #         'input': args
-        #     }
-        # }
-        # try:
-        #     db['sam'].insert(document)
-        # except:
-        #     logging.exception(Exception)
+        # pass
+        filename = "Eco_daily_" + jid
+        # Insert document to store info about the multiple Mongo documents that make up Daily Conc output
+        document = {
+            "user_id": "admin",
+            "jid": jid,
+            "run_type": run_type,
+            "model_object_dict": {
+                'filename': filename,
+                'input': args
+            }
+        }
+        try:
+            db['sam'].insert(document)
+        except:
+            logging.exception(Exception)
 
     else: # Time-Averaged Results
 
@@ -106,7 +107,7 @@ def update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output):
         # Insert document to store info about the multiple Mongo documents that make up Daily Conc output
         for k in huc_output:
             document = {
-                "user_id": "admin",
+                # "user_id": "admin",
                 "jid": jid,
                 "run_type": run_type,
                 "model_object_dict": {
@@ -142,10 +143,7 @@ def update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output):
             logging.info("MongoDB updated...")
             if os.name == 'posix':
                 # Only try to update Postgres DB if running on Linux, which is most likely the production server
-                try:
-                    update_postgres(jid, args, huc_output)
-                except Exception, e:
-                    logging.exception(e)
+                update_postgres(jid, args, huc_output)
 
         except Exception:
             logging.exception(Exception)
@@ -153,7 +151,7 @@ def update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output):
 
 def update_postgres(jid, args, huc_output):
     import psycopg2 as pg
-
+    logging.info("update_postgres() called")
     data_list = huc_output.items()
     # print data_list
 
@@ -225,7 +223,8 @@ def update_postgres(jid, args, huc_output):
 
                 conn.commit()
 
-            except:
+            except Exception:
+                logging.exception(Exception)
                 # Rollback bad statement
                 conn.rollback()
 
@@ -255,6 +254,7 @@ def update_postgres(jid, args, huc_output):
 
                 conn.commit()
 
-            except:
+            except Exception:
+                logging.exception(Exception)
                 # Rollback bad statement
                 conn.rollback()
