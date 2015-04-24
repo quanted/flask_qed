@@ -226,7 +226,12 @@ def update_postgres(jid, args, huc_output):
                                                         "year28 decimal(5, 2), " +
                                                         "year29 decimal(5, 2), " +
                                                         "year30 decimal(5, 2));")
-                cur.executemany("INSERT INTO jid_" + jid + " (huc12, sam_output) " +
+                cur.executemany("INSERT INTO jid_" + jid + " (huc12, year1, year2, year3, year4, year5, " +
+                                                           "year6, year7, year8, year9, year10, " +
+                                                           "year11, year12, year13, year14, year15, " +
+                                                           "year16, year17, year18, year19, year20, " +
+                                                           "year21, year22, year23, year24, year25, " +
+                                                           "year26, year27, year28, year29, year30) " +
                                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " +
                                         "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " +
                                         "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", data_list)
@@ -259,7 +264,8 @@ def update_postgres(jid, args, huc_output):
                                                 "nov decimal(5, 2), " +
                                                 "dece decimal(5, 2));"
                 )
-                cur.executemany("INSERT INTO jid_" + jid + " (huc12, sam_output) " +
+                cur.executemany("INSERT INTO jid_" + jid + " (huc12, jan, feb, mar, apr, may, " +
+                                                           "jun, jul, aug, sep, oct, nov, dece) " +
                                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", data_list)
 
                 conn.commit()
