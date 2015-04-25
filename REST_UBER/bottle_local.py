@@ -834,7 +834,7 @@ def get_model_object():
         # Cursor          Mongo collection
         cursor = db.sam.aggregate([
             { '$match': { "jid": jid } },             # Filter document by "jid" / Mongo "_id"
-            { '$project' : { "model_object_dict.output": { huc12: 1 } } }  # Return only desired HUC
+            { '$project' : { "_id": 0, "model_object_dict.output": { huc12: 1 } } }  # Return only desired HUC
         ])
         # print cursor
         # print type(cursor)
