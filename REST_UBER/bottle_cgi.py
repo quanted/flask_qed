@@ -19,6 +19,7 @@ import json
 import warnings
 import logging
 import pandas as pd
+from bottle import static_file
 
 print repr(sys.path)
 
@@ -141,6 +142,16 @@ def save_to_mongo(model, model_obj_dict):
 
     db[model].save(model_obj_dict)
     logging.info("Saved to mongo!")
+
+#################################static file #########################################
+@route('/static/<filename>')
+def server_static(filename):
+    return static_file(filename, root='/var/www/ubertool/ubertool_ecorest/static/')
+
+#for subdirectories in static
+#@route('/static/<filepath:path>')
+#def server_static(filepath):
+#    return static_file(filepath, root='/path/to/your/static/files')
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
