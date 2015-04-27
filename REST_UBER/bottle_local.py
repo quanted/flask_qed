@@ -761,7 +761,12 @@ def insert_output_html():
 
     for k, v in request.json.iteritems():
         exec "%s = v" % k
-    element={"user_id":"admin", "_id":_id, "run_type":run_type, "output_html": output_html, "model_object_dict":model_object_dict}
+    element = { "user_id": "admin",
+                "_id": _id,
+                "run_type": run_type,
+                "output_html": output_html,
+                "model_object_dict": model_object_dict
+                }
     db[model_name].save(element)
     logging.info("Save history, _id = "+_id)
     print _id
@@ -775,7 +780,11 @@ def insert_model_obj():
     """
     for k, v in request.json.iteritems():
         exec "%s = v" % k
-    element={"user_id":"admin", "_id":_id, "run_type":run_type, "model_object_dict":model_object_dict}
+    element = { "user_id": "admin",
+                "_id": _id,
+                "run_type": run_type,
+                "model_object_dict": model_object_dict
+                }
     db[model_name].save(element)
     # logging.info("Save history test, _id = "+_id)
     
@@ -790,19 +799,26 @@ def get_model_object():
         exec '%s = v' % k
 
     try:
-        # Cursor          Mongo collection     Document      Projection (fields to return)
-        model_object_c = db[model_name].find(
-            { "_id": jid },
-            { "model_object_dict": 1, "_id": 0 }
-        )
+
+        if model_name == 'sam':  # SAM changed "_id" to "jid" Mongo key
+            model_object_c = db[model_name].find(
+                { "jid": jid },
+                { "_id": 0, "model_object_dict": 1 }
+            )
+        else:
+            # Cursor          Mongo collection     Document      Projection (fields to return)
+            model_object_c = db[model_name].find(
+                { "_id": jid },
+                { "model_object_dict": 1, "_id": 0 }
+            )
         for i in model_object_c:
             # print i
             model_object = i['model_object_dict']
-        logging.info({"model_object": model_object})
+        # logging.info({"model_object": model_object})
         return {"model_object": model_object}
 
     except Exception, e:
-        return {"model_object": None, "error": str(e)}
+        return { "model_object": None, "error": str(e) }
 
 
 @route('/get_sam_huc_output', method='POST')
@@ -817,19 +833,19 @@ def get_model_object():
     try:
         # Cursor          Mongo collection
         cursor = db.sam.aggregate([
-            { '$match': { "_id": jid } },             # Filter document by "jid" / Mongo "_id"
-            { '$project' : { "model_object_dict.output": {huc12: 1 }} }  # Return only desired HUC
+            { '$match': { "jid": jid } },             # Filter document by "jid" / Mongo "_id"
+            { '$project' : { "_id": 0, "model_object_dict.output": { huc12: 1 } } }  # Return only desired HUC
         ])
         # print cursor
         # print type(cursor)
         # for i in cursor['result']:
         #     print i
         #     huc12_output = i[huc12]
-        logging.info({"huc12_output": cursor['result']})
-        return {"huc12_output": cursor['result']}
+        logging.info({ "huc12_output": cursor['result'] })
+        return { "huc12_output": cursor['result'] }
 
     except Exception, e:
-        return {"huc12_output": None, "error": str(e)}
+        return { "huc12_output": None, "error": str(e) }
 
 
 @route('/update_html', method='POST')
@@ -843,14 +859,14 @@ def update_output_html():
     for k, v in request.json.iteritems():
         exec "%s = v" % k
     # print request.json
-    db[model_name].update({"_id" :_id}, {'$set': {"output_html": output_html}})
+    db[model_name].update( { "_id" : _id }, { '$set': { "output_html": output_html } } )
 
 
 ###############Check History####################
 @route('/ubertool_history/<model_name>/<jid>')
 @auth_basic(check)
 def get_document(model_name, jid):
-    entity = db[model_name].find_one({'_id':jid})
+    entity = db[model_name].find_one( { '_id': jid } )
     # print entity
     if not entity:
         abort(404, 'No document with jid %s' % jid)
@@ -866,12 +882,27 @@ def get_user_model_hist():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
     hist_all = []
-    entity = db[model_name].find({'user_id':user_id}).sort("_id", -1)
-    for i in entity:
-        hist_all.append(i)
-    if not entity:
-        abort(404, 'No document with jid %s' % jid)
-    return {"hist_all":hist_all}
+
+    if model_name == 'sam':  # SAM changed "_id" to "jid" Mongo key
+
+        entity = db[model_name].find( { 'user_id': user_id } ).sort("jid", -1)
+
+        for i in entity:
+            i.pop('_id', None)  # Remove '_id' key, which is a Mongo ObjectId, bc it cannot be serialized
+            hist_all.append(i)
+        if not entity:
+            abort(404, 'No document with jid %s' % jid)
+
+        return { "hist_all": hist_all }
+
+    else:
+        entity = db[model_name].find( { 'user_id': user_id } ).sort("_id", -1)
+        for i in entity:
+            hist_all.append(i)
+        if not entity:
+            abort(404, 'No document with jid %s' % jid)
+
+        return { "hist_all": hist_all }
 
 @route('/get_html_output', method='POST')
 @auth_basic(check)
@@ -883,22 +914,22 @@ def get_html_output():
 
     for k, v in request.json.iteritems():
         exec '%s = v' % k
-    html_output_c = db[model_name].find({"_id" :jid}, {"output_html":1, "_id":0})
+    html_output_c = db[model_name].find( { "_id" :jid }, { "output_html":1, "_id":0 } )
     for i in html_output_c:
         # print i
         html_output = i['output_html']
-    return {"html_output":html_output}
+    return { "html_output":html_output }
 
 @route('/get_przm_batch_output', method='POST')
 @auth_basic(check)
 def get_przm_batch_output():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
-    result_output_c = db[model_name].find({"_id" :jid}, {"model_object_dict":1, "_id":0})
+    result_output_c = db[model_name].find( { "_id" :jid }, { "model_object_dict":1, "_id":0 } )
     for i in result_output_c:
         # print i
         result = i['model_object_dict']
-    return {"result":result}
+    return { "result":result }
 
 @route('/get_pdf', method='POST')
 @auth_basic(check)
@@ -914,7 +945,7 @@ def get_pdf():
 
     from generate_doc import generatepdf_pi
     result=generatepdf_pi.generatepdf_pi(final_str)
-    return {"result":result}
+    return { "result":result }
 
 @route('/get_html', method='POST')
 @auth_basic(check)
@@ -930,7 +961,7 @@ def get_html():
 
     from generate_doc import generatehtml_pi
     result=generatehtml_pi.generatehtml_pi(final_str)
-    return {"result":result}
+    return { "result":result }
 
 
 """
@@ -960,7 +991,7 @@ def ore_rest_query(query):
     #     all_result[jid]['result']=result
 
     # return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    return {"result": result}
+    return { "result":result }
 
 @route('/ore/category', method='GET')
 def ore_rest_query():
@@ -976,7 +1007,7 @@ def ore_rest_query():
 
     print result
 
-    return {"result": result}
+    return { "result":result }
 
 
 
