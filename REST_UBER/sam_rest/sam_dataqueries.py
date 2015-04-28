@@ -7,11 +7,63 @@ from pylab import *
 ## agg backend is used to create plot as a .png file
 #mpl.use('agg')
 
+#mongo call support
+import json
+import auth_s3
+import requests
+import logging
+
+# Set HTTP header
+http_headers = auth_s3.setHTTPHeaders()
+#this probably not set for back end
+url_part1 = os.environ['UBERTOOL_REST_SERVER']
+
+##############################
+## mongo calls
+###########################function to retrieve model object from MongoDB################################
+def get_model_object(jid, model_name):
+    """Retrieves JSON from MongoDB representing model (Python) object and returns it as Python dictionary"""
+    all_dic = {"jid": jid, "model_name": model_name}
+    data = json.dumps(all_dic)
+    url = url_part1 + '/get_model_object'
+    try:
+        response = requests.post(url, data=data, headers=http_headers, timeout=60)
+        if response:
+            model_object = json.loads(response.content)['model_object']
+        else:
+            model_object = ""
+
+    except:
+        return { "error": "error" }
+
+    return model_object
+
+###########################function to retrieve model object from MongoDB################################
+def get_sam_huc_output(jid, huc12):
+    """Retrieves JSON from MongoDB representing model (Python) object and returns it as Python dictionary"""
+    all_dic = {"jid": jid, "model_name": "sam", "huc12": huc12}
+    data = json.dumps(all_dic)
+    url = url_part1 + '/get_sam_huc_output'
+    try:
+        response = requests.post(url, data=data, headers=http_headers, timeout=60)
+        if response:
+            model_object = json.loads(response.content)['huc12_output']
+        else:
+            model_object =""
+
+    except:
+        logging.exception(Exception)
+        return "error"
+
+    return model_object
+
+
+
+
 
 #############################
 # get data
 ##############################
-
 
 ##################################
 #monthly streak data for huc
