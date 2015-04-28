@@ -8,6 +8,7 @@ from pylab import *
 #mpl.use('agg')
 
 #mongo call support
+import os
 import json
 import auth_s3
 import requests
@@ -17,6 +18,7 @@ import logging
 http_headers = auth_s3.setHTTPHeaders()
 #this probably not set for back end
 url_part1 = os.environ['UBERTOOL_REST_SERVER']
+
 
 ##############################
 ## mongo calls
