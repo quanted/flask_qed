@@ -21,7 +21,8 @@ def GetSAM_MonthlyHUCStreakOutput(jobid, hucid):
 	#fake
     sam_dict = {0:[0.,0.,0.,3.3,2.4,1.1,3.6,2.0,0.,0.,0.,0.]}
 
-    #actual mongo query
+    #actual mongo query - function is in front end in /REST/rest_funcs.py
+    #sam_dict = get_sam_huc_output(jid, huc12)
 
     #get values from dictionary- return the list
     sam_huc = sam_dict.values()
@@ -37,7 +38,8 @@ def GetSAM_AnnualHUCStreakOutput(jobid, hucid):
                    0.,0.,0.,3.3,2.4,1.1,3.6,2.0,0.,0.,0.,0.,
                    0.,0.,0.,3.3,2.4,1.1]}
 
-    #actual mongo query
+    #actual mongo query - function is in front end in /REST/rest_funcs.py
+    #sam_dict = get_sam_huc_output(jid, huc12)
 
     #get values from dictionary- return the list
     sam_huc = sam_dict.values()
@@ -49,7 +51,8 @@ def GetSAM_MonthlyHUCFreqofExceedOutput(jobid, hucid):
 	#fake
     sam_dict =  {0:[0.,0.,0.,0.03,0.05,0.05,0.04,0.02,0.,0.,0.,0.]}
 
-    #actual mongo query
+    #actual mongo query - function is in front end in /REST/rest_funcs.py
+    #sam_dict = get_sam_huc_output(jid, huc12)
 
     #get values from dictionary- return the list
     sam_huc = sam_dict.values()
@@ -63,7 +66,8 @@ def GetSAM_AnnualHUCFreqofExceedOutput(jobid, hucid):
                0.03,0.02,0.04,0.11,0.09,0.07,0.05,0.03,0.02,0.06,0.04,0.06,
                0.01,0.05,0.03,0.06,0.07,0.02]}
 
-    #actual mongo query
+    #actual mongo query - function is on front end in /REST/rest_funcs.py
+    #sam_dict = get_sam_huc_output(jid, huc12)
 
     #get values from dictionary- return the list
     sam_huc = sam_dict.values()
@@ -92,7 +96,7 @@ def GetSAM_MonthlyArrayStreakOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
-
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to numpy array using pandas dataframe
     sam = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
@@ -115,6 +119,7 @@ def GetSAM_AnnualArrayStreakOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to numpy array using pandas dataframe
     sam = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
@@ -139,7 +144,7 @@ def GetSAM_MonthlyArrayFreqofExceedOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
-
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to numpy array using pandas dataframe
     sam = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
@@ -162,6 +167,7 @@ def GetSAM_AnnualArrayFreqofExceedOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to numpy array using pandas dataframe
     sam = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
@@ -189,7 +195,7 @@ def GetSAM_MonthlyVectorStreakOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
-
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to 2-d numpy array using pandas dataframe
     sam_matrix = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
@@ -216,7 +222,7 @@ def GetSAM_MonthlyVectorFreqofExceedOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
-
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to 2-d numpy array using pandas dataframe
     sam_matrix = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
@@ -243,7 +249,7 @@ def GetSAM_AnnualVectorStreakOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
-
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to 2-d numpy array using pandas dataframe
     sam_matrix = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
@@ -270,7 +276,7 @@ def GetSAM_AnnualFreqofExceedStreakOutput(jobid):
     sam_dict = {0:huc01,1:huc02,2:huc03,3:huc04,4:huc05,5:huc06,6:huc07,7:huc08,8:huc09,9:huc10}
 
     #actual mongo query
-
+    #sam_dict = get_model_object(jid, "SAM")
 
     #convert dictionary to 2-d numpy array using pandas dataframe
     sam_matrix = pd.DataFrame.from_dict(sam_dict, orient="index").as_matrix()
