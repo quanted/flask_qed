@@ -24,6 +24,12 @@ import json
 import warnings
 import pandas as pd
 
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+os.environ.update({
+    "PROJECT_ROOT": PROJECT_ROOT
+})
+print os.environ['PROJECT_ROOT']
+
 # Enable console logging
 bottle.debug(True)
 import logging
@@ -815,7 +821,7 @@ def get_model_object():
             # print i
             model_object = i['model_object_dict']
         # logging.info({"model_object": model_object})
-        return {"model_object": model_object}
+        return { "model_object": model_object, "jid": jid }
 
     except Exception, e:
         return { "model_object": None, "error": str(e) }
@@ -841,8 +847,8 @@ def get_model_object():
         # for i in cursor['result']:
         #     print i
         #     huc12_output = i[huc12]
-        logging.info({ "huc12_output": cursor['result'] })
-        return { "huc12_output": cursor['result'] }
+        logging.info({ "huc12_output": cursor['result'], "jid": jid })
+        return { "huc12_output": cursor['result'], "jid": jid }
 
     except Exception, e:
         return { "huc12_output": None, "error": str(e) }
@@ -991,23 +997,27 @@ def ore_rest_query(query):
     #     all_result[jid]['result']=result
 
     # return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
-    return { "result":result }
+    return { "result": result }
 
 @route('/ore/category', method='GET')
 def ore_rest_query():
 
-    category = request.json['category']
-    print category
     from ore_rest import ore_db
-    result = ore_db.oreWorkerActivities(category)
 
-    # exposure_scenario = []
-    # for item in result:
-    #     exposure_scenario.append(item[0])
+    crop_category = request.json['crop_category']
+    print crop_category
+
+    try:
+        filter = request.json['filter']
+        print filter
+        result = ore_db.oreWorkerActivities(crop_category, filter)
+
+    except KeyError:
+        result = ore_db.oreWorkerActivities(crop_category)
 
     print result
 
-    return { "result":result }
+    return { "result": result }
 
 
 

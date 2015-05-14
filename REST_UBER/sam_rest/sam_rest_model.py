@@ -200,6 +200,17 @@ def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, args, sectio
                 if len(done_list) == no_of_processes:
                     # Last SAM run has completed or was cancelled
                     update_global_output_holder(temp_sam_run_path, args, section)
+
+                    import sam_figures
+                    sam_figures.sam_figures_callable(
+                        jid,
+                        args['output_type'] == '1',
+                        args['output_type'] == '1',
+                        args['output_type'] == '1',
+                        huc_output
+                    )
+
+
                     sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
 
                     logging.info("jid = %s" %jid)

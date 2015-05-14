@@ -23,6 +23,12 @@ from bottle import static_file
 
 print repr(sys.path)
 
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+os.environ.update({
+    "PROJECT_ROOT": PROJECT_ROOT
+})
+
+
 # Check whether running on EB/EC2 or Tao's EC2
 if os.environ.has_key("eb_server"):
     print "Has 'eb_server' key"
@@ -957,15 +963,19 @@ def ore_rest_query(query):
 @route('/ore/category', method='GET')
 def ore_rest_query():
 
-    category = request.json['category']
-    print category
     from ore_rest import ore_db
-    result = ore_db.oreWorkerActivities(category)
 
-    # exposure_scenario = []
-    # for item in result:
-    #     exposure_scenario.append(item[0])
+    crop_category = request.json['crop_category']
+    print crop_category
+
+    try:
+        filter = request.json['filter']
+        print filter
+        result = ore_db.oreWorkerActivities(crop_category, filter)
+
+    except KeyError:
+        result = ore_db.oreWorkerActivities(crop_category)
 
     print result
 
-    return {"result": result}
+    return { "result": result }
