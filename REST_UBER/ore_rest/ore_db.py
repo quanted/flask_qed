@@ -36,7 +36,7 @@ def oreDbQuery():
     return c.fetchall()
 
 def generateSQLFilter(filter):
-
+    # e.g. "Category=? AND AppEquip IN (?, ?, ?, ?)"
     query_string = "Category=? AND "
 
     i = 0
