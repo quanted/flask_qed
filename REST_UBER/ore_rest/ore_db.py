@@ -73,15 +73,13 @@ def oreWorkerActivities(query):
         print query_string
 
         crop_category = tuple(query_string[1])
-        c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation '
-                   'FROM CCA WHERE ' + query_string[0],
+        c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE ' + query_string[0],
                    crop_category )
 
     except KeyError, e:
         logging.exception(e)
         crop_category = (category, )  # Must be a tuple
-        c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation '
-                   'FROM CCA WHERE Category=?',
+        c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE Category=?',
                    crop_category )
 
     query = c.fetchall()
