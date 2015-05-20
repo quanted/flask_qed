@@ -1,3 +1,4 @@
+import logging
 import os, sys, sqlite3
 
 file_path = os.path.abspath(os.path.dirname(__file__))
@@ -35,41 +36,49 @@ def oreDbQuery():
 
     return c.fetchall()
 
-def generateSQLFilter(filter):
+def generateSQLFilter(filter, es_type, category):
     # e.g. "Category=? AND AppEquip IN (?, ?, ?, ?)"
-    query_string = "Category=? AND "
+    query_string = "Category=?"
+    insertion_list = [category]
 
     i = 0
     while i < len(filter):
         print filter[i]
-        if i > 0:
-            query_string += ", ?"
-        else:  # i == 0 (first loop pass)
-            query_string += "AppEquip IN (?"
-
+        # if i > 0:
+        #     query_string += ", ?"
+        # else:  # i == 0 (first loop pass)
+        #     query_string += es_type + " IS NOT (?"
+        insertion_list.append(filter[i])
+        query_string += " AND " + es_type + " IS NOT ?"
         i += 1
 
-    query_string += ")"
+    # query_string += ")"
 
-    return query_string
+    return query_string, insertion_list
 
 
-def oreWorkerActivities(category, filter=None):
+def oreWorkerActivities(query):
     """
     Get
     """
+    print query
+    category = query['crop_category']
 
-    if filter:
+    try:
+        filter = query['es_type_filter']
+        es_type = query['es_type']
         print 'Filter exists!'
 
-        generateSQLFilter(filter)
-        print generateSQLFilter(filter)
+        query_string = generateSQLFilter(filter, es_type, category)
+        print query_string
 
-        crop_category = (category, filter)
+        crop_category = tuple(query_string[1])
         c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation '
-                   'FROM CCA WHERE Category=? AND AppEquip=?',
+                   'FROM CCA WHERE ' + query_string[0],
                    crop_category )
-    else:
+
+    except KeyError, e:
+        logging.exception(e)
         crop_category = (category, )  # Must be a tuple
         c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation '
                    'FROM CCA WHERE Category=?',
@@ -77,17 +86,14 @@ def oreWorkerActivities(category, filter=None):
 
     query = c.fetchall()
 
-
     formulation = []
     appequip = []
     apptype = []
     activity = []
 
-    print query
+    # print query
 
     for result in query:
-
-        print result
 
         if result[0] not in activity:
             activity.append(result[0])
@@ -98,9 +104,12 @@ def oreWorkerActivities(category, filter=None):
         if result[3] not in formulation:
             formulation.append(result[3])
 
-    print activity
-    print apptype
-    print appequip
-    print formulation
+    # print activity
+    # print apptype
+    # print appequip
+    # print formulation
 
-    return activity, apptype, appequip, formulation
+    return { 'Activity': activity,
+             'AppType': apptype,
+             'AppEquip': appequip,
+             'Formulation': formulation }

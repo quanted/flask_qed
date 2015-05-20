@@ -965,17 +965,10 @@ def ore_rest_query():
 
     from ore_rest import ore_db
 
-    crop_category = request.json['crop_category']
-    print crop_category
+    query = {}
+    for k, v in request.json.iteritems():
+        exec "query['%s'] = v" % k
 
-    try:
-        filter = request.json['filter']
-        print filter
-        result = ore_db.oreWorkerActivities(crop_category, filter)
-
-    except KeyError:
-        result = ore_db.oreWorkerActivities(crop_category)
-
-    print result
+    result = ore_db.oreWorkerActivities(query)
 
     return { "result": result }
