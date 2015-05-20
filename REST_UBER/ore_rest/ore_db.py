@@ -49,7 +49,7 @@ def generateSQLFilter(filter, es_type, category):
         # else:  # i == 0 (first loop pass)
         #     query_string += es_type + " IS NOT (?"
         insertion_list.append(filter[i])
-        query_string += " AND " + es_type + " IS NOT ?"
+        query_string += " AND " + es_type + " != ?"
         i += 1
 
     # query_string += ")"
