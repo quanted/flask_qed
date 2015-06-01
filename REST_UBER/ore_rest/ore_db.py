@@ -1,5 +1,5 @@
 import logging
-import os, sys, sqlite3
+import os, sqlite3
 
 file_path = os.path.abspath(os.path.dirname(__file__))
 db = os.path.join(file_path, 'sqliteDB', 'ore.s3db')
@@ -111,3 +111,49 @@ def oreWorkerActivities(query):
              'AppType': apptype,
              'AppEquip': appequip,
              'Formulation': formulation }
+
+
+def oreOutputQuery(query):
+    """
+    SELECT * FROM CCA WHERE Crop = 'Corn, field' AND (Activity = 'M/L' OR Activity = 'Applicator' OR Activity = 'Fla
+    gger') AND AppEquip = 'Aerial' AND AppType = 'Broadcast' AND (Formulation = 'L/SC/EC' OR Formulation = 'Spray (all start
+    ing formulations)');
+    """
+
+    params = {}
+
+
+    # activity_query = "Activity = ?"
+    # i = 0
+    # while i < len(query['activity']):
+    #     params['activity_' + str(i + 1)] = query['activity'][i]
+    #     if i > 0:
+    #         activity_query += " OR Activity = ?"
+    #     i += 1
+    # params['activity'] = ['M/L', 'Applicator', 'Flagger']
+
+    def query_generator(exp_scenario):
+
+        query = exp_scenario + " = ?" #  E.g. "Activity = ?"
+        i = 0
+        while i < len(query[exp_scenario]):
+            params[exp_scenario + '_' + str(i + 1)] = query[exp_scenario][i]
+            if i > 0:
+                query += " OR " + exp_scenario + " = ?" #  E.g. "Activity = ? OR Activity = ? OR Activity = ?"
+            i += 1
+        return query
+
+    sql_query = 'SELECT * FROM CCA WHERE Crop = ? ' \
+                'AND (' + query_generator('Activity') + ') ' \
+                'AND (' + query_generator('AppEquip') + ') ' \
+                'AND (' + query_generator('AppType') + ') ' \
+                'AND (' + query_generator('Formulation') + ')'
+
+    #TreatedVal, TreatedUnit, DUESLNoG, DUESLG, DUEDLG, DUESLGCRH, DUEDLGCRH, IUENoR, IUEPF5R, IUEPF10R, IUEEC
+    print sql_query
+
+    c.execute( sql_query, params )
+
+    query = c.fetchall()
+
+    return query

@@ -972,3 +972,20 @@ def ore_rest_query():
     result = ore_db.oreWorkerActivities(query)
 
     return { "result": result }
+
+@route('/ore/output', method='POST')
+def ore_rest_output_query():
+
+    from ore_rest import ore_db
+    print request.json
+    # query = {}
+    # for k, v in request.json.iteritems():
+    #     exec "query['%s'] = v" % k
+    #     # print k, v
+
+    # query_result = ore_db.oreOutputQuery(request.json)
+    # print query_result
+
+    result = "Done"
+
+    return { "result": result }

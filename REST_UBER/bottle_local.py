@@ -978,29 +978,18 @@ def get_html():
 
 # @auth_basic(check)
 # @enable_cors
-@route('/ore/<query>', method='GET')
-def ore_rest_query(query):
-    # for k, v in request.json.iteritems():
-    #     exec '%s = v' % k
-        # print k, v
-    # all_result.setdefault(jid,{}).setdefault('status','none')
+@route('/ore/load/<query>', method='GET')
+def ore_rest_category_query(query):
 
     from ore_rest import ore_db
     # print query
-    result = ore_db.loadChoices(query)
-    # print result
-    # print type(result)
-    # result = test
-    # if (result):
-    #     all_result[jid]['status']='done'
-    #     all_result[jid]['input']=request.json
-    #     all_result[jid]['result']=result
 
-    # return {'user_id':'admin', 'result': result.__dict__, '_id':jid}
+    result = ore_db.loadChoices(query)
+
     return { "result": result }
 
-@route('/ore/category', method='GET')
-def ore_rest_query():
+@route('/ore/category', method='POST')
+def ore_rest_category_query():
 
     from ore_rest import ore_db
 
@@ -1009,31 +998,31 @@ def ore_rest_query():
         exec "query['%s'] = v" % k
         # print k, v
 
-    # crop_category = request.json['crop_category']
-    # print crop_category
-    #
-    # try:
-    #     filter = request.json['es_type_filter']
-    #     print filter
-    #     es_type = request.json['es_type']
-    #     print es_type
-    #     query = { 'crop_category': crop_category,
-    #               'filter': filter,
-    #               'es_type': es_type }
-    #
-    # except KeyError:
-    #     query = { 'crop_category': crop_category }
-    print query
-
     result = ore_db.oreWorkerActivities(query)
     # print result
 
     return { "result": result }
 
+@route('/ore/output', method='POST')
+def ore_rest_output_query():
+
+    from ore_rest import ore_db
+    print request.json
+    # query = {}
+    # for k, v in request.json.iteritems():
+    #     exec "query['%s'] = v" % k
+    #     # print k, v
+
+    # query_result = ore_db.oreOutputQuery(request.json)
+    # print query_result
+
+    result = "Done"
+
+    return { "result": result }
 
 
 """
     Execute command for Bottle server
 """
-run(host='localhost', port=80, debug=True)
+run(host='localhost', port=7777, debug=True)
 # run(host='localhost', port=7777, server='gevent', debug=True)
