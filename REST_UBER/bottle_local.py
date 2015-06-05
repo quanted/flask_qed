@@ -985,6 +985,7 @@ def ore_rest_category_query(query):
     # print query
 
     result = ore_db.loadChoices(query)
+    print result
 
     return { "result": result }
 
@@ -1006,17 +1007,18 @@ def ore_rest_category_query():
 @route('/ore/output', method='POST')
 def ore_rest_output_query():
 
-    from ore_rest import ore_db
-    print request.json
+    from ore_rest import ore_db, ore_rest_model
+    inputs = request.json
+    print inputs
     # query = {}
     # for k, v in request.json.iteritems():
     #     exec "query['%s'] = v" % k
     #     # print k, v
 
-    # query_result = ore_db.oreOutputQuery(request.json)
-    # print query_result
+    query_result_list = ore_db.oreOutputQuery(inputs)
+    result = ore_rest_model.ore(inputs, query_result_list)
 
-    result = "Done"
+    # result = "Done"
 
     return { "result": result }
 

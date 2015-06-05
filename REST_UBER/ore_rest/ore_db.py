@@ -5,7 +5,6 @@ file_path = os.path.abspath(os.path.dirname(__file__))
 db = os.path.join(file_path, 'sqliteDB', 'ore.s3db')
 # Connecting to the database file
 conn = sqlite3.connect(db)
-# conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
 
@@ -120,40 +119,44 @@ def oreOutputQuery(query):
     ing formulations)');
     """
 
-    params = {}
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
 
+    crop = query['exp_crop']
+    activities = query['exp_scenario']['Activity']
+    app_eqips = query['exp_scenario']['AppEquip']
+    app_types = query['exp_scenario']['AppType']
+    formulations = query['exp_scenario']['Formulation']
 
-    # activity_query = "Activity = ?"
-    # i = 0
-    # while i < len(query['activity']):
-    #     params['activity_' + str(i + 1)] = query['activity'][i]
-    #     if i > 0:
-    #         activity_query += " OR Activity = ?"
-    #     i += 1
-    # params['activity'] = ['M/L', 'Applicator', 'Flagger']
+    params = []
+    params.append(crop)
 
-    def query_generator(exp_scenario):
+    def query_generator(exp_scenario, exp_scenario_list):
 
         query = exp_scenario + " = ?" #  E.g. "Activity = ?"
         i = 0
-        while i < len(query[exp_scenario]):
-            params[exp_scenario + '_' + str(i + 1)] = query[exp_scenario][i]
-            if i > 0:
+        while i < len(exp_scenario_list):
+            params.append(exp_scenario_list[i])  # append item to params[] to pass to SQL statement
+            if i > 0:  # skip 1st list item bc it is handle by default in the 'query' string definition
                 query += " OR " + exp_scenario + " = ?" #  E.g. "Activity = ? OR Activity = ? OR Activity = ?"
             i += 1
         return query
 
     sql_query = 'SELECT * FROM CCA WHERE Crop = ? ' \
-                'AND (' + query_generator('Activity') + ') ' \
-                'AND (' + query_generator('AppEquip') + ') ' \
-                'AND (' + query_generator('AppType') + ') ' \
-                'AND (' + query_generator('Formulation') + ')'
+                'AND (' + query_generator('Activity', activities) + ') ' \
+                'AND (' + query_generator('AppEquip', app_eqips) + ') ' \
+                'AND (' + query_generator('AppType', app_types) + ') ' \
+                'AND (' + query_generator('Formulation', formulations) + ')'
 
     #TreatedVal, TreatedUnit, DUESLNoG, DUESLG, DUEDLG, DUESLGCRH, DUEDLGCRH, IUENoR, IUEPF5R, IUEPF10R, IUEEC
-    print sql_query
+    # print sql_query
+    # print len(params)
+    # print params
 
-    c.execute( sql_query, params )
+    c.execute( sql_query, tuple(params) )
 
     query = c.fetchall()
+    conn.close()  #  Close 'row_factory' connection
 
     return query
