@@ -1,6 +1,7 @@
 import logging
 import os
 import keys_Picloud_S3
+import requests
 
 
 def create_mongo_document(jid, run_type, args):
@@ -148,6 +149,13 @@ def update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output):
         except Exception:
             logging.exception(Exception)
 
+
+def update_mongo_tornado(temp_sam_run_path, jid, run_type, args, section, huc_output):
+    response = requests.post("http://localhost:8787/sam/daily/" + jid, huc_output)
+    if response.status_code == 200:
+        return "OK"
+    else:
+        return "Error"
 
 def update_postgres(jid, args, huc_output):
     import psycopg2 as pg

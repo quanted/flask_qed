@@ -132,9 +132,9 @@ class OreOutputFormatter(object):
     def __init__(self, ore_class_list):
         """
         [
-        (<ore_rest.OreCalculator.DermalNonCancer object at 0x000000000A6E0DD8>, <ore_rest.OreCalculator.InhalNonCancer object at 0x000000000A6E0FD0>),
-        (<ore_rest.OreCalculator.DermalNonCancer object at 0x000000000A697128>, <ore_rest.OreCalculator.InhalNonCancer object at 0x000000000A697160>),
-        (<ore_rest.OreCalculator.DermalNonCancer object at 0x000000000A6971D0>, <ore_rest.OreCalculator.InhalNonCancer object at 0x000000000A697278>)
+        (<ore_rest.OreCalculator.DermalNonCancer object at ...>, <ore_rest.OreCalculator.InhalNonCancer object at ...>),
+        (<ore_rest.OreCalculator.DermalNonCancer object at ...>, <ore_rest.OreCalculator.InhalNonCancer object at ...>),
+        (<ore_rest.OreCalculator.DermalNonCancer object at ...>, <ore_rest.OreCalculator.InhalNonCancer object at ...>)
         ]
         """
         print ore_class_list
@@ -230,6 +230,7 @@ class OreOutputFormatter(object):
             dermal_dict = {}
 
             dermal_unit_exp = []
+            dermal_exp = []
             dermal_dose = []
             dermal_moe = []
             for k, v in attr_dict.items():
@@ -238,6 +239,7 @@ class OreOutputFormatter(object):
                     # Attributes have been ordered by PPE to match the logic of the calculator
                     # print k, attr_dict[k], attr_dict[k].moe
                     dermal_unit_exp.append(str(attr_dict[k].unit_exp) + " [" + k.upper() + "]")
+                    dermal_exp.append(str(attr_dict[k].exposure_conc))
                     dermal_dose.append(str(attr_dict[k].dose_conc))
                     dermal_moe.append(str(attr_dict[k].moe))
                 elif attr_dict[k] != None and attr_dict[k] != "No Data":
@@ -245,6 +247,7 @@ class OreOutputFormatter(object):
                     dermal_dict[k] = attr_dict[k]
 
             dermal_dict['dermal_unit_exp'] = dermal_unit_exp
+            dermal_dict['dermal_exp'] = dermal_exp
             dermal_dict['dermal_dose'] = dermal_dose
             dermal_dict['dermal_moe'] = dermal_moe
 
@@ -264,6 +267,7 @@ class OreOutputFormatter(object):
             inhal_dict = {}
 
             inhal_unit_exp = []
+            inhal_exp = []
             inhal_dose = []
             inhal_moe = []
             for k, v in attr_dict.items():
@@ -271,10 +275,12 @@ class OreOutputFormatter(object):
                     # Attributes have been ordered by PPE to match the logic of the calculator
                     # print k, attr_dict[k], attr_dict[k].moe
                     inhal_unit_exp.append(str(attr_dict[k].unit_exp) + " [" + k.upper() + "]")
+                    inhal_exp.append(str(attr_dict[k].exposure_conc))
                     inhal_dose.append(str(attr_dict[k].dose_conc))
                     inhal_moe.append(str(attr_dict[k].moe))
 
             inhal_dict['inhal_unit_exp'] = inhal_unit_exp
+            inhal_dict['inhal_exp'] = inhal_exp
             inhal_dict['inhal_dose'] = inhal_dose
             inhal_dict['inhal_moe'] = inhal_moe
 
@@ -290,13 +296,3 @@ class OreOutputFormatter(object):
 
             self.output_dict[str(i)].update(combined)
             i += 1
-
-
-# class OreOutputDjango(object):
-#     def __init__(self, exp_scenario, output_list):
-#         self.exp_scenario = exp_scenario
-#         self.output_list = output_list
-#
-#     def to_JSON(self):
-#         return json.dumps(self, default=lambda o: o.__dict__,
-#             sort_keys=True, indent=4)

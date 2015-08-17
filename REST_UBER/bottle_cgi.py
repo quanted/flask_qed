@@ -450,7 +450,7 @@ def myroute(jid):
             exec '%s = v' % k
         all_result.setdefault(jid,{}).setdefault('status','none')
 
-        from geneec import gfix
+        from geneec_rest import gfix
         # print request.json
         result = gfix.geneec2(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
         all_result[jid]['status']='done'
@@ -977,8 +977,11 @@ def ore_rest_output_query():
     #     # print k, v
 
     query_result_list = ore_db.oreOutputQuery(inputs)
-    result = ore_rest_model.ore(inputs, query_result_list)
+    output = ore_rest_model.ore(inputs, query_result_list)
 
     # result = "Done"
 
-    return { "result": result }
+    return { "result": {
+                "input": inputs,
+                "output": output
+            }}

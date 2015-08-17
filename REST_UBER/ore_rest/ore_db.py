@@ -36,22 +36,30 @@ def oreDbQuery():
     return c.fetchall()
 
 def generateSQLFilter(filter, es_type, category):
-    # e.g. "Category=? AND AppEquip IN (?, ?, ?, ?)"
-    query_string = "Category=?"
+    """
+    Generates the trailing part of the SQLite query (e.g. "Category=? AND AppEquip IN (?, ?, ?, ?)") resulting in:
+    SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE Category=? AND AppEquip IN (?, ?, ?, ?)
+
+
+    :param filter:
+    :param es_type:
+    :param category:
+    :return:
+    """
+    query_string = "Category = ? AND ("
     insertion_list = [category]
 
     i = 0
     while i < len(filter):
-        print filter[i]
-        # if i > 0:
-        #     query_string += ", ?"
-        # else:  # i == 0 (first loop pass)
-        #     query_string += es_type + " IS NOT (?"
-        insertion_list.append(filter[i])
-        query_string += " AND " + es_type + " != ?"
+        insertion_list.append(filter[i])  # append values to be inserted into SQL statement (? substitution)
+        if (i + 1) != 1:  # NOT first loop
+            query_string += " OR "
+        query_string += es_type + " = ?"
         i += 1
 
-    # query_string += ")"
+    query_string += ")"
+    # print query_string
+    # print insertion_list
 
     return query_string, insertion_list
 
@@ -60,25 +68,26 @@ def oreWorkerActivities(query):
     """
     Get
     """
-    print query
+    # print query
     category = query['crop_category']
+    _query_root = 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE '
 
-    try:
+    try:  # Exposure Scenario filtering (e.g. has 'es_type' key in request)
         filter = query['es_type_filter']
         es_type = query['es_type']
-        print 'Filter exists!'
 
         query_string = generateSQLFilter(filter, es_type, category)
-        print query_string
+        print _query_root + query_string[0] + ', ' + str(query_string[1])
 
         crop_category = tuple(query_string[1])
-        c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE ' + query_string[0],
+        c.execute( _query_root + query_string[0],
                    crop_category )
 
-    except KeyError, e:
+    except KeyError, e:  # Crop-Target query (Crop-Target Category Lookup Tab)
         logging.exception(e)
         crop_category = (category, )  # Must be a tuple
-        c.execute( 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE Category=?',
+        print _query_root + 'Category=?'
+        c.execute( _query_root + 'Category=?',
                    crop_category )
 
     query = c.fetchall()
@@ -88,7 +97,7 @@ def oreWorkerActivities(query):
     apptype = []
     activity = []
 
-    # print query
+    print query
 
     for result in query:
 
@@ -101,10 +110,10 @@ def oreWorkerActivities(query):
         if result[3] not in formulation:
             formulation.append(result[3])
 
-    # print activity
-    # print apptype
-    # print appequip
-    # print formulation
+    print activity
+    print apptype
+    print appequip
+    print formulation
 
     return { 'Activity': activity,
              'AppType': apptype,
@@ -150,7 +159,7 @@ def oreOutputQuery(query):
                 'AND (' + query_generator('Formulation', formulations) + ')'
 
     #TreatedVal, TreatedUnit, DUESLNoG, DUESLG, DUEDLG, DUESLGCRH, DUEDLGCRH, IUENoR, IUEPF5R, IUEPF10R, IUEEC
-    # print sql_query
+    print sql_query
     # print len(params)
     # print params
 

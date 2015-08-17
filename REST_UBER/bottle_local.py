@@ -22,7 +22,11 @@ from boto.s3.bucket import Bucket
 import os
 import json
 import warnings
-import pandas as pd
+
+try:
+    import pandas as pd
+except:
+    pass
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
@@ -164,7 +168,7 @@ def save_to_mongo(model, model_obj_dict):
 
 ##################################terrplant#############################################
 @route('/terrplant/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def terrplant_rest(jid):
     # try:
     #     from terrplant_rest import terrplant_model_rest
@@ -211,7 +215,7 @@ def terrplant_rest(jid):
 
 ##################################sip#############################################
 @route('/sip/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def sip_rest(jid):
     # try:
     #     for k, v in request.json.iteritems():
@@ -232,7 +236,7 @@ def sip_rest(jid):
 
 ##################################stir#############################################
 @route('/stir/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def stir_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -255,7 +259,7 @@ def stir_rest(jid):
 
 ##################################dust#############################################
 @route('/dust/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def dust_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -276,7 +280,7 @@ def dust_rest(jid):
 
 ##################################trex2#############################################
 @route('/trex2/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def trex2_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -301,7 +305,7 @@ def trex2_rest(jid):
 
 ##################################therps#############################################
 @route('/therps/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def therps_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -326,7 +330,7 @@ def therps_rest(jid):
 
 ##################################iec#############################################
 @route('/iec/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def iec_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -346,7 +350,7 @@ def iec_rest(jid):
 
 ##################################agdrift#############################################
 @route('/agdrift/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def agdrift_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -366,7 +370,7 @@ def agdrift_rest(jid):
 
 ##################################earthworm#############################################
 @route('/earthworm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def earthworm_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -386,7 +390,7 @@ def earthworm_rest(jid):
 
 ##################################rice#############################################
 @route('/rice/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def rice_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -406,7 +410,7 @@ def rice_rest(jid):
 
 ##################################kabam#############################################
 @route('/kabam/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def kabam_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -427,17 +431,17 @@ def kabam_rest(jid):
 
 ##################################geneec#############################################
 @route('/geneec/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def geneec_rest(jid):
     try:
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid,{}).setdefault('status','none')
-        # from geneec_rest import gfix
-        # # print request.json
-        # result = gfix.geneec2(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
-        from geneec_rest import geneec_model_rest
-        result = geneec_model_rest.geneec(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
+        from geneec_rest import gfix
+        # print request.json
+        result = gfix.geneec2(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
+        # from geneec_rest import geneec_model_rest
+        # result = geneec_model_rest.geneec(APPRAT,APPNUM,APSPAC,KOC,METHAF,WETTED,METHOD,AIRFLG,YLOCEN,GRNFLG,GRSIZE,ORCFLG,INCORP,SOL,METHAP,HYDHAP,FOTHAP)
 
         # if (result):
             # all_result[jid]['status']='done'
@@ -453,7 +457,7 @@ def geneec_rest(jid):
 
 ##################################przm5#############################################
 @route('/przm5/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm5_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -500,7 +504,7 @@ def przm5_rest(jid):
 
 ################################# VVWM #############################################
 @route('/vvwm/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def vvwm_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -576,7 +580,7 @@ def przm_rest(jid):
 
 ##################################przm_batch##############################################
 @route('/przm_batch/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm_rest(jid):
     try:
         from przm_rest import PRZM_pi_new
@@ -612,7 +616,7 @@ def przm_rest(jid):
 
 ##################################exams##############################################
 @route('/exams/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def exams_rest(jid):
     try:
         import time
@@ -653,7 +657,7 @@ def pfam_rest(jid):
 
 ##################################przm_exams##############################################
 @route('/przm_exams/<jid>', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def przm_exams_rest(jid):
     try:
         for k, v in request.json.iteritems():
@@ -673,20 +677,7 @@ def przm_exams_rest(jid):
 ################################## SAM ##############################################
 @route('/sam/<jid>', method='POST')
 def sam_rest(jid):
-    # try:
-    #     for k, v in request.json.iteritems():
-    #         exec '%s = v' % k
-    #         print k
-    #     all_result.setdefault(jid,{}).setdefault('status','none')
 
-    #     # Commented out for Local Run
-    #     #from sam_rest import sam_rest_win
-    #     #result = sam_rest_win.sam()
-    #     #return {'user_id':'admin', 'result': result, '_id':jid}
-    #     # Local faking of results
-    #     return {'user_id':'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id':jid}
-    # except Exception, e:
-    #     return errorMessage(e, jid)
     try:
         import sam_rest.sam_rest_model as sam
 
@@ -729,7 +720,7 @@ def sam_rest(jid):
 
 ##################File upload####################
 @route('/file_upload', method='POST') 
-@auth_basic(check)
+# @auth_basic(check)
 def file_upload():
     import shutil
     for k, v in request.json.iteritems():
@@ -758,7 +749,7 @@ def file_upload():
 
 ##########insert results into mongodb#########################
 @route('/save_history_html', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def insert_output_html():
     """
     DEPRECATED: Use save_model_object(model_object_dict, model_name, run_type) instead
@@ -779,7 +770,7 @@ def insert_output_html():
 
 
 @route('/save_history', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def insert_model_obj():
     """
     Save model object to MongoDB as new document
@@ -796,7 +787,7 @@ def insert_model_obj():
     
 
 @route('/get_model_object', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_model_object():
     """
         Return model object from MongoDB to be loaded into view (e.g. Django)
@@ -828,7 +819,7 @@ def get_model_object():
 
 
 @route('/get_sam_huc_output', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_model_object():
     """
         Return model object from MongoDB to be loaded into view (e.g. Django)
@@ -855,7 +846,7 @@ def get_model_object():
 
 
 @route('/update_html', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def update_output_html():
     """
     DEPRECATED: no replacement method as model's output page as HTML is no longer being stored in MongoDB
@@ -870,7 +861,7 @@ def update_output_html():
 
 ###############Check History####################
 @route('/ubertool_history/<model_name>/<jid>')
-@auth_basic(check)
+# @auth_basic(check)
 def get_document(model_name, jid):
     entity = db[model_name].find_one( { '_id': jid } )
     # print entity
@@ -880,7 +871,7 @@ def get_document(model_name, jid):
 
 
 @route('/user_history', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_user_model_hist():
     """
         Return python list of all model run entries from MongoDB
@@ -891,7 +882,7 @@ def get_user_model_hist():
 
     if model_name == 'sam':  # SAM changed "_id" to "jid" Mongo key
 
-        entity = db[model_name].find( { 'user_id': user_id } ).sort("jid", -1)
+        entity = db.sam.find( { 'user_id': user_id } ).sort("jid", -1).limit(20)
 
         for i in entity:
             i.pop('_id', None)  # Remove '_id' key, which is a Mongo ObjectId, bc it cannot be serialized
@@ -911,7 +902,7 @@ def get_user_model_hist():
         return { "hist_all": hist_all }
 
 @route('/get_html_output', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_html_output():
     """
     DEPRECATED: Use get_model_object(jid, model_name) instead
@@ -927,7 +918,7 @@ def get_html_output():
     return { "html_output":html_output }
 
 @route('/get_przm_batch_output', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_przm_batch_output():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -938,7 +929,7 @@ def get_przm_batch_output():
     return { "result":result }
 
 @route('/get_pdf', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_pdf():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -954,7 +945,7 @@ def get_pdf():
     return { "result":result }
 
 @route('/get_html', method='POST')
-@auth_basic(check)
+# @auth_basic(check)
 def get_html():
     for k, v in request.json.iteritems():
         exec '%s = v' % k
@@ -985,7 +976,6 @@ def ore_rest_category_query(query):
     # print query
 
     result = ore_db.loadChoices(query)
-    print result
 
     return { "result": result }
 
@@ -1000,7 +990,6 @@ def ore_rest_category_query():
         # print k, v
 
     result = ore_db.oreWorkerActivities(query)
-    # print result
 
     return { "result": result }
 
@@ -1009,18 +998,21 @@ def ore_rest_output_query():
 
     from ore_rest import ore_db, ore_rest_model
     inputs = request.json
-    print inputs
+
     # query = {}
     # for k, v in request.json.iteritems():
     #     exec "query['%s'] = v" % k
     #     # print k, v
 
     query_result_list = ore_db.oreOutputQuery(inputs)
-    result = ore_rest_model.ore(inputs, query_result_list)
+    output = ore_rest_model.ore(inputs, query_result_list)
 
     # result = "Done"
 
-    return { "result": result }
+    return { "result": {
+                "input": inputs,
+                "output": output
+            }}
 
 
 """
