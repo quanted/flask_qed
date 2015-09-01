@@ -1,5 +1,5 @@
 import unittest
-import sip_model_rest
+import sip_model_rest as sip_model
 import pandas as pd
 
 
@@ -20,21 +20,17 @@ class TestSip(unittest.TestCase):
         pd_obj_exp_out.columns -= 5
 
         # instance sip object
-        sip_obj = sip_model_rest.sip(0, pd_obj_inputs, pd_obj_exp_out)
-        return
+        self.sip2 = sip_model.sip(0, pd_obj_inputs, pd_obj_exp_out)
 
     def teardown(self):
         pass
         # teardown called after each test
         # e.g. maybe write test results to some text file
 
-    def test_fail(self):
-        result = [1, 2, 3]
-        self.assertEquals(result, [2, 3, 4])
-
-    def test_pass(self):
-        result = [2, 3, 4]
-        self.assertEquals(result, [2, 3, 4])
+    def test_fw_bird(self):
+        result = self.sip2.fw_bird()
+        self.assertEquals(result, 0.0162)
+        return
 
     def test_sip_blackbox(self):
         pass
