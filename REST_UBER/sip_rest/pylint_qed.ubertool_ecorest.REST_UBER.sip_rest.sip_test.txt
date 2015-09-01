@@ -1,0 +1,13 @@
+************* Module qed.ubertool_ecorest.REST_UBER.sip_rest.sip_test
+C:  1, 0: Missing module docstring (missing-docstring)
+W:  2, 0: Relative import 'sip_model_rest', should be 'qed.ubertool_ecorest.REST_UBER.sip_rest.sip_model_rest' (relative-import)
+C:  6, 0: Missing class docstring (missing-docstring)
+C:  7, 4: Missing method docstring (missing-docstring)
+E: 13,24: Instance of 'tuple' has no 'drop' member (no-member)
+E: 13,50: Instance of 'tuple' has no 'columns' member (no-member)
+E: 18,25: Instance of 'tuple' has no 'drop' member (no-member)
+E: 18,52: Instance of 'tuple' has no 'columns' member (no-member)
+C: 25, 4: Missing method docstring (missing-docstring)
+C: 30, 4: Missing method docstring (missing-docstring)
+C: 35, 4: Missing method docstring (missing-docstring)
+W: 23, 8: Attribute 'sip2' defined outside __init__ (attribute-defined-outside-init)
