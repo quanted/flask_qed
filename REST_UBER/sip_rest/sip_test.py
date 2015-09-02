@@ -65,6 +65,99 @@ class TestSip(unittest.TestCase):
         self.assertEquals(result, 1000000.)
         return
 
+# #Amber
+#     def test_dose_mamm(self):
+#         # self.fw_mamm_out * self.solubility)/(self.bodyweight_assessed_mammal / 1000.
+#
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Amber
+#     def test_at_bird(self):
+#         #self.ld50_avian_water) * ((self.bodyweight_assessed_bird / self.bodyweight_tested_bird)**(self.mineau_scaling_factor - 1.))
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Amber
+#     def test_at_mamm(self):
+#         #self.ld50_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Amber
+#     def test_fi_bird(self):
+#         #0.0582 * ((bw_grams / 1000.)**0.651)
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Weird equation. Let's talk about this one.
+#     def test_det(self):
+#         # ?? crazy equation
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Amber
+#     def act(self):
+#         #(self.noael_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+#
+# #Carmen
+#     def test_acute_bird(self):
+#         #self.dose_bird_out / self.at_bird_out
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Carmen
+#     def test_acuconb(self):
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Carmen
+#     def test_acute_mamm(self):
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Carmen
+#     def test_acuconm(self):
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Marcia
+#     def test_chron_bird(self):
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Marcia
+#     def test_chronconb(self):
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Marcia
+#     def test_chron_mamm(self):
+#         result =
+#         self.assertEquals(result, )
+#         return
+#
+# #Marcia
+#     def test_chronconm(self):
+#         result =
+#         self.assertEquals(result, )
+#         return
+
     def test_blackbox_act(self):
         result = sip_calc.pd_obj_out["act_out"]
         expected = sip_calc.pd_obj_exp["act_exp"]
