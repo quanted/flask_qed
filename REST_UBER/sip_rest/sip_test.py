@@ -94,24 +94,24 @@ class TestSip(unittest.TestCase):
 #         self.assertEquals(result, )
 #         return
 
-#Weird equation. Let's talk about this one.
-    def test_det(self):
-        """
-        Dose Equiv. Toxicity:
-
-        The FI value (kg-diet) is multiplied by the reported NOAEC (mg/kg-diet) and then divided by
-        the test animal's body weight to derive the dose-equivalent chronic toxicity value (mg/kg-bw):
-
-        Dose Equiv. Toxicity = (NOAEC * FI) / BW
-
-        NOTE: The user enters the lowest available NOAEC for the mallard duck, for the bobwhite quail,
-        and for any other test species. The model calculates the dose equivalent toxicity values for
-        all of the modeled values (Cells F20-24 and results worksheet) and then selects the lowest dose
-        equivalent toxicity value to represent the chronic toxicity of the chemical to birds.
-        """
-        result =
-        self.assertEquals(result, )
-        return
+# #Weird equation. Let's talk about this one.
+#     def test_det(self):
+#         """
+#         Dose Equiv. Toxicity:
+#
+#         The FI value (kg-diet) is multiplied by the reported NOAEC (mg/kg-diet) and then divided by
+#         the test animal's body weight to derive the dose-equivalent chronic toxicity value (mg/kg-bw):
+#
+#         Dose Equiv. Toxicity = (NOAEC * FI) / BW
+#
+#         NOTE: The user enters the lowest available NOAEC for the mallard duck, for the bobwhite quail,
+#         and for any other test species. The model calculates the dose equivalent toxicity values for
+#         all of the modeled values (Cells F20-24 and results worksheet) and then selects the lowest dose
+#         equivalent toxicity value to represent the chronic toxicity of the chemical to birds.
+#         """
+#         result =
+#         self.assertEquals(result, )
+#         return
 
 # #Amber
 #     def act(self):
@@ -144,7 +144,11 @@ class TestSip(unittest.TestCase):
             # else:
             #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
         sip_empty.acute_bird_out = 0.2
-        result = sip_empty.acuconb_out() # NOT SURE IF SIP_EMPTY IS CORRECT
+        self.acuconb_out = sip_empty.acute_bird_out.map(lambda x:
+                                                        'Drinking water exposure alone is NOT a potential concern for birds'
+                                                        if x == True
+                                                        else 'Exposure through drinking water alone is a potential concern for birds')
+        result = self.acuconb_out()  # NOT SURE IF SIP_EMPTY IS CORRECT
         self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for birds')
         return
 
@@ -153,7 +157,7 @@ class TestSip(unittest.TestCase):
         #self.acute_mamm_out = self.dose_mamm_out / self.at_mamm_out
         sip_empty.dose_mamm_out = 100
         sip_empty.at_mamm_out = 10
-        result = sip_empty.acute_mamm_out
+        result = sip_empty.acute_mamm_out()
         self.assertEquals(result, 10)
         return
 
@@ -172,7 +176,11 @@ class TestSip(unittest.TestCase):
         #         self.acuconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
         #     return self.acuconm_out
         sip_empty.acute_mamm_out = 0.2
-        result = sip_empty.acuconm_out()
+        self.acuconm_out = sip_empty.acute_mamm_out.map(lambda x:
+                                                        'Drinking water exposure alone is NOT a potential concern for mammals'
+                                                        if x == True
+                                                        else 'Exposure through drinking water alone is a potential concern for mammals')
+        result = self.acuconm_out()
         self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for mammals')
         return
 
