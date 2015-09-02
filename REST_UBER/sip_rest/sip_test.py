@@ -93,14 +93,26 @@ class TestSip(unittest.TestCase):
 #         result =
 #         self.assertEquals(result, )
 #         return
-#
-# #Weird equation. Let's talk about this one.
-#     def test_det(self):
-#         # ?? crazy equation
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
+
+#Weird equation. Let's talk about this one.
+    def test_det(self):
+        """
+        Dose Equiv. Toxicity:
+
+        The FI value (kg-diet) is multiplied by the reported NOAEC (mg/kg-diet) and then divided by
+        the test animal's body weight to derive the dose-equivalent chronic toxicity value (mg/kg-bw):
+
+        Dose Equiv. Toxicity = (NOAEC * FI) / BW
+
+        NOTE: The user enters the lowest available NOAEC for the mallard duck, for the bobwhite quail,
+        and for any other test species. The model calculates the dose equivalent toxicity values for
+        all of the modeled values (Cells F20-24 and results worksheet) and then selects the lowest dose
+        equivalent toxicity value to represent the chronic toxicity of the chemical to birds.
+        """
+        result =
+        self.assertEquals(result, )
+        return
+
 # #Amber
 #     def act(self):
 #         #(self.noael_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
@@ -108,32 +120,62 @@ class TestSip(unittest.TestCase):
 #         self.assertEquals(result, )
 #         return
 #
-#
-# #Carmen
-#     def test_acute_bird(self):
-#         #self.dose_bird_out / self.at_bird_out
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Carmen
-#     def test_acuconb(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Carmen
-#     def test_acute_mamm(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Carmen
-#     def test_acuconm(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
+
+#Carmen
+    def test_acute_bird(self):
+        #self.dose_bird_out / self.at_bird_out
+        sip_empty.dose_bird_out = 100
+        sip_empty.at_bird_out = 10
+        result = sip_empty.acute_bird_out()
+        self.assertEquals(result, 10)
+        return
+
+#Carmen
+    def test_acuconb(self):
+        """
+        Message stating whether or not a risk is present
+        """
+        # if self.acuconb_out == -1:
+        #     if self.acute_bird_out == None:
+        #         raise ValueError\
+        #         ('acute_bird variable equals None and therefor this function cannot be run.')
+            # if self.acute_bird_out < 0.1:
+            #     self.acuconb_out = ('Drinking water exposure alone is NOT a potential concern for birds')
+            # else:
+            #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
+        sip_empty.acute_bird_out = 0.2
+        result = sip_empty.acuconb_out() # NOT SURE IF SIP_EMPTY IS CORRECT
+        self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for birds')
+        return
+
+#Carmen
+    def test_acute_mamm(self):
+        #self.acute_mamm_out = self.dose_mamm_out / self.at_mamm_out
+        sip_empty.dose_mamm_out = 100
+        sip_empty.at_mamm_out = 10
+        result = sip_empty.acute_mamm_out
+        self.assertEquals(result, 10)
+        return
+
+#Carmen
+    def test_acuconm(self):
+        """
+        Message stating whether or not a risk is present
+        """
+        # if self.acuconm_out == -1:
+        #     if self.acute_mamm_out == None:
+        #         raise ValueError\
+        #         ('acute_mamm variable equals None and therefor this function cannot be run.')
+        #     if self.acute_mamm_out < 0.1:
+        #         self.acuconm_out = ('Drinking water exposure alone is NOT a potential concern for mammals')
+        #     else:
+        #         self.acuconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
+        #     return self.acuconm_out
+        sip_empty.acute_mamm_out = 0.2
+        result = sip_empty.acuconm_out()
+        self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for mammals')
+        return
+
 # #Marcia
 #     def test_chron_bird(self):
 #         result =
