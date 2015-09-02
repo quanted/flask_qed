@@ -150,7 +150,7 @@ class TestSip(unittest.TestCase):
                                               if x == True
                                               else 'Exposure through drinking water alone is a potential concern for birds')
         result = sip_empty.acuconb_out()  # NOT SURE IF SIP_EMPTY IS CORRECT
-        self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for birds')
+        self.assertTrue(result, "Exposure through drinking water alone is a potential concern for birds")
         return
 
 #Carmen
@@ -177,13 +177,8 @@ class TestSip(unittest.TestCase):
         #         self.acuconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
         #     return self.acuconm_out
         sip_empty.acute_mamm_out = 0.2
-        acute_mamm_out = sip_empty.acute_mamm_out
-        sip_empty.acuconm_out = acute_mamm_out.map(lambda x:
-                                                   'Drinking water exposure alone is NOT a potential concern for birds'
-                                                   if x == True
-                                                   else 'Exposure through drinking water alone is a potential concern for birds')
         result = sip_empty.acuconm_out()
-        self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for mammals')
+        self.assertTrue(result, "Exposure through drinking water alone is a potential concern for mammals")
         return
 
 # #Marcia
