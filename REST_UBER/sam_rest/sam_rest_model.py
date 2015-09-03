@@ -57,7 +57,7 @@ def sam(inputs_json, jid, run_type):
 
     Actual run launches SuperPRZMPesticide after determining which OS is being used
     in a separate process.  A Futures object is created and when the process is finished
-    executing (SAM completes or is killed) a callback function is fired (sam_callback()).
+    executing (SAM completes or is killed) a callback function is fired (callback_avg()).
     The callback function stores the output and input file into MongoDB for later
     retrieval.
     """
@@ -90,10 +90,14 @@ def sam(inputs_json, jid, run_type):
 
                 if args['output_type'] == '1':  # Daily Concentrations
 
-                    sam_daily_conc(no_of_processes, name_temp)
+                    if dll_loaded:
+                        number_of_rows_list = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
+                        sam_daily_conc(no_of_processes, name_temp, number_of_rows_list)
+                    else:
+                        return None
 
                 else:
-
+                    sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)  # Does not use 'number_of_rows_list' for SuperPRZMPesticide.exe runs
                     sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type)
 
             except ImportError, e:
@@ -121,32 +125,15 @@ def sam(inputs_json, jid, run_type):
         return  {'user_id': 'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id': jid }
 
 
-def sam_daily_conc(no_of_processes, name_temp):
+def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
+    """
+    Helper function to create temporary directory and generate the SAM.inp file(s) for SAM run.
 
-    # from concurrent.futures import ThreadPoolExecutor as Pool
-    from concurrent.futures import ProcessPoolExecutor as Pool
-    import multiprocessing
-    nproc = multiprocessing.cpu_count()
-    print "max_workers=%s" % nproc
-    pool = Pool(max_workers=nproc)
-
-    for x in range(no_of_processes):
-        pool.submit(
-            callable,
-            name_temp,
-            two_digit(x)  #  'number_of_rows' needs to be added this
-            # superprzm.runmain.run,
-            # "/cygdrive/d/Workspace/GitHub/qed/ubertool_ecorest/REST_UBER/sam_rest/bin", "B0SNI8", two_digit(x), 320
-        ).add_done_callback(
-            partial(sam_callback_dll)
-        )
-
-    # Destroy the Pool object which hosts the threads when the pending Futures objects are finished,
-    # but do not wait until all Futures are done to have this function return
-    pool.shutdown(wait=False)
-
-
-def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type):
+    :param no_of_processes: int, number of sections the list of HUCs for the SAM run will be divided into
+    :param temp_sam_run_path: str, absolute path of the temporary directory to place the SAM input file(s) and, if necessary, the output files
+    :param args: dict, the input values POSTed by the user
+    :return: list, list containing the number of 'rows'/HUC12s for each worker/process, which is passed to SuperPRZM
+    """
     if not os.path.exists(temp_sam_run_path):
         print "Creating SAM run temporary directory: ",\
             str(temp_sam_run_path)
@@ -155,14 +142,63 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
             str(os.path.join(temp_sam_run_path, 'output'))
         os.makedirs(os.path.join(temp_sam_run_path, 'output'))
 
-
     sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
 
     # Generate "SAM.inp" file
     sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
 
-    for x in range(no_of_workers):
+    for x in range(no_of_processes):
         shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
+
+    # Divide master HUC12 list CSV into subsets for current run based on 'no_of_processes'
+    number_of_rows_list = split_csv(no_of_processes, name_temp)
+
+    return number_of_rows_list
+
+
+def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
+    """
+    Wrapper method for firing off SAM daily runs (e.g. SuperPRZM dll).  This will eventually be used for all SAM runs.
+
+    :param no_of_processes: int, number of
+    :param name_temp: str,
+    :param number_of_rows_list: list,
+    :return:
+    """
+
+    from concurrent.futures import ProcessPoolExecutor as Pool
+    import multiprocessing
+    nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
+    print "max_workers=%s" % nproc
+    pool = Pool(max_workers=nproc)  # Set number of workers to equal the number of processors available on machine
+
+    for x in range(no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
+        pool.submit(
+            daily_conc_callable,
+            name_temp,              # Temporary path name for this SuperPRZM run
+            two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
+            number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
+        ).add_done_callback(
+            partial(callback_daily)
+        )
+
+    # Destroy the Pool object which hosts the processes when the pending Futures objects are finished,
+    # but do not wait until all Futures are done to have this function return
+    pool.shutdown(wait=False)
+
+
+def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type):
+    """
+
+    :param no_of_processes:
+    :param no_of_workers:
+    :param name_temp:
+    :param temp_sam_run_path:
+    :param args:
+    :param jid:
+    :param run_type:
+    :return:
+    """
 
     # Set "SuperPRZMpesticide.exe" based on OS
     if os.name == 'posix':
@@ -184,104 +220,67 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
     sam_arg1 = sam_bin_path     # Absolute path to "root" of SAM model
     sam_arg2 = name_temp        # Temp directory name for SAM run
 
-    # Divide master HUC CSV into subsets for current run
-    split_csv(no_of_processes, curr_path, name_temp)
-
     for x in range(no_of_processes):
         print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
         pool.submit(
             subprocess.call,
             [sam_path, sam_arg1, sam_arg2, two_digit(x)]
         ).add_done_callback(
-            partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
+            partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
         )
 
     # Destroy the Pool object which hosts the threads when the pending Futures objects are finished,
     # but do not wait until all Futures are done to have this function return
     pool.shutdown(wait=False)
 
-def callable(name_temp, section, array_size=320):
+def daily_conc_callable(name_temp, section, array_size=320):
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
     # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
-    return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)
+    return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
 
 
-def sam_callback_dll(future):
+def callback_daily(future):
     print type(future.result())
 
 
-def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
+def callback_avg(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
     """
+    Time-Averaged Concentrations callback function for when each Future object completes, fails, or is cancelled.
+
     temp_sam_run_path: String; Absolute path to SAM output temporary directory
     jid: String; SAM run jid
     run_type: String; SAM run type ('single', 'qaqc', or 'batch')
     future: concurrent.Future object; automatically passed in from concurrent.Future.add_done_callback()
 
-    Callback function for when SuperPRZMPestide.exe has completed.
+    Callback function for when SuperPRZMPesticide.exe has completed.
     Calls update_mongo() to insert output file into MongoDB.
     Deletes SAM output temporary directory.
     """
 
-    # if future.done():
-    # logging.info("Future is done")
     if future.cancelled():
         logging.info("but was cancelled")
     else:
-        global huc_output  # Use global (module) variable 'huc_output'
+        global huc_output  # Use global (module-level) variable 'huc_output'
 
         done_list.append("Done")
         logging.info("Appended 'Done' to list with len = %s", len(done_list))
 
-        if args['output_type'] == '1': # Daily Concentrations
-            print "Future %s done" % section
-            # if len(done_list) == no_of_processes:
-            #     # Read output files
-            #     update_global_output_holder(temp_sam_run_path, args, section)
-            #     sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
-            #
-            #     logging.info("jid = %s" %jid)
-            #     logging.info("run_type = %s" %run_type)
-            #     logging.info("Last SuperPRZMpesticide process completed")
-            #
-            #     # Remove temporary SAM run directory upon completion
-            #     shutil.rmtree(temp_sam_run_path)
-            #     empty_global_output_holders()
-            # else:
-            #     pass
-            #     if future.result is not None:
-            #         try:
-            #             sam_daily_results_parser(future.result()[0])  # Result is tuple (0 = STDOUT, 1 = STDERR)
-            #         except:
-            #             logging.exception(future.exception())
-            # sam_daily_results_parser(temp_sam_run_path, jid, run_type, args, huc_output)
+        if len(done_list) == no_of_processes:
+            # Last SAM run has completed or was cancelled
+            update_global_output_holder(temp_sam_run_path, args, section)
 
-        else: # Time-Averaged Concentrations
-            if len(done_list) == no_of_processes:
-                # Last SAM run has completed or was cancelled
-                update_global_output_holder(temp_sam_run_path, args, section)
+            sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
 
-                # import sam_figures
-                # sam_figures.sam_figures_callable(
-                #     jid,
-                #     args['output_type'] == '1',
-                #     args['output_type'] == '1',
-                #     args['output_type'] == '1',
-                #     huc_output
-                # )
+            logging.info("jid = %s" %jid)
+            logging.info("run_type = %s" %run_type)
+            logging.info("Last SuperPRZMpesticide process completed")
 
-
-                sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
-
-                logging.info("jid = %s" %jid)
-                logging.info("run_type = %s" %run_type)
-                logging.info("Last SuperPRZMpesticide process completed")
-
-                # Remove temporary SAM run directory upon completion
-                #shutil.rmtree(temp_sam_run_path)
-                empty_global_output_holders()
-            else:
-                update_global_output_holder(temp_sam_run_path, args, section)
+            # Remove temporary SAM run directory upon completion
+            shutil.rmtree(temp_sam_run_path)
+            empty_global_output_holders()
+        else:
+            update_global_output_holder(temp_sam_run_path, args, section)
 
 
 def sam_daily_results_parser(temp_sam_run_path, jid, run_type, args, section, huc_output):
@@ -341,7 +340,7 @@ def convert_text_to_html(sam_input_file_path):
 
     return html
 
-def split_csv(number, curr_path, name_temp):
+def split_csv(number, name_temp):
     """
     Load master CSV for SuperPRZM run as Pandas DataFrame and slice it
     based on the number of Futures objects created to execute it.
@@ -373,7 +372,7 @@ def split_csv(number, curr_path, name_temp):
 
     os.makedirs(os.path.join(sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012'))
 
-    number_of_rows = []
+    number_of_rows_list = []
     i = 1
     while i <= number:
         if i == 1:
@@ -389,14 +388,14 @@ def split_csv(number, curr_path, name_temp):
             # Middle slices (not first or last)
             df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
-        number_of_rows.append(len(df_slice.count()))  #  Save the number of rows for each CSV to be passed to SuperPRZM
+        number_of_rows_list.append(len(df_slice.count()))  # Save the number of rows for each CSV to be passed to SuperPRZM
         df_slice.to_csv(os.path.join(
             sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + two_digit(i - 1) + '.csv'
         ), index=False)
 
         i += 1
 
-    return number_of_rows
+    return number_of_rows_list
 
 def empty_global_output_holders():
     # Empty output dictionary if needed
