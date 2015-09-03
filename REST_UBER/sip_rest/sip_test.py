@@ -3,35 +3,18 @@ import sip_model_rest as sip_model
 import pandas as pd
 import numpy.testing as npt
 
-csv_transpose_path_in = "./sip_qaqc_in_transpose.csv"
-csv_transpose_path_exp = "./sip_qaqc_exp_transpose.csv"
-
-# # needs to be run whenever the qaqc csv is updated
-# csv_path = "./sip_qaqc.csv"
-#
-# pd_obj_inputs = pd.read_csv(csv_path, index_col=0, header=None, skiprows=1, skipfooter=32, engine='python')
-# pd_obj_inputs = pd_obj_inputs.drop(labels=pd_obj_inputs.columns[range(4)], axis=1)
-# pd_obj_inputs.index.name = None
-# pd_obj_inputs.columns -= 5
-# pd_obj_inputs_transposed = pd_obj_inputs.transpose()
-# pd_obj_inputs_transposed.to_csv(csv_transpose_path_in)
-#
-# pd_obj_exp_out = pd.read_csv(csv_path, index_col=0, header=None, skiprows=33, engine='python')
-# pd_obj_exp_out = pd_obj_exp_out.drop(labels=pd_obj_exp_out.columns[range(4)], axis=1)
-# pd_obj_exp_out.index.name = None
-# pd_obj_exp_out.columns -= 5
-# pd_obj_exp_out_transposed = pd_obj_exp_out.transpose()
-# pd_obj_exp_out_transposed.to_csv(csv_transpose_path_exp)
 
 # load transposed qaqc data for inputs and expected outputs
+csv_transpose_path_in = "./sip_qaqc_in_transpose.csv"
 pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
 # print(pd_obj_inputs)
+csv_transpose_path_exp = "./sip_qaqc_exp_transpose.csv"
 pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 # print(pd_obj_exp_out)
 
 # create an instance of sip object with qaqc data
-sip_calc = sip_model.sip(0, pd_obj_inputs, pd_obj_exp_out)
-sip_empty = sip_model.sip(1, pd_obj_inputs, pd_obj_exp_out)
+sip_calc = sip_model.sip("batch", pd_obj_inputs, pd_obj_exp_out)
+sip_empty = sip_model.sip("empty", pd_obj_inputs, pd_obj_exp_out)
 
 class TestSip(unittest.TestCase):
     def setup(self):
@@ -157,12 +140,13 @@ class TestSip(unittest.TestCase):
             # else:
             #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
         sip_empty.acute_bird_out = 0.2
-        self.acuconb_out = sip_empty.acute_bird_out.map(lambda x:
-                                                        'Drinking water exposure alone is NOT a potential concern for birds'
-                                                        if x == True
-                                                        else 'Exposure through drinking water alone is a potential concern for birds')
-        result = self.acuconb_out()  # NOT SURE IF SIP_EMPTY IS CORRECT
-        self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for birds')
+        acute_bird_out = sip_empty.acute_bird_out
+        sip_empty.acuconb_out = acute_bird_out.map(lambda x:
+                                              'Drinking water exposure alone is NOT a potential concern for birds'
+                                              if x == True
+                                              else 'Exposure through drinking water alone is a potential concern for birds')
+        result = sip_empty.acuconb_out()  # NOT SURE IF SIP_EMPTY IS CORRECT
+        self.assertTrue(result, "Exposure through drinking water alone is a potential concern for birds")
         return
 
 #Carmen
@@ -189,12 +173,8 @@ class TestSip(unittest.TestCase):
         #         self.acuconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
         #     return self.acuconm_out
         sip_empty.acute_mamm_out = 0.2
-        self.acuconm_out = sip_empty.acute_mamm_out.map(lambda x:
-                                                        'Drinking water exposure alone is NOT a potential concern for mammals'
-                                                        if x == True
-                                                        else 'Exposure through drinking water alone is a potential concern for mammals')
-        result = self.acuconm_out()
-        self.assertTrue(result, 'Exposure through drinking water alone is a potential concern for mammals')
+        result = sip_empty.acuconm_out()
+        self.assertTrue(result, "Exposure through drinking water alone is a potential concern for mammals")
         return
 
 # #Marcia
