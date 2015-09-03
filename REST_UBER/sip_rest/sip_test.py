@@ -135,28 +135,43 @@ class TestSip(unittest.TestCase):
 #         return
 #
 # #Marcia
-#     def test_chron_bird(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
+    def test_chron_bird(self):
+    #self.chron_bird_out = self.dose_bird_out / self.det_out
+        sip_empty.dose_bird_out = 5
+        sip_empty.det_out = 10
+        result = sip_empty.chron_bird()
+        self.assertEquals(result, 0.5)
+        return
+
+# #Marcia #boolean look up unit test
+    def test_chronconb(self):
+    #boolean = self.chron_bird_out < 1
+        #self.chronconb_out = boolean.map(lambda x:
+         #   'Drinking water exposure alone is NOT a potential concern for birds' if x == True
+         #   else 'Exposure through drinking water alone is a potential concern for birds')
+        sip_empty.chron_bird_out = 3
+        result = sip_empty.chronconb()
+        self.assertEquals(result, False)
+        return
+
 # #Marcia
-#     def test_chronconb(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
+    def test_chron_mamm(self):
+         # self.chron_mamm_out = self.dose_mamm_out / self.act_out
+        sip_empty.dose_mamm_out = 8
+        sip_empty.act_out = 4
+        result = sip_empty.chron_mamm()
+        self.assertEquals(result, 2)
+        return
+
 # #Marcia
-#     def test_chron_mamm(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Marcia
-#     def test_chronconm(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
+    def test_chronconm(self):
+        # self.chronconm_out = boolean.map(lambda x:
+         #   'Drinking water exposure alone is NOT a potential concern for mammals' if x == True
+         #   else 'Exposure through drinking water alone is a potential concern for mammals')
+        sip_empty.chron_mamm_out = 0.5
+        result = sip_empty.chronconm()
+        self.assertEquals(result, 'Drinking water exposure alone is NOT a potential concern for mammals')
+        return
 
     def test_blackbox_act(self):
         result = sip_calc.pd_obj_out["act_out"]
