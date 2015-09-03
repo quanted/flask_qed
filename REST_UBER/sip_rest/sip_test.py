@@ -30,8 +30,8 @@ pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python
 # print(pd_obj_exp_out)
 
 # create an instance of sip object with qaqc data
-sip_calc = sip_model.sip(0, pd_obj_inputs, pd_obj_exp_out)
-sip_empty = sip_model.sip(1, pd_obj_inputs, pd_obj_exp_out)
+sip_calc = sip_model.sip("batch", pd_obj_inputs, pd_obj_exp_out)
+sip_empty = sip_model.sip("empty", pd_obj_inputs, pd_obj_exp_out)
 
 class TestSip(unittest.TestCase):
     def setup(self):
