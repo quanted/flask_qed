@@ -30,7 +30,7 @@ class sip(object):
         self.pd_obj_exp = pd_obj_exp
 
         # Execute model methods if requested
-        if self.run_type == 0:
+        if self.run_type != "empty":
             self.execute_model()
 
     def execute_model(self):
