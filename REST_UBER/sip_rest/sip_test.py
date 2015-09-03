@@ -82,14 +82,13 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 8.408964, 4, '', True)
         return
 
-###Error. Issue with fi_bird and bw_grams? In sip_model_rest.py, fi_bird only equation using an argument
-### and fi_bird is not included in run_methods function. ?
-#     def test_fi_bird(self):
-#         #0.0582 * ((bw_grams / 1000.)**0.651)
-#         sip_empty.bw_grams = 100.
-#         result = sip_calc.fi_bird()
-#         self.assertAlmostEquals(result, 0.012999)
-#         return
+##Error. Issue with sip_model_rest.py file?
+    # def test_fi_bird(self):
+    #     #0.0582 * ((bw_grams / 1000.)**0.651)
+    #     sip_empty.bw_grams = pd.Series([100.], dtype='int')
+    #     result = sip_empty.fi_bird()
+    #     npt.assert_array_almost_equal(result, 0.012999, 4, '', True)
+    #     return
 
 #Amber.
     def test_act(self):
@@ -227,10 +226,6 @@ class TestSip(unittest.TestCase):
         """
         result = sip_calc.pd_obj_out[output + "_out"]
         expected = sip_calc.pd_obj_exp[output + "_exp"]
-        #self.assertEquals(result, expected)
-        # setup sip object
-        # compare sip qaqc csv expected output to
-        # sip object output with an assertEquals
         npt.assert_array_almost_equal(result, expected, 4, '', True)
 
     def blackbox_method_str(self, output):
