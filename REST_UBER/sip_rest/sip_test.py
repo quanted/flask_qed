@@ -144,7 +144,7 @@ class TestSip(unittest.TestCase):
             #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
         sip_empty.acute_bird_out = pd.Series([0.2])
         result = sip_empty.acuconb()
-        exp = pd.Series(["Exposure through drinking water alone is a potential concern for mammals"])
+        exp = pd.Series(["Exposure through drinking water alone is a potential concern for birds"])
         pdt.assert_series_equal(result, exp)
         return
 
@@ -220,8 +220,6 @@ class TestSip(unittest.TestCase):
 
 #Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
     def test_blackbox_method(self):
-       #  self.blackbox_method('fw_bird')
-       #  self.blackbox_method('fw_mamm')
          self.blackbox_method_int('dose_bird')
          self.blackbox_method_int('dose_mamm')
          self.blackbox_method_int('at_bird')
