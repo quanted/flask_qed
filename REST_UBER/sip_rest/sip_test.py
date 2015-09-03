@@ -33,21 +33,21 @@ class TestSip(unittest.TestCase):
 
     def test_fw_bird(self):
         result = sip_calc.fw_bird()
-        self.assertEquals(result, 0.0162)
+        npt.assert_array_almost_equal(result, 0.0162, 4, '', True)
         return
 
     def test_fw_mamm(self):
         result = sip_calc.fw_mamm()
-        self.assertEquals(result, 0.172)
+        npt.assert_array_almost_equal(result, 0.172, 4, '', True)
         return
 
     def test_dose_bird(self):
         #(self.fw_bird_out * self.solubility)/(self.bodyweight_assessed_bird / 1000.)
-        sip_empty.fw_bird_out = 10.
-        sip_empty.solubility = 100.
-        sip_empty.bodyweight_assessed_bird = 1.
+        sip_empty.fw_bird_out = pd.Series([10.], dtype='int')
+        sip_empty.solubility = pd.Series([100.], dtype='int')
+        sip_empty.bodyweight_assessed_bird = pd.Series([1.], dtype='int')
         result = sip_empty.dose_bird()
-        self.assertEquals(result, 1000000.)
+        npt.assert_array_almost_equal(result, 1000000., 4, '', True)
         return
 
 #Amber
@@ -202,23 +202,23 @@ class TestSip(unittest.TestCase):
     def test_blackbox_method(self):
        #  self.blackbox_method('fw_bird')
        #  self.blackbox_method('fw_mamm')
-         self.blackbox_method('dose_bird')
-         self.blackbox_method('dose_mamm')
-         self.blackbox_method('at_bird')
-         self.blackbox_method('at_mamm')
+         self.blackbox_method_int('dose_bird')
+         self.blackbox_method_int('dose_mamm')
+         self.blackbox_method_int('at_bird')
+         self.blackbox_method_int('at_mamm')
        #  self.blackbox_method('fi_bird')
-         self.blackbox_method('det')
-         self.blackbox_method('act')
-         self.blackbox_method('acute_bird')
-       #  self.blackbox_method('acuconb')
-         self.blackbox_method('acute_mamm')
-       #  self.blackbox_method('acuconm')
-         self.blackbox_method('chron_bird')
-       #  self.blackbox_method('chronconb')
-         self.blackbox_method('chron_mamm')
-       #  self.blackbox_method('chronconm')
+         self.blackbox_method_int('det')
+         self.blackbox_method_int('act')
+         self.blackbox_method_int('acute_bird')
+         self.blackbox_method_str('acuconb')
+         self.blackbox_method_int('acute_mamm')
+         self.blackbox_method_str('acuconm')
+         self.blackbox_method_int('chron_bird')
+         self.blackbox_method_str('chronconb')
+         self.blackbox_method_int('chron_mamm')
+         self.blackbox_method_str('chronconm')
 
-    def blackbox_method(self, output):
+    def blackbox_method_int(self, output):
         """
         Helper method to reuse code for testing numpy array outputs from SIP model
         :param output: String; Pandas Series name (e.g. column name) without '_out'
@@ -232,6 +232,10 @@ class TestSip(unittest.TestCase):
         # sip object output with an assertEquals
         npt.assert_array_almost_equal(result, expected, 4, '', True)
 
+    def blackbox_method_str(self, output):
+        result = sip_calc.pd_obj_out[output + "_out"]
+        expected = sip_calc.pd_obj_exp[output + "_exp"]
+        npt.assert_array_equal(result, expected)
 
 # unittest will
 # 1) call the setup method,
