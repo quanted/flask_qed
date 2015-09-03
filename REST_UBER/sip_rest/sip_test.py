@@ -170,8 +170,7 @@ class TestSip(unittest.TestCase):
         #     else:
         #         self.acuconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
         #     return self.acuconm_out
-        ratio = pd.Series([0.2])
-        sip_empty.acute_mamm_out = ratio
+        sip_empty.acute_mamm_out = pd.Series([0.2])
         result = sip_empty.acuconm()
         exp = pd.Series(["Exposure through drinking water alone is a potential concern for mammals"])
         pdt.assert_series_equal(result, exp)
