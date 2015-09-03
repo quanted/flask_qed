@@ -144,7 +144,7 @@ class TestSip(unittest.TestCase):
             #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
         sip_empty.acute_bird_out = pd.Series([0.2])
         result = sip_empty.acuconb()
-        exp = pd.Series(["Exposure through drinking water alone is a potential concern for mammals"])
+        exp = pd.Series(["Exposure through drinking water alone is a potential concern for birds"])
         pdt.assert_series_equal(result, exp)
         return
 
