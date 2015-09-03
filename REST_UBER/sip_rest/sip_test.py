@@ -109,7 +109,7 @@ class TestSip(unittest.TestCase):
         #self.dose_bird_out / self.at_bird_out
         sip_empty.dose_bird_out = 100
         sip_empty.at_bird_out = 10
-        result = sip_empty.acute_bird_out()
+        result = sip_empty.acute_bird()
         self.assertEquals(result, 10)
         return
 
@@ -132,7 +132,7 @@ class TestSip(unittest.TestCase):
                                               'Drinking water exposure alone is NOT a potential concern for birds'
                                               if x == True
                                               else 'Exposure through drinking water alone is a potential concern for birds')
-        result = sip_empty.acuconb_out()  # NOT SURE IF SIP_EMPTY IS CORRECT
+        result = sip_empty.acuconb()  # NOT SURE IF SIP_EMPTY IS CORRECT
         self.assertTrue(result, "Exposure through drinking water alone is a potential concern for birds")
         return
 
@@ -141,7 +141,7 @@ class TestSip(unittest.TestCase):
         #self.acute_mamm_out = self.dose_mamm_out / self.at_mamm_out
         sip_empty.dose_mamm_out = 100
         sip_empty.at_mamm_out = 10
-        result = sip_empty.acute_mamm_out()
+        result = sip_empty.acute_mamm()
         self.assertEquals(result, 10)
         return
 
@@ -160,7 +160,7 @@ class TestSip(unittest.TestCase):
         #         self.acuconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
         #     return self.acuconm_out
         sip_empty.acute_mamm_out = 0.2
-        result = sip_empty.acuconm_out()
+        result = sip_empty.acuconm()
         self.assertTrue(result, "Exposure through drinking water alone is a potential concern for mammals")
         return
 
