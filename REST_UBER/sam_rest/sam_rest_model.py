@@ -90,7 +90,7 @@ def sam(inputs_json, jid, run_type):
 
                 if args['output_type'] == '1':  # Daily Concentrations
 
-                    sam_daily_conc(no_of_processes)
+                    sam_daily_conc(no_of_processes, name_temp)
 
                 else:
 
@@ -121,7 +121,7 @@ def sam(inputs_json, jid, run_type):
         return  {'user_id': 'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id': jid }
 
 
-def sam_daily_conc(no_of_processes):
+def sam_daily_conc(no_of_processes, name_temp):
 
     # from concurrent.futures import ThreadPoolExecutor as Pool
     from concurrent.futures import ProcessPoolExecutor as Pool
@@ -133,6 +133,7 @@ def sam_daily_conc(no_of_processes):
     for x in range(no_of_processes):
         pool.submit(
             callable,
+            name_temp,
             two_digit(x)  #  'number_of_rows' needs to be added this
             # superprzm.runmain.run,
             # "/cygdrive/d/Workspace/GitHub/qed/ubertool_ecorest/REST_UBER/sam_rest/bin", "B0SNI8", two_digit(x), 320
@@ -184,7 +185,7 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
     sam_arg2 = name_temp        # Temp directory name for SAM run
 
     # Divide master HUC CSV into subsets for current run
-    number_of_rows = split_csv(no_of_processes, curr_path, name_temp)
+    split_csv(no_of_processes, curr_path, name_temp)
 
     for x in range(no_of_processes):
         print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
@@ -199,11 +200,11 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
     # but do not wait until all Futures are done to have this function return
     pool.shutdown(wait=False)
 
-def callable(section):
+def callable(name_temp, section, array_size=320):
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
-    # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()
+    # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
-    return superprzm.runmain.run(sam_bin_path, "B0SNI8", section, 320)
+    return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)
 
 
 def sam_callback_dll(future):
