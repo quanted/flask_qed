@@ -40,7 +40,7 @@ class TestSip(unittest.TestCase):
         return
 
     def test_dose_bird(self):
-        # self.fw_bird_out * self.solubility)/(self.bodyweight_assessed_bird / 1000.
+        #(self.fw_bird_out * self.solubility)/(self.bodyweight_assessed_bird / 1000.)
         sip_empty.fw_bird_out = 10.
         sip_empty.solubility = 100.
         sip_empty.bodyweight_assessed_bird = 1.
@@ -48,34 +48,55 @@ class TestSip(unittest.TestCase):
         self.assertEquals(result, 1000000.)
         return
 
-# #Amber
-#     def test_dose_mamm(self):
-#         # self.fw_mamm_out * self.solubility)/(self.bodyweight_assessed_mammal / 1000.
-#
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Amber
-#     def test_at_bird(self):
-#         #self.ld50_avian_water) * ((self.bodyweight_assessed_bird / self.bodyweight_tested_bird)**(self.mineau_scaling_factor - 1.))
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Amber
-#     def test_at_mamm(self):
-#         #self.ld50_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Amber
+#Amber
+    def test_dose_mamm(self):
+        #(self.fw_mamm_out * self.solubility)/(self.bodyweight_assessed_mammal / 1000)
+        sip_empty.fw_mamm_out = 20.
+        sip_empty.solubility = 400.
+        sip_empty.bodyweight_assessed_mammal = 1.
+        result = sip_empty.dose_mamm()
+        self.assertEquals(result, 8000000.)
+        return
+
+#Amber
+    def test_at_bird(self):
+        #(self.ld50_avian_water) * ((self.bodyweight_assessed_bird / self.bodyweight_tested_bird)**(self.mineau_scaling_factor - 1.))
+        sip_empty.ld50_avian_water = 2000.
+        sip_empty.bodyweight_assessed_bird = 100.
+        sip_empty.bodyweight_tested_bird = 200.
+        sip_empty.mineau_scaling_factor = 2.
+        result = sip_empty.at_bird()
+        self.assertEquals(result, 1000.)
+        return
+
+#Amber
+    def test_at_mamm(self):
+        #(self.ld50_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
+        sip_empty.ld50_mammal_water = 10.
+        sip_empty.bodyweight_tested_mammal = 100.
+        sip_empty.bodyweight_assessed_mammal = 200.
+        result = sip_empty.at_mamm()
+        self.assertAlmostEquals(result, 8.408964, 4)
+        return
+
+###Error. Issue with fi_bird and bw_grams? In sip_model_rest.py, fi_bird only equation using an argument
+### and fi_bird is not included in run_methods function. ?
 #     def test_fi_bird(self):
 #         #0.0582 * ((bw_grams / 1000.)**0.651)
-#         result =
-#         self.assertEquals(result, )
+#         sip_empty.bw_grams = 100.
+#         result = sip_calc.fi_bird()
+#         self.assertEquals(result, 0.012999)
 #         return
+
+#Amber.
+    def test_act(self):
+        #(self.noael_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
+        sip_empty.noael_mammal_water = 10.
+        sip_empty.bodyweight_tested_mammal = 500.
+        sip_empty.bodyweight_assessed_mammal = 400.
+        result = sip_empty.act()
+        self.assertAlmostEquals(result, 10.5737, 4)
+        return
 
 # #Weird equation. Let's talk about this one.
 #     def test_det(self):
@@ -95,14 +116,6 @@ class TestSip(unittest.TestCase):
 #         result =
 #         self.assertEquals(result, )
 #         return
-
-# #Amber
-#     def act(self):
-#         #(self.noael_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
 
 #Carmen
     def test_acute_bird(self):
@@ -191,11 +204,11 @@ class TestSip(unittest.TestCase):
     def test_blackbox_act(self):
         result = sip_calc.pd_obj_out["act_out"]
         expected = sip_calc.pd_obj_exp["act_exp"]
-        npt.assert_array_equal(result, expected)
         #self.assertEquals(result, expected)
         # setup sip object
         # compare sip qaqc csv expected output to
         # sip object output with an assertEquals
+        npt.assert_array_almost_equal(result, expected, 4, '', True)
 
 # unittest will
 # 1) call the setup method,
