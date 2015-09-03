@@ -143,7 +143,7 @@ class TestSip(unittest.TestCase):
             #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
         sip_empty.acute_bird_out = pd.Series([0.2])
         result = sip_empty.acuconb()
-        exp = pd.Series(["Exposure through drinking water alone is a potential concern for mammals"])
+        exp = pd.Series(["Exposure through drinking water alone is a potential concern for birds"])
         pdt.assert_series_equal(result, exp)
         return
 
@@ -177,28 +177,45 @@ class TestSip(unittest.TestCase):
         return
 
 # #Marcia
-#     def test_chron_bird(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
+    def test_chron_bird(self):
+    #self.chron_bird_out = self.dose_bird_out / self.det_out
+        sip_empty.dose_bird_out = pd.Series([5.], dtype='int')
+        sip_empty.det_out = pd.Series([10.], dtype='int')
+        result = sip_empty.chron_bird()
+        npt.assert_array_almost_equal(result, 0.5, 4, '', True)
+        return
+
+# #Marcia #boolean look up unit test
+    def test_chronconb(self):
+    #boolean = self.chron_bird_out < 1
+        #self.chronconb_out = boolean.map(lambda x:
+         #   'Drinking water exposure alone is NOT a potential concern for birds' if x == True
+         #   else 'Exposure through drinking water alone is a potential concern for birds')
+        sip_empty.chron_bird_out = pd.Series([3])
+        result = sip_empty.chronconb()
+        exp = pd.Series(["Exposure through drinking water alone is a potential concern for birds"])
+        pdt.assert_series_equal(result, exp)
+        return
+
 # #Marcia
-#     def test_chronconb(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
+    def test_chron_mamm(self):
+         # self.chron_mamm_out = self.dose_mamm_out / self.act_out
+        sip_empty.dose_mamm_out = pd.Series([8.], dtype='int')
+        sip_empty.act_out = pd.Series([4.], dtype='int')
+        result = sip_empty.chron_mamm()
+        npt.assert_array_almost_equal(result, 2, 4, '', True)
+        return
+
 # #Marcia
-#     def test_chron_mamm(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
-#
-# #Marcia
-#     def test_chronconm(self):
-#         result =
-#         self.assertEquals(result, )
-#         return
+    def test_chronconm(self):
+        # self.chronconm_out = boolean.map(lambda x:
+         #   'Drinking water exposure alone is NOT a potential concern for mammals' if x == True
+         #   else 'Exposure through drinking water alone is a potential concern for mammals')
+        sip_empty.chron_mamm_out =  pd.Series([0.5])
+        result = sip_empty.chronconm()
+        exp = pd.Series(["Drinking water exposure alone is NOT a potential concern for mammals"])
+        pdt.assert_series_equal(result, exp)
+        return
 
 #Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
     def test_blackbox_method(self):
