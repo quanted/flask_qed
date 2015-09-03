@@ -34,52 +34,52 @@ class TestSip(unittest.TestCase):
 
     def test_fw_bird(self):
         result = sip_calc.fw_bird()
-        self.assertEquals(result, 0.0162)
+        npt.assert_array_almost_equal(result, 0.0162, 4, '', True)
         return
 
     def test_fw_mamm(self):
         result = sip_calc.fw_mamm()
-        self.assertEquals(result, 0.172)
+        npt.assert_array_almost_equal(result, 0.172, 4, '', True)
         return
 
     def test_dose_bird(self):
         #(self.fw_bird_out * self.solubility)/(self.bodyweight_assessed_bird / 1000.)
-        sip_empty.fw_bird_out = 10.
-        sip_empty.solubility = 100.
-        sip_empty.bodyweight_assessed_bird = 1.
+        sip_empty.fw_bird_out = pd.Series([10.], dtype='int')
+        sip_empty.solubility = pd.Series([100.], dtype='int')
+        sip_empty.bodyweight_assessed_bird = pd.Series([1.], dtype='int')
         result = sip_empty.dose_bird()
-        self.assertEquals(result, 1000000.)
+        npt.assert_array_almost_equal(result, 1000000., 4, '', True)
         return
 
 #Amber
     def test_dose_mamm(self):
         #(self.fw_mamm_out * self.solubility)/(self.bodyweight_assessed_mammal / 1000)
-        sip_empty.fw_mamm_out = 20.
-        sip_empty.solubility = 400.
-        sip_empty.bodyweight_assessed_mammal = 1.
+        sip_empty.fw_mamm_out = pd.Series([20.], dtype='int')
+        sip_empty.solubility = pd.Series([400.], dtype='int')
+        sip_empty.bodyweight_assessed_mammal = pd.Series([1.], dtype='int')
         result = sip_empty.dose_mamm()
-        self.assertEquals(result, 8000000.)
+        npt.assert_array_almost_equal(result, 8000000., 4, '', True)
         return
 
 #Amber
     def test_at_bird(self):
         #(self.ld50_avian_water) * ((self.bodyweight_assessed_bird / self.bodyweight_tested_bird)**(self.mineau_scaling_factor - 1.))
-        sip_empty.ld50_avian_water = 2000.
-        sip_empty.bodyweight_assessed_bird = 100.
-        sip_empty.bodyweight_tested_bird = 200.
-        sip_empty.mineau_scaling_factor = 2.
+        sip_empty.ld50_avian_water = pd.Series([2000.], dtype='int')
+        sip_empty.bodyweight_assessed_bird = pd.Series([100.], dtype='int')
+        sip_empty.bodyweight_tested_bird = pd.Series([200.], dtype='int')
+        sip_empty.mineau_scaling_factor = pd.Series([2.], dtype='int')
         result = sip_empty.at_bird()
-        self.assertEquals(result, 1000.)
+        npt.assert_array_almost_equal(result, 1000., 4, '', True)
         return
 
 #Amber
     def test_at_mamm(self):
         #(self.ld50_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
-        sip_empty.ld50_mammal_water = 10.
-        sip_empty.bodyweight_tested_mammal = 100.
-        sip_empty.bodyweight_assessed_mammal = 200.
+        sip_empty.ld50_mammal_water = pd.Series([10.], dtype='int')
+        sip_empty.bodyweight_tested_mammal = pd.Series([100.], dtype='int')
+        sip_empty.bodyweight_assessed_mammal = pd.Series([200.], dtype='int')
         result = sip_empty.at_mamm()
-        self.assertAlmostEquals(result, 8.408964, 4)
+        npt.assert_array_almost_equal(result, 8.408964, 4, '', True)
         return
 
 ###Error. Issue with fi_bird and bw_grams? In sip_model_rest.py, fi_bird only equation using an argument
@@ -94,11 +94,11 @@ class TestSip(unittest.TestCase):
 #Amber.
     def test_act(self):
         #(self.noael_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
-        sip_empty.noael_mammal_water = 10.
-        sip_empty.bodyweight_tested_mammal = 500.
-        sip_empty.bodyweight_assessed_mammal = 400.
+        sip_empty.noael_mammal_water = pd.Series([10.], dtype='int')
+        sip_empty.bodyweight_tested_mammal = pd.Series([500.], dtype='int')
+        sip_empty.bodyweight_assessed_mammal = pd.Series([400.], dtype='int')
         result = sip_empty.act()
-        self.assertAlmostEquals(result, 10.5737, 4)
+        npt.assert_array_almost_equal(result, 10.5737, 4, '', True)
         return
 
 # #Weird equation. Let's talk about this one.
@@ -205,23 +205,23 @@ class TestSip(unittest.TestCase):
     def test_blackbox_method(self):
        #  self.blackbox_method('fw_bird')
        #  self.blackbox_method('fw_mamm')
-         self.blackbox_method('dose_bird')
-         self.blackbox_method('dose_mamm')
-         self.blackbox_method('at_bird')
-         self.blackbox_method('at_mamm')
+         self.blackbox_method_int('dose_bird')
+         self.blackbox_method_int('dose_mamm')
+         self.blackbox_method_int('at_bird')
+         self.blackbox_method_int('at_mamm')
        #  self.blackbox_method('fi_bird')
-         self.blackbox_method('det')
-         self.blackbox_method('act')
-         self.blackbox_method('acute_bird')
-       #  self.blackbox_method('acuconb')
-         self.blackbox_method('acute_mamm')
-       #  self.blackbox_method('acuconm')
-         self.blackbox_method('chron_bird')
-       #  self.blackbox_method('chronconb')
-         self.blackbox_method('chron_mamm')
-       #  self.blackbox_method('chronconm')
+         self.blackbox_method_int('det')
+         self.blackbox_method_int('act')
+         self.blackbox_method_int('acute_bird')
+         self.blackbox_method_str('acuconb')
+         self.blackbox_method_int('acute_mamm')
+         self.blackbox_method_str('acuconm')
+         self.blackbox_method_int('chron_bird')
+         self.blackbox_method_str('chronconb')
+         self.blackbox_method_int('chron_mamm')
+         self.blackbox_method_str('chronconm')
 
-    def blackbox_method(self, output):
+    def blackbox_method_int(self, output):
         """
         Helper method to reuse code for testing numpy array outputs from SIP model
         :param output: String; Pandas Series name (e.g. column name) without '_out'
@@ -235,6 +235,10 @@ class TestSip(unittest.TestCase):
         # sip object output with an assertEquals
         npt.assert_array_almost_equal(result, expected, 4, '', True)
 
+    def blackbox_method_str(self, output):
+        result = sip_calc.pd_obj_out[output + "_out"]
+        expected = sip_calc.pd_obj_exp[output + "_exp"]
+        npt.assert_array_equal(result, expected)
 
 # unittest will
 # 1) call the setup method,
