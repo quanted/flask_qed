@@ -203,8 +203,6 @@ class TestSip(unittest.TestCase):
 
 #Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
     def test_blackbox_method(self):
-       #  self.blackbox_method('fw_bird')
-       #  self.blackbox_method('fw_mamm')
          self.blackbox_method_int('dose_bird')
          self.blackbox_method_int('dose_mamm')
          self.blackbox_method_int('at_bird')
