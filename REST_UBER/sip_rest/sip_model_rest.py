@@ -537,7 +537,7 @@ class sip(object):
             det_other_1 = None
 
         try:
-            det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_1)) / (self.bodyweight_bird_other_1 / 1000.)           
+            det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_2)) / (self.bodyweight_bird_other_2 / 1000.)
         except:
             det_other_2 = None
 

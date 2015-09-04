@@ -99,32 +99,42 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 10.5737, 4, '', True)
         return
 
-# #Weird equation. Let's talk about this one.
-#     def test_det(self):
-#         """
-#         Dose Equiv. Toxicity:
-#
-#         The FI value (kg-diet) is multiplied by the reported NOAEC (mg/kg-diet) and then divided by
-#         the test animal's body weight to derive the dose-equivalent chronic toxicity value (mg/kg-bw):
-#
-#         Dose Equiv. Toxicity = (NOAEC * FI) / BW
-#
-#         NOTE: The user enters the lowest available NOAEC for the mallard duck, for the bobwhite quail,
-#         and for any other test species. The model calculates the dose equivalent toxicity values for
-#         all of the modeled values (Cells F20-24 and results worksheet) and then selects the lowest dose
-#         equivalent toxicity value to represent the chronic toxicity of the chemical to birds.
-#         """
-#         result =
-#         self.assertEquals(result, )
-#         return
+#Weird equation. Let's talk about this one.
+    def test_det(self):
+        """
+        Dose Equiv. Toxicity:
+
+        The FI value (kg-diet) is multiplied by the reported NOAEC (mg/kg-diet) and then divided by
+        the test animal's body weight to derive the dose-equivalent chronic toxicity value (mg/kg-bw):
+
+        Dose Equiv. Toxicity = (NOAEC * FI) / BW
+
+        NOTE: The user enters the lowest available NOAEC for the mallard duck, for the bobwhite quail,
+        and for any other test species. The model calculates the dose equivalent toxicity values for
+        all of the modeled values (Cells F20-24 and results worksheet) and then selects the lowest dose
+        equivalent toxicity value to represent the chronic toxicity of the chemical to birds.
+        """
+        # result =
+        # self.assertEquals(result, )
+        # return
 
 #amber
-#        noaec_quail = self.pd_obj['noaec_quail']
-#        self.noaec_duck = self.pd_obj['noaec_duck']
+#        def test_det_quail(self):
+#            sip_empty.noaec_quail = pd.Series([100.], dtype='int')
+#            sip_empty.fi_bird = pd.Series([10.], dtype='int')
+#            result = sip_empty.det_quail()
+#            npt.assert_array_almost_equal(result, 10., 4)
+#            return
 
 #carmen
-#        self.noaec_bird_other_1 = self.pd_obj['noaec_bird_other_1']
-#        self.noaec_bird_other_2
+#        det_other_1 = (self.noaec_bird_other_1 * self.fi_bird(self.bodyweight_bird_other_1)) / (self.bodyweight_bird_other_1 / 1000.)
+#        det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_1)) / (self.bodyweight_bird_other_1 / 1000.)
+    def test_det_other_1(self):
+        sip_empty.noaec_bird_other_1 = pd.Series([400.]) # mg/kg-diet
+        sip_empty.bodyweight_bird_other_1 = pd.Series([100]) # grams
+        result = sip_empty.det_other_1()
+        npt.assert_array_almost_equal(result, 4666, 4)
+        return
 
 #Carmen
     def test_acute_bird(self):
