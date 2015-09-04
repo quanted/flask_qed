@@ -15,13 +15,14 @@ pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python
 
 # create an instance of sip object with qaqc data
 sip_calc = sip_model.sip("batch", pd_obj_inputs, pd_obj_exp_out)
+sip_empty = sip_model.sip("empty", pd_obj_inputs, pd_obj_exp_out)
 test = {}
 
 
 class TestSip(unittest.TestCase):
     def setup(self):
+        pass
         # sip2 = sip_model.sip(0, pd_obj_inputs, pd_obj_exp_out)
-        sip_empty = sip_model.sip("empty", pd_obj_inputs, pd_obj_exp_out)
         # setup the test as needed
         # e.g. pandas to open sip qaqc csv
         #  Read qaqc csv and create pandas DataFrames for inputs and expected outputs
@@ -81,13 +82,12 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 8.408964, 4, '', True)
         return
 
-##Error. Issue with sip_model_rest.py file?
-    # def test_fi_bird(self):
-    #     #0.0582 * ((bw_grams / 1000.)**0.651)
-    #     sip_empty.bw_grams = pd.Series([100.], dtype='int')
-    #     result = sip_empty.fi_bird()
-    #     npt.assert_array_almost_equal(result, 0.012999, 4, '', True)
-    #     return
+    def test_fi_bird(self):
+        #0.0582 * ((bw_grams / 1000.)**0.651)
+        sip_empty.bw_grams = pd.Series([100.], dtype='int')
+        result = sip_empty.fi_bird(sip_empty.bw_grams)
+        npt.assert_array_almost_equal(result, 0.012999, 4, '', True)
+        return
 
 #Amber.
     def test_act(self):
@@ -117,6 +117,14 @@ class TestSip(unittest.TestCase):
 #         result =
 #         self.assertEquals(result, )
 #         return
+
+#amber
+#        noaec_quail = self.pd_obj['noaec_quail']
+#        self.noaec_duck = self.pd_obj['noaec_duck']
+
+#carmen
+#        self.noaec_bird_other_1 = self.pd_obj['noaec_bird_other_1']
+#        self.noaec_bird_other_2
 
 #Carmen
     def test_acute_bird(self):
