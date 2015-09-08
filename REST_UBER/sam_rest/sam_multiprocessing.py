@@ -14,12 +14,11 @@ except ImportError, e:
 curr_path = os.path.abspath(os.path.dirname(__file__))
 
 class SamModelCaller(object):
-    def __init__(self, sam_bin_path, name_temp, number_of_rows_list, no_of_processes=16):
+    def __init__(self, name_temp, number_of_rows_list, no_of_processes=16):
 
         if _dll_loaded:
 
             self.sam_bin_path = os.path.join(curr_path, 'bin')
-            self.sam_bin_path = sam_bin_path
             self.name_temp = name_temp
             self.number_of_rows_list = number_of_rows_list
             self.no_of_processes = no_of_processes
@@ -38,28 +37,20 @@ class SamModelCaller(object):
         testing_sections = [308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 330]
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
             self.pool.submit(
-                self.daily_conc_callable,
+                daily_conc_callable,
+                self.sam_bin_path,
                 self.name_temp,              # Temporary path name for this SuperPRZM run
                 self.two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
                 testing_sections[x]
                 #number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
-                partial(self.callback_daily)
+                partial(callback_daily)
             )
 
         # Destroy the Pool object which hosts the processes when the pending Futures objects are finished,
         # but do not wait until all Futures are done to have this function return
         self.pool.shutdown(wait=False)
 
-
-    def daily_conc_callable(self, name_temp, section, array_size=320):
-        # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
-        # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
-
-        return superprzm.runmain.run(self.sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
-
-    def callback_daily(future):
-        print type(future.result())
 
     def two_digit(self, x):
         """
@@ -75,17 +66,26 @@ class SamModelCaller(object):
         return number_string
 
 
+def daily_conc_callable(sam_bin_path, name_temp, section, array_size=320):
+        # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
+        # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
+
+        return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
+
+
+def callback_daily(future):
+    print type(future.result())
+
 def main():
     # Get command line arguments
-    sam_bin_path = sys.argv[1]
-    name_temp = sys.argv[2]
-    number_of_rows_list = sys.argv[3]
+    name_temp = sys.argv[1]
+    number_of_rows_list = sys.argv[2]
     # 'no_of_processes' is an optional command line argument that defaults to 16 if not given
     try:
-        no_of_processes = sys.argv[4]
-        sam = SamModelCaller(sam_bin_path, name_temp, number_of_rows_list, no_of_processes)
+        no_of_processes = sys.argv[3]
+        sam = SamModelCaller(name_temp, number_of_rows_list, no_of_processes)
     except:
-        sam = SamModelCaller(sam_bin_path, name_temp, number_of_rows_list)
+        sam = SamModelCaller(name_temp, number_of_rows_list)
 
     sam.sam_multiprocessing()
 
