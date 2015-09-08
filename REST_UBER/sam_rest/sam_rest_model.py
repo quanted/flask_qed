@@ -18,13 +18,6 @@ try:
 except ImportError:
     import subprocess
 
-try:
-    import superprzm  #  Import superprzm.dll / .so
-    dll_loaded = True
-except ImportError, e:
-    logging.exception(e)
-    dll_loaded = False
-
 
 curr_path = os.path.abspath(os.path.dirname(__file__))
 sam_bin_path = os.path.join(curr_path, 'bin')
@@ -89,12 +82,8 @@ def sam(inputs_json, jid, run_type):
             try:
 
                 if args['output_type'] == '1':  # Daily Concentrations
-
-                    if dll_loaded:
-                        number_of_rows_list = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
-                        sam_daily_conc(no_of_processes, name_temp, number_of_rows_list)
-                    else:
-                        return None
+                    number_of_rows_list = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
+                    sam_daily_conc(no_of_processes, name_temp, number_of_rows_list)
 
                 else:
                     sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)  # Does not use 'number_of_rows_list' for SuperPRZMPesticide.exe runs
@@ -166,25 +155,8 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
     :return:
     """
 
-    from concurrent.futures import ProcessPoolExecutor as Pool
-    import multiprocessing
-    nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
-    print "max_workers=%s" % nproc
-    pool = Pool(max_workers=nproc)  # Set number of workers to equal the number of processors available on machine
-
-    for x in range(no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
-        pool.submit(
-            daily_conc_callable,
-            name_temp,              # Temporary path name for this SuperPRZM run
-            two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
-            number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
-        ).add_done_callback(
-            partial(callback_daily)
-        )
-
-    # Destroy the Pool object which hosts the processes when the pending Futures objects are finished,
-    # but do not wait until all Futures are done to have this function return
-    pool.shutdown(wait=False)
+    import sam_multiprocessing as mp
+    mp.sam_multiprocessing(no_of_processes, name_temp, number_of_rows_list)
 
 
 def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type):
