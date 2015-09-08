@@ -13,6 +13,13 @@ except ImportError, e:
 
 curr_path = os.path.abspath(os.path.dirname(__file__))
 
+
+def multiprocessing_setup():
+    nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
+    print "max_workers=%s" % nproc
+    return Pool(max_workers = nproc)  # Set number of workers to equal the number of processors available on machin
+
+
 class SamModelCaller(object):
     def __init__(self, name_temp, number_of_rows_list, no_of_processes=16):
 
@@ -23,20 +30,12 @@ class SamModelCaller(object):
             self.number_of_rows_list = number_of_rows_list
             self.no_of_processes = no_of_processes
 
-            self.multiprocessing_setup()
-
-
-    def multiprocessing_setup(self):
-        self.nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
-        print "max_workers=%s" % self.nproc
-        self.pool = Pool(max_workers = self.nproc)  # Set number of workers to equal the number of processors available on machin
-
 
     def sam_multiprocessing(self):
 
         testing_sections = [308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 330]
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
-            self.pool.submit(
+            pool.submit(
                 daily_conc_callable,
                 self.sam_bin_path,
                 self.name_temp,              # Temporary path name for this SuperPRZM run
@@ -49,8 +48,65 @@ class SamModelCaller(object):
 
         # Destroy the Pool object which hosts the processes when the pending Futures objects are finished,
         # but do not wait until all Futures are done to have this function return
-        self.pool.shutdown(wait=False)
+        pool.shutdown(wait=False)
 
+
+    def split_csv(self, number, name_temp):
+        """
+        Load master CSV for SuperPRZM run as Pandas DataFrame and slice it
+        based on the number of Futures objects created to execute it.
+        (Currently Fortran is set to accept only a 1 char digit; therefore,
+        the max number here is 9)
+        :param number: int (1 - 9)
+        :param curr_path: String; absolute path to this module
+        :return: None
+        """
+
+        print "number = ", number
+        import pandas as pd
+        df = pd.read_csv(os.path.join(
+            self.sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'
+        ))
+
+        if number > 99:
+            number = 99
+        if number < 1:
+            number = 1
+
+        try:
+            rows_per_sect = df.shape[0] / number
+            print rows_per_sect
+            print type(rows_per_sect)
+        except:
+            number = 1
+            rows_per_sect = df.shape[0] / number
+
+        os.makedirs(os.path.join(self.sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012'))
+
+        number_of_rows_list = []
+        i = 1
+        while i <= number:
+            if i == 1:
+                print 1
+                # First slice
+                df_slice = df[:rows_per_sect]
+            elif i == number:
+                print str(i) + " (last)"
+                # End slice: slice to the end of the DataFrame
+                df_slice = df[((i - 1) * rows_per_sect):]
+            else:
+                print i
+                # Middle slices (not first or last)
+                df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
+
+            number_of_rows_list.append(len(df_slice.count()))  # Save the number of rows for each CSV to be passed to SuperPRZM
+            df_slice.to_csv(os.path.join(
+                self.sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + self.two_digit(i - 1) + '.csv'
+            ), index=False)
+
+            i += 1
+
+        return number_of_rows_list
 
     def two_digit(self, x):
         """
@@ -77,6 +133,7 @@ def callback_daily(future):
     print type(future.result())
 
 def main():
+
     # Get command line arguments
     name_temp = sys.argv[1]
     number_of_rows_list = sys.argv[2]
@@ -90,4 +147,6 @@ def main():
     sam.sam_multiprocessing()
 
 if __name__ == "__main__":
+    # Create Process Pool
+    pool = multiprocessing_setup()
     main()

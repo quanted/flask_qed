@@ -205,16 +205,6 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
     # but do not wait until all Futures are done to have this function return
     pool.shutdown(wait=False)
 
-def daily_conc_callable(name_temp, section, array_size=320):
-    # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
-    # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
-
-    return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
-
-
-def callback_daily(future):
-    print type(future.result())
-
 
 def callback_avg(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
     """
