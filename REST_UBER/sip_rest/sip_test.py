@@ -118,23 +118,33 @@ class TestSip(unittest.TestCase):
         # self.assertEquals(result, )
         # return
 
-#amber
-#        def test_det_quail(self):
-#            sip_empty.noaec_quail = pd.Series([100.], dtype='int')
-#            sip_empty.fi_bird = pd.Series([10.], dtype='int')
-#            result = sip_empty.det_quail()
-#            npt.assert_array_almost_equal(result, 10., 4)
-#            return
+#Amber working
+    # def test_det_duck(self):
+    # # det_duck = (self.noaec_duck * self.fi_bird(1580.)) / (1580. / 1000.)
+    #     sip_empty.noaec_duck = pd.Series([1.], dtype='int')
+    #     sip_empty.fi_bird = pd.Series([1.], dtype='int')
+    #     result = sip_empty.det_duck()
+    #     npt.assert_array_almost_equal(result, 1000., 4, '', True)
 
-#carmen
+#Amber working
+    # def test_det_quail(self):
+    # # det_quail = (self.noaec_quail * self.fi_bird(178.)) / (178. / 1000.)
+    #     sip_empty.noaec_quail = pd.Series([1.], dtype='int')
+    #     sip_empty.fi_bird = pd.Series([1.], dtype='int')
+    #     result = sip_empty.det_quail()
+    #     npt.assert_array_almost_equal(result, 1000., 4, '', True)
+
+#Carmen
 #        det_other_1 = (self.noaec_bird_other_1 * self.fi_bird(self.bodyweight_bird_other_1)) / (self.bodyweight_bird_other_1 / 1000.)
 #        det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_1)) / (self.bodyweight_bird_other_1 / 1000.)
-    def test_det_other_1(self):
-        sip_empty.noaec_bird_other_1 = pd.Series([400.]) # mg/kg-diet
-        sip_empty.bodyweight_bird_other_1 = pd.Series([100]) # grams
-        result = sip_empty.det_other_1()
-        npt.assert_array_almost_equal(result, 4666, 4)
-        return
+
+#Carmen
+    # def test_det_other_1(self):
+    #     sip_empty.noaec_bird_other_1 = pd.Series([400.]) # mg/kg-diet
+    #     sip_empty.bodyweight_bird_other_1 = pd.Series([100]) # grams
+    #     result = sip_empty.det_other_1()
+    #     npt.assert_array_almost_equal(result, 4666, 4)
+    #     return
 
 #Carmen
     def test_acute_bird(self):
