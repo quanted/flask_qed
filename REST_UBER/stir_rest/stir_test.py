@@ -28,7 +28,7 @@ class TestStir(unittest.TestCase):
         # teardown called after each test
         # e.g. maybe write test results to some text file
 
-    # each of these functions are queued by "run_methods" and have outputs defined as properties in the stir qaqc
+    # # each of these functions are queued by "run_methods" and have outputs defined as properties in the stir qaqc
     #
     # #eq. 1 saturated air concentration in mg/m^3
     # def CalcSatAirConc(self):
