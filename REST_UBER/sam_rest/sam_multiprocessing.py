@@ -43,12 +43,14 @@ class SamModelCaller(object):
                 testing_sections[x]
                 #number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
-                partial(callback_daily)
+                callback_daily
+                #partial(callback_daily, self.two_digit(x))
             )
 
         # Destroy the Pool object which hosts the processes when the pending Futures objects are finished,
         # but do not wait until all Futures are done to have this function return
-        pool.shutdown(wait=False)
+        pool.shutdown(wait=False)  # Non-blocking
+        #pool.shutdown()  # Blocking
 
 
     def split_csv(self, number, name_temp):
@@ -126,11 +128,17 @@ def daily_conc_callable(sam_bin_path, name_temp, section, array_size=320):
         # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
         # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
-        return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
+        #return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
+
+        import sam_callable
+
+        sam_callable.run(sam_bin_path, name_temp, section, array_size)
 
 
-def callback_daily(future):
-    print type(future.result())
+def callback_daily(section, future):
+    print "Section: ", section
+    print future.result()
+
 
 def main():
 
@@ -150,3 +158,4 @@ if __name__ == "__main__":
     # Create Process Pool
     pool = multiprocessing_setup()
     main()
+    sys.exit()
