@@ -52,8 +52,8 @@ class stir(object):
         # Execute model methods
         self.run_methods()
 
-         # Create DataFrame containing output value Series
-        pd_obj_out = pd.DataFrame({      
+        # Create DataFrame containing output value Series
+        pd_obj_out = pd.DataFrame({
             "sat_air_conc" : self.sat_air_conc,
             "inh_rate_avian" : self.inh_rate_avian,
             "vid_avian" : self.vid_avian,
@@ -113,14 +113,14 @@ class stir(object):
             Convert DataFrames to JSON, returning a tuple 
             of JSON strings (inputs, outputs, exp_out)
         """
-        
+
         pd_obj_json = pd_obj.to_json()
         pd_obj_out_json = pd_obj_out.to_json()
         try:
             pd_obj_exp_json = pd_obj_exp.to_json()
         except:
             pd_obj_exp_json = "{}"
-        
+
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
     #eq. 1 saturated air concentration in mg/m^3
@@ -156,7 +156,7 @@ class stir(object):
         duration_hours = 1.
         conversion_factor = 1000000. # cm3/m3
         # 1 (hr) is duration of exposure
-        self.vid_avian = (self.sat_air_conc * self.inh_rate_avian * duration_hours)/(conversion_factor * self.body_weight_assessed_bird) 
+        self.vid_avian = (self.sat_air_conc * self.inh_rate_avian * duration_hours)/(conversion_factor * self.body_weight_assessed_bird)
         logging.info(self.vid_avian)
         return self.vid_avian
 
@@ -181,7 +181,7 @@ class stir(object):
         duration_hours = 1.
         conversion_factor = 1000000.
         # 1 hr = duration of exposure
-        self.vid_mammal = (self.sat_air_conc * self.inh_rate_mammal * duration_hours)/(conversion_factor * self.body_weight_assessed_mammal) 
+        self.vid_mammal = (self.sat_air_conc * self.inh_rate_mammal * duration_hours)/(conversion_factor * self.body_weight_assessed_mammal)
         logging.info(self.vid_mammal)
         return self.vid_mammal
 
@@ -264,7 +264,7 @@ class stir(object):
         #    self.mammal_inhalation_ld50 = float(self.mammal_inhalation_ld50)
         #    self.mammal_oral_ld50 = float(self.mammal_oral_ld50)
         three_five = 3.5
-        self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50) 
+        self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50)
         logging.info(self.estimated_avian_inhalation_ld50)
         return self.estimated_avian_inhalation_ld50
 
@@ -298,9 +298,9 @@ class stir(object):
         #else:
         #    self.loc_vid_avian = 'Proceed to Refinements'
         exceed_boolean = self.ratio_vid_avian < 0.1
-        self.loc_vid_avian = exceed_boolean.map(lambda x: 
-            'Exposure not Likely Significant' if x == True 
-            else 'Proceed to Refinements')
+        self.loc_vid_avian = exceed_boolean.map(lambda x:
+                                                'Exposure not Likely Significant' if x == True
+                                                else 'Proceed to Refinements')
         logging.info(self.loc_vid_avian)
         return self.loc_vid_avian
 
@@ -320,9 +320,9 @@ class stir(object):
         #else:
         #    self.loc_sid_avian = 'Proceed to Refinements'
         exceed_boolean = self.ratio_sid_avian < 0.1
-        self.loc_sid_avian = exceed_boolean.map(lambda x: 
-            'Exposure not Likely Significant' if x == True 
-            else 'Proceed to Refinements')
+        self.loc_sid_avian = exceed_boolean.map(lambda x:
+                                                'Exposure not Likely Significant' if x == True
+                                                else 'Proceed to Refinements')
         logging.info(self.loc_sid_avian)
         return self.loc_sid_avian
 
@@ -342,9 +342,9 @@ class stir(object):
         #else:
         #    self.loc_vid_mammal = 'Proceed to Refinements'
         exceed_boolean = self.ratio_vid_mammal < 0.1
-        self.loc_vid_mammal = exceed_boolean.map(lambda x: 
-            'Exposure not Likely Significant' if x == True 
-            else 'Proceed to Refinements')
+        self.loc_vid_mammal = exceed_boolean.map(lambda x:
+                                                 'Exposure not Likely Significant' if x == True
+                                                 else 'Proceed to Refinements')
         logging.info(self.loc_vid_mammal)
         return self.loc_vid_mammal
 
@@ -364,9 +364,9 @@ class stir(object):
         #else:
         #    self.loc_sid_mammal = 'Proceed to Refinements'
         exceed_boolean = self.ratio_sid_mammal < 0.1
-        self.loc_sid_mammal = exceed_boolean.map(lambda x: 
-            'Exposure not Likely Significant' if x == True 
-            else 'Proceed to Refinements')
+        self.loc_sid_mammal = exceed_boolean.map(lambda x:
+                                                 'Exposure not Likely Significant' if x == True
+                                                 else 'Proceed to Refinements')
         logging.info(self.loc_sid_mammal)
         return self.loc_sid_mammal
 
