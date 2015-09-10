@@ -15,7 +15,7 @@ def run(sam_bin_path, name_temp, section, array_size):
     np_array_out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
     test_array = np.random.rand(50,3)
     mongo_motor_insert(test_array, name_temp, section)  # Motor only works on Linux
-    #mongo_pymongo_insert(out, name_temp, section)  # Pymongo used for testing on Windows
+    #mongo_pymongo_insert(np_array_out, name_temp, section)  # Pymongo used for testing on Windows
 
     return True
 
@@ -25,8 +25,8 @@ def mongo_motor_insert(np_array, name_temp, section):
     jid = name_temp + "_" +section
     url = 'http://localhost:8787/sam/daily/' + jid
     http_headers = {'Content-Type': 'application/json'}
-    data = json.dumps(create_mongo_document(np_array, name_temp, section))
-
+    #data = json.dumps(create_mongo_document(np_array, name_temp, section))
+    data = cPickle.dumps(create_mongo_document(np_array, name_temp, section), protocol=2)
     requests.post(url, data=data, headers=http_headers, timeout=30)
 
 
@@ -57,6 +57,6 @@ def create_mongo_document(np_array, name_temp, section):
         "model_object_dict": {
             #'filename': filename,
             #'input': args
-            'output': Binary(cPickle.dumps(np_array, protocol=2))
+            'output': np_array
         }
     }
