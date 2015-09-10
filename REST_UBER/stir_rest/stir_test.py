@@ -29,81 +29,61 @@ class TestStir(unittest.TestCase):
         # teardown called after each test
         # e.g. maybe write test results to some text file
 
-    # # each of these functions are queued by "run_methods" and have outputs defined as properties in the stir qaqc
-    #
+    # each of these functions are queued by "run_methods" and have outputs defined as properties in the stir qaqc
+
     # Carmen
-    # #eq. 1 saturated air concentration in mg/m^3
-    # def CalcSatAirConc(self):
-    #     #if self.sat_air_conc == -1:
-    #     #    self.vapor_pressure = float(self.vapor_pressure)
-    #     #    self.molecular_weight = float(self.molecular_weight)
-    #     air_vol = 24.45
-    #     pressure = 760.0
-    #     conv = 1000000.0
-    #     self.sat_air_conc = (self.vapor_pressure * self.molecular_weight * conv)/(pressure * air_vol)
-    #     logging.info(self.sat_air_conc)
-    #     return self.sat_air_conc
-    #
+    # eq. 1 saturated air concentration in mg/m^3
+    def test_CalcSatAirConc(self):
+        # self.sat_air_conc = (self.vapor_pressure * self.molecular_weight * conv)/(pressure * air_vol)
+        stir_empty.vapor_pressure = pd.Series([0.000008], dtype='float')
+        stir_empty.molecular_weight = pd.Series([200.], dtype='int')
+        result= sip_empty.sat_air_conc
+        npt.assert_array_almost_equal(result,0.086105, 4, '', True)
+        return
+
     # Carmen
-    # #eq. 2 Avian inhalation rate
-    # def CalcInhRateAvian(self):
-    #     #if self.inh_rate_avian == -1:
-    #     #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
-    #     magic1 = 284.
-    #     magic2 = 0.77
-    #     conversion = 60.
-    #     activity_factor = 3.
-    #     self.inh_rate_avian = magic1 * (self.body_weight_assessed_bird**magic2) * conversion * activity_factor
-    #     logging.info(self.inh_rate_avian)
-    #     return self.inh_rate_avian
-    #
+    # eq. 2 Avian inhalation rate
+    def test_CalcInhRateAvian(self):
+        # self.inh_rate_avian = magic1 * (self.body_weight_assessed_bird**magic2) * conversion * activity_factor
+        stir_empty.body_weight_assessed_bird = pd.Series([0.05], dtype='float')
+        result = stir_empty.inh_rate_avian
+        npt.assert_array_almost_equal(result,5090.9373, 4, '', True)
+        return
+
     # Carmen
-    # #eq. 3  Maximum avian vapor inhalation dose
-    # def CalcVidAvian(self):
-    #     #if self.vid_avian == -1:
-    #     #    self.sat_air_conc = float(self.sat_air_conc)
-    #     #    self.inh_rate_avian = float(self.inh_rate_avian)
-    #     #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
-    #     duration_hours = 1.
-    #     conversion_factor = 1000000. # cm3/m3
-    #     # 1 (hr) is duration of exposure
-    #     self.vid_avian = (self.sat_air_conc * self.inh_rate_avian * duration_hours)/(conversion_factor * self.body_weight_assessed_bird)
-    #     logging.info(self.vid_avian)
-    #     return self.vid_avian
-    #
+    # eq. 3  Maximum avian vapor inhalation dose
+    def test_CalcVidAvian(self):
+        # self.vid_avian = (self.sat_air_conc * self.inh_rate_avian * duration_hours)/(conversion_factor * self.body_weight_assessed_bird)
+        stir_empty.sat_air_conc = pd.Series([200.], dtype='int')
+        stir_empty.inh_rate_avian = pd.Series([10.], dtype='int')
+        stir_empty.body_weight_assessed_bird = pd.Series([0.05], dtype='float')
+        result = stir_empty.vid_avian
+        npt.assert_array_almost_equal(result,0.04, 4, '', True)
+        return
+
     # Carmen
-    # #eq. 4 Mammalian inhalation rate
-    # def CalcInhRateMammal(self):
-    #     #if self.inh_rate_mammal == -1:
-    #     #    self.body_weight_assessed_mammal = float(self.body_weight_assessed_mammal)
-    #     magic1 = 379.0
-    #     magic2 = 0.8
-    #     minutes_conversion = 60.
-    #     activity_factor = 3.
-    #     self.inh_rate_mammal = magic1 * (self.body_weight_assessed_mammal**magic2) * minutes_conversion * activity_factor
-    #     logging.info(self.inh_rate_mammal)
-    #     return self.inh_rate_mammal
-    #
+    # eq. 4 Mammalian inhalation rate
+    def test_CalcInhRateMammal(self):
+        # self.inh_rate_mammal = magic1 * (self.body_weight_assessed_mammal**magic2) * minutes_conversion * activity_factor
+        stir_empty.body_weight_assessed_mammal = pd.Series([0.08], dtype='float')
+        result = stir_empty.inh_rate_mammal
+        npt.assert_array_almost_equal(result,9044.4821, 4, '', True)
+        return
+
     # Carmen
-    # #eq. 5 Maximum mammalian vapor inhalation dose
-    # def CalcVidMammal(self):
-    #     #if self.vid_mammal == -1:
-    #     #    self.sat_air_conc = float(self.sat_air_conc) # eq. 1
-    #     #    self.inh_rate_mammal = float(self.inh_rate_mammal) # eq. 4
-    #     #    self.body_weight_assessed_mammal = float(self.body_weight_assessed_mammal)
-    #     duration_hours = 1.
-    #     conversion_factor = 1000000.
-    #     # 1 hr = duration of exposure
-    #     self.vid_mammal = (self.sat_air_conc * self.inh_rate_mammal * duration_hours)/(conversion_factor * self.body_weight_assessed_mammal)
-    #     logging.info(self.vid_mammal)
-    #     return self.vid_mammal
-    #
-    # Carmen
-    # #eq. 6 Air column concentration after spray
-    # def CalcConcAir(self):
-    #     #if self.air_conc == -1:
-    #     #    self.application_rate = float(self.application_rate)
-    #     #    self.column_height = float(self.column_height)
+    # eq. 5 Maximum mammalian vapor inhalation dose
+    def test_CalcVidMammal(self):
+        # self.vid_mammal = (self.sat_air_conc * self.inh_rate_mammal * duration_hours)/(conversion_factor * self.body_weight_assessed_mammal)
+        stir_empty.sat_air_conc = pd.Series([100.], dtype='int')
+        stir_empty.inh_rate_mammal = pd.Series([50.], dtype='int')
+        stir_empty.body_weight_assessed_mammal = pd.Series([0.08], dtype='float')
+        result = stir_empty.vid_mammal
+        npt.assert_array_almost_equal(result, 0.0625, 4, '', True)
+        return
+
+    # # Carmen
+    # # eq. 6 Air column concentration after spray
+    # def test_CalcConcAir(self):
     #     conversion_factor = 100. #cm/m
     #     # conversion of application rate from lbs/acre to mg/cm2
     #     cf_g_lbs = 453.59237
@@ -114,41 +94,36 @@ class TestStir(unittest.TestCase):
     #     self.air_conc = self.ar2/(self.column_height * conversion_factor)
     #     logging.info(self.air_conc)
     #     return self.air_conc
-    #
+
     # Carmen
-    # #eq. 7 Avian spray droplet inhalation dose
-    # def CalcSidAvian(self):
-    #     #if self.sid_avian == -1:
-    #     #    self.air_conc = float(self.air_conc)
-    #     #    self.inh_rate_avian = float(self.inh_rate_avian)
-    #     #    self.direct_spray_duration = float(self.direct_spray_duration)
-    #     #    self.spray_drift_fraction = float(self.spray_drift_fraction)
-    #     #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
-    #     self.sid_avian = (self.air_conc * self.inh_rate_avian * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_bird)
-    #     #logging.info("self.air_conc = " + self.air_conc)
-    #     #logging.info("self.inh_rate_avian = " + self.inh_rate_avian)
-    #     #logging.info("self.direct_spray_duration = " + self.direct_spray_duration)
-    #     #logging.info("self.spray_drift_fraction = " + self.spray_drift_fraction)
-    #     #logging.info("self.body_weight_assessed_bird = " + self.body_weight_assessed_bird)
-    #     #logging.info("self.sid_avian = " + self.sid_avian)
-    #     return self.sid_avian
-    #
+    # eq. 7 Avian spray droplet inhalation dose
+    def test_CalcSidAvian(self):
+        # self.sid_avian = (self.air_conc * self.inh_rate_avian * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_bird)
+        stir_empty.air_conc = pd.Series([150.], dtype='int')
+        stir_empty.inh_rate_avian = pd.Series([10.], dtype='int')
+        stir_empty.direct_spray_duration = pd.Series([0.5], dtype='float')
+        stir_empty.spray_drift_fraction = pd.Series([0.75], dtype='float')
+        stir_empty.body_weight_assessed_bird = pd.Series([0.02], dtype='float')
+        result = stir_empty.sid_avian
+        npt.assert_array_almost_equal(result, 468.75, 4, '', True)
+        return
+
     # Carmen
-    # #eq. 8 Mammalian spray droplet inhalation dose
-    # def CalcSidMammal(self):
-    #     #if self.sid_mammal == -1:
-    #     #    self.air_conc = float(self.air_conc)
-    #     #    self.inh_rate_mammal = float(self.inh_rate_mammal)
-    #     #    self.direct_spray_duration = float(self.direct_spray_duration)
-    #     #    self.spray_drift_fraction = float(self.spray_drift_fraction)
-    #     #    self.body_weight_assessed_mammal = float(self.body_weight_assessed_mammal)
-    #     self.sid_mammal = (self.air_conc * self.inh_rate_mammal * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_mammal)
-    #     logging.info(self.sid_mammal)
-    #     return self.sid_mammal
-    #
-    # Carmen
-    # #eq. 9 Conversion of mammalian LC50 to LD50
-    # def CalcConvertMammalInhalationLC50toLD50(self):
+    # eq. 8 Mammalian spray droplet inhalation dose
+    def test_CalcSidMammal(self):
+        # self.sid_mammal = (self.air_conc * self.inh_rate_mammal * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_mammal)
+        stir_empty.air_conc = pd.Series([150.], dtype='int')
+        stir_empty.inh_rate_mammal = pd.Series([50.], dtype='int')
+        stir_empty.direct_spray_duration = pd.Series([0.5], dtype='float')
+        stir_empty.spray_drift_fraction = pd.Series([0.75], dtype='float')
+        stir_empty.body_weight_assessed_mammal = pd.Series([0.08], dtype='float')
+        result = stir_empty.sid_mammal
+        npt.assert_array_almost_equal(result, 585.9375, 4, '', True)
+        return
+
+    # # Carmen
+    # # eq. 9 Conversion of mammalian LC50 to LD50
+    # def test_CalcConvertMammalInhalationLC50toLD50(self):
     #     #if self.mammal_inhalation_ld50 == -1:
     #     #    self.mammal_inhalation_lc50 = float(self.mammal_inhalation_lc50)
     #     #    #conversion factor
@@ -162,31 +137,31 @@ class TestStir(unittest.TestCase):
     #     self.mammal_inhalation_ld50 = self.mammal_inhalation_lc50 * absorption * self.cf * self.duration_mammal_inhalation_study * activity_factor
     #     logging.info(self.mammal_inhalation_ld50)
     #     return self.mammal_inhalation_ld50
-    #
+
     # Carmen
-    # #eq. 10 Adjusted mammalian inhalation LD50
-    # def CalcAdjustedMammalInhalationLD50(self):
-    #     #if self.adjusted_mammal_inhalation_ld50 == -1:
-    #     #    self.mammal_inhalation_ld50 = float(self.mammal_inhalation_ld50)
-    #     #    self.body_weight_assessed_mammal = float(self.body_weight_assessed_mammal)
-    #     #    self.body_weight_tested_mammal = float(self.body_weight_tested_mammal)
-    #     magicpower = 0.25
-    #     self.adjusted_mammal_inhalation_ld50 = self.mammal_inhalation_ld50 * (self.body_weight_tested_mammal/self.body_weight_assessed_mammal)**magicpower
-    #     logging.info(self.adjusted_mammal_inhalation_ld50)
-    #     return self.adjusted_mammal_inhalation_ld50
-    #
-    # Amber
-    # #eq. 11 Estimated avian inhalation LD50
-    # def CalcEstimatedAvianInhalationLD50(self):
-    #     #if self.estimated_avian_inhalation_ld50 == -1:
-    #     #    self.avian_oral_ld50 = float(self.avian_oral_ld50)
-    #     #    self.mammal_inhalation_ld50 = float(self.mammal_inhalation_ld50)
-    #     #    self.mammal_oral_ld50 = float(self.mammal_oral_ld50)
-    #     three_five = 3.5
-    #     self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50)
-    #     logging.info(self.estimated_avian_inhalation_ld50)
-    #     return self.estimated_avian_inhalation_ld50
-    #
+    # eq. 10 Adjusted mammalian inhalation LD50
+    def test_CalcAdjustedMammalInhalationLD50(self):
+        magicpower = 0.25
+        # self.adjusted_mammal_inhalation_ld50 = self.mammal_inhalation_ld50 * (self.body_weight_tested_mammal/self.body_weight_assessed_mammal)**magicpower
+        stir_empty.mammal_inhalation_ld50 = pd.Series([2.], dtype='int')
+        stir_empty.body_weight_tested_mammal = pd.Series([0.35], dtype='float')
+        stir_empty.body_weight_assessed_mammal = pd.Series([0.2], dtype='float')
+        result = stir_empty.adjusted_mammal_inhalation_ld50
+        npt.assert_array_almost_equal(result, 1.0287, 4, '', True)
+        return
+
+    Amber
+    #eq. 11 Estimated avian inhalation LD50
+    def CalcEstimatedAvianInhalationLD50(self):
+        #if self.estimated_avian_inhalation_ld50 == -1:
+        #    self.avian_oral_ld50 = float(self.avian_oral_ld50)
+        #    self.mammal_inhalation_ld50 = float(self.mammal_inhalation_ld50)
+        #    self.mammal_oral_ld50 = float(self.mammal_oral_ld50)
+        three_five = 3.5
+        self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50)
+        logging.info(self.estimated_avian_inhalation_ld50)
+        return self.estimated_avian_inhalation_ld50
+
     # Amber
     # #eq. 12 Adjusted avian inhalation LD50
     # def CalcAdjustedAvianInhalationLD50(self):
