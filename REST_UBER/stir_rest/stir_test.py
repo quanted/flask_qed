@@ -31,6 +31,7 @@ class TestStir(unittest.TestCase):
 
     # # each of these functions are queued by "run_methods" and have outputs defined as properties in the stir qaqc
     #
+    # Carmen
     # #eq. 1 saturated air concentration in mg/m^3
     # def CalcSatAirConc(self):
     #     #if self.sat_air_conc == -1:
@@ -43,6 +44,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.sat_air_conc)
     #     return self.sat_air_conc
     #
+    # Carmen
     # #eq. 2 Avian inhalation rate
     # def CalcInhRateAvian(self):
     #     #if self.inh_rate_avian == -1:
@@ -55,6 +57,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.inh_rate_avian)
     #     return self.inh_rate_avian
     #
+    # Carmen
     # #eq. 3  Maximum avian vapor inhalation dose
     # def CalcVidAvian(self):
     #     #if self.vid_avian == -1:
@@ -68,6 +71,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.vid_avian)
     #     return self.vid_avian
     #
+    # Carmen
     # #eq. 4 Mammalian inhalation rate
     # def CalcInhRateMammal(self):
     #     #if self.inh_rate_mammal == -1:
@@ -80,6 +84,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.inh_rate_mammal)
     #     return self.inh_rate_mammal
     #
+    # Carmen
     # #eq. 5 Maximum mammalian vapor inhalation dose
     # def CalcVidMammal(self):
     #     #if self.vid_mammal == -1:
@@ -93,6 +98,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.vid_mammal)
     #     return self.vid_mammal
     #
+    # Carmen
     # #eq. 6 Air column concentration after spray
     # def CalcConcAir(self):
     #     #if self.air_conc == -1:
@@ -109,6 +115,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.air_conc)
     #     return self.air_conc
     #
+    # Carmen
     # #eq. 7 Avian spray droplet inhalation dose
     # def CalcSidAvian(self):
     #     #if self.sid_avian == -1:
@@ -126,6 +133,7 @@ class TestStir(unittest.TestCase):
     #     #logging.info("self.sid_avian = " + self.sid_avian)
     #     return self.sid_avian
     #
+    # Carmen
     # #eq. 8 Mammalian spray droplet inhalation dose
     # def CalcSidMammal(self):
     #     #if self.sid_mammal == -1:
@@ -138,6 +146,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.sid_mammal)
     #     return self.sid_mammal
     #
+    # Carmen
     # #eq. 9 Conversion of mammalian LC50 to LD50
     # def CalcConvertMammalInhalationLC50toLD50(self):
     #     #if self.mammal_inhalation_ld50 == -1:
@@ -154,6 +163,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.mammal_inhalation_ld50)
     #     return self.mammal_inhalation_ld50
     #
+    # Carmen
     # #eq. 10 Adjusted mammalian inhalation LD50
     # def CalcAdjustedMammalInhalationLD50(self):
     #     #if self.adjusted_mammal_inhalation_ld50 == -1:
@@ -165,6 +175,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.adjusted_mammal_inhalation_ld50)
     #     return self.adjusted_mammal_inhalation_ld50
     #
+    # Amber
     # #eq. 11 Estimated avian inhalation LD50
     # def CalcEstimatedAvianInhalationLD50(self):
     #     #if self.estimated_avian_inhalation_ld50 == -1:
@@ -176,6 +187,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.estimated_avian_inhalation_ld50)
     #     return self.estimated_avian_inhalation_ld50
     #
+    # Amber
     # #eq. 12 Adjusted avian inhalation LD50
     # def CalcAdjustedAvianInhalationLD50(self):
     #     #if self.adjusted_avian_inhalation_ld50 == -1:
@@ -190,6 +202,8 @@ class TestStir(unittest.TestCase):
     # # ----------------------------------------------
     # # results
     # # ----------------------------------------------
+    #
+    # Amber
     # # results #1: Ratio of avian vapor dose to adjusted inhalation LD50
     # def ReturnRatioVidAvian(self):
     #     #if self.ratio_vid_avian == -1:
@@ -199,6 +213,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.ratio_vid_avian)
     #     return self.ratio_vid_avian
     #
+    # Amber
     # # results #2: Level of Concern for avian vapor phase risk
     # def ReturnLocVidAvian(self):
     #     #if self.ratio_vid_avian < 0.1:
@@ -212,6 +227,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.loc_vid_avian)
     #     return self.loc_vid_avian
     #
+    # Amber
     # # results #3: Ratio of avian droplet inhalation dose to adjusted inhalation LD50
     # def ReturnRatioSidAvian(self):
     #     #if self.ratio_sid_avian == -1:
@@ -221,6 +237,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.ratio_sid_avian)
     #     return self.ratio_sid_avian
     #
+    # Amber
     # # results #4: Level of Concern for avian droplet inhalation risk
     # def ReturnLocSidAvian(self):
     #     #if self.ratio_sid_avian < 0.1:
@@ -234,6 +251,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.loc_sid_avian)
     #     return self.loc_sid_avian
     #
+    # Amber
     # # results #5: Ratio of mammalian vapor dose to adjusted inhalation LD50
     # def ReturnRatioVidMammal(self):
     #     #if self.ratio_vid_mammal == -1:
@@ -243,6 +261,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.ratio_vid_mammal)
     #     return self.ratio_vid_mammal
     #
+    # Amber
     # # results #6: Level of Concern for mammalian vapor phase risk
     # def ReturnLocVidMammal(self):
     #     #if self.ratio_vid_mammal < 0.1:
@@ -256,6 +275,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.loc_vid_mammal)
     #     return self.loc_vid_mammal
     #
+    # Amber
     # # results #7: Ratio of mammalian droplet inhalation dose to adjusted inhalation LD50
     # def ReturnRatioSidMammal(self):
     #     #if self.ratio_sid_mammal == -1:
@@ -265,6 +285,7 @@ class TestStir(unittest.TestCase):
     #     logging.info(self.ratio_sid_mammal)
     #     return self.ratio_sid_mammal
     #
+    # Amber
     # # results #8: Level of Concern for mammaliam droplet inhalation risk
     # def ReturnLocSidMammal(self):
     #     #if self.ratio_sid_mammal < 0.1:
