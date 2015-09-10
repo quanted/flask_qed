@@ -10,6 +10,7 @@ pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
 # print(pd_obj_inputs)
 csv_transpose_path_exp = "./stir_qaqc_exp_transpose.csv"
 pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
+# print (pd_obj_exp_out)
 
 # create an instance of sip object with qaqc data
 stir_calc = stir_model.stir("batch", pd_obj_inputs, pd_obj_exp_out)
