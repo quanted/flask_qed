@@ -14,6 +14,8 @@ except ImportError, e:
 curr_path = os.path.abspath(os.path.dirname(__file__))
 
 
+mp_logger = multiprocessing.log_to_stderr()
+
 def multiprocessing_setup():
     nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
     print "max_workers=%s" % nproc
@@ -132,7 +134,10 @@ def daily_conc_callable(sam_bin_path, name_temp, section, array_size=320):
 
         import sam_callable
 
-        sam_callable.run(sam_bin_path, name_temp, section, array_size)
+        try:
+            sam_callable.run(sam_bin_path, name_temp, section, array_size)
+        except Exception, e:
+            mp_logger.exception(e)
 
 
 def callback_daily(section, future):
