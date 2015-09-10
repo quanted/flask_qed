@@ -1,6 +1,6 @@
 __author__ = 'jflaisha'
 
-import logging, numpy as np, requests
+import logging, numpy as np, requests, json
 
 try:
     import superprzm  #  Import superprzm.dll / .so
@@ -12,17 +12,18 @@ except ImportError, e:
 def run(sam_bin_path, name_temp, section, array_size):
 
     out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
-    #mongo_motor_insert(out, name_temp, section)  # Motor only works on Linux
-    mongo_pymongo_insert(out, name_temp, section)  # Pymongo used for testing on Windows
+    mongo_motor_insert(out, name_temp, section)  # Motor only works on Linux
+    #mongo_pymongo_insert(out, name_temp, section)  # Pymongo used for testing on Windows
 
     return True
 
 
 def mongo_motor_insert(array, name_temp, section):
 
-    url = 'localhost:8787'
+    jid = name_temp + "_" +section
+    url = 'http://localhost:8787/sam/daily/' + jid
     http_headers = {'Content-Type': 'application/json'}
-    data = create_mongo_document(array, name_temp, section)
+    data = json.dumps(create_mongo_document(array, name_temp, section))
 
     requests.post(url, data=data, headers=http_headers, timeout=30)
 
@@ -41,7 +42,7 @@ def mongo_pymongo_insert(array, name_temp, section):
         return None
 
     # Crete MongoDB document
-    document = create_mongo_document(array, name_temp, section)
+    document = json.dumps(create_mongo_document(array, name_temp, section))
 
     db.sam.insert(document)
 
