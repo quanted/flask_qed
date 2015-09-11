@@ -1,7 +1,7 @@
 __author__ = 'jflaisha'
 
 import logging, numpy as np, requests, json, cPickle
-from bson.binary import Binary
+from bson import BSON
 
 try:
     import superprzm  #  Import superprzm.dll / .so
@@ -12,9 +12,9 @@ except ImportError, e:
 
 def run(sam_bin_path, name_temp, section, array_size):
 
-    np_array_out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
-    test_array = np.random.rand(50,3)
-    mongo_motor_insert(test_array, name_temp, section)  # Motor only works on Linux
+    # np_array_out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
+    np_array_out = np.random.rand(50,3)
+    mongo_motor_insert(np_array_out, name_temp, section)  # Motor only works on Unix-based OS
     #mongo_pymongo_insert(np_array_out, name_temp, section)  # Pymongo used for testing on Windows
 
     return True
@@ -24,9 +24,12 @@ def mongo_motor_insert(np_array, name_temp, section):
 
     jid = name_temp + "_" +section
     url = 'http://localhost:8787/sam/daily/' + jid
-    http_headers = {'Content-Type': 'application/json'}
+    # http_headers = {'Content-Type': 'application/json'}
+    http_headers = {'Content-Type': 'application/octet-stream'}
     #data = json.dumps(create_mongo_document(np_array, name_temp, section))
-    data = cPickle.dumps(create_mongo_document(np_array, name_temp, section), protocol=2)
+    data = serialize(np_array, name_temp, section)
+
+    # Send data to Mongo server
     requests.post(url, data=data, headers=http_headers, timeout=30)
 
 
@@ -35,7 +38,7 @@ def mongo_pymongo_insert(np_array, name_temp, section):
     # Dummy-fy the np_array
     # np_array = [1, 2, 3]
 
-    # Connect to MongoDB server
+    # Connect to MongoDB server using Pymongo
     try:
         import pymongo
         client = pymongo.MongoClient('localhost', 27017)
@@ -44,13 +47,20 @@ def mongo_pymongo_insert(np_array, name_temp, section):
         return None
 
     # Crete MongoDB document
-    document = json.dumps(create_mongo_document(np_array, name_temp, section))
+    document = serialize(np_array, name_temp, section)
 
     db.sam.insert(document)
 
 
-def create_mongo_document(np_array, name_temp, section):
-    return {
+def serialize(np_array, name_temp, section):
+    """
+    Returns pickle to be sent to Mongo server.
+    :param np_array:
+    :param name_temp:
+    :param section:
+    :return:
+    """
+    return  cPickle.dumps({
         "user_id": "admin",
         "jid": name_temp + "_" + section,
         "run_type": 'single',
@@ -59,4 +69,4 @@ def create_mongo_document(np_array, name_temp, section):
             #'input': args
             'output': np_array
         }
-    }
+    }, protocol=2)
