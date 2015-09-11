@@ -1,7 +1,7 @@
 # needs to be run whenever the qaqc csv is updated
 csv_path = "./sip_qaqc.csv"
-csv_in = "./csv_transpose_path_in.csv"
-csv_exp = "./csv_transpose_path_exp.csv"
+csv_in = "./sip_qaqc_in_transpose.csv"
+csv_exp = "./sip_qaqc_exp_transpose.csv"
 import pandas as pd
 
 pd_obj_inputs = pd.read_csv(csv_path, index_col=0, header=None, skiprows=1, skipfooter=32, engine='python')
