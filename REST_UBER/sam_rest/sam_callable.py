@@ -12,8 +12,8 @@ except ImportError, e:
 
 def run(sam_bin_path, name_temp, section, array_size):
 
-    # np_array_out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
-    np_array_out = np.random.rand(50,3)
+    # np_array_out = np.random.rand(50,3)  # Dummy NumPy data
+    np_array_out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
     mongo_motor_insert(np_array_out, name_temp, section)  # Motor only works on Unix-based OS
     #mongo_pymongo_insert(np_array_out, name_temp, section)  # Pymongo used for testing on Windows
 
