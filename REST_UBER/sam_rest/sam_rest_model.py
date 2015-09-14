@@ -168,6 +168,8 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
     #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
     # )
 
+    pool.shutdown(wait=False)
+
     # import sam_multiprocessing as mp
     # sam = mp.SamModelCaller(name_temp, number_of_rows_list)
     # sam.sam_multiprocessing()

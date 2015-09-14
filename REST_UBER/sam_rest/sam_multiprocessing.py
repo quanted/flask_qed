@@ -55,14 +55,13 @@ class SamModelCaller(object):
                 # testing_sections[x]
                 self.number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
-                callback_daily
-                #partial(callback_daily, self.two_digit(x))
+                partial(callback_daily, self.two_digit(x))
             )
 
         # Destroy the Pool object which hosts the processes when the pending Futures objects are finished,
         # but do not wait until all Futures are done to have this function return
-        pool.shutdown(wait=False)  # Non-blocking
-        #pool.shutdown()  # Blocking
+        # pool.shutdown(wait=False)  # Non-blocking
+        pool.shutdown()  # Blocking
 
 
     def split_csv(self, number, name_temp):
