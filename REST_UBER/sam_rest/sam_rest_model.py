@@ -163,7 +163,8 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
 
     pool.submit(
         subprocess.call,
-        ['python', sam_callable, name_temp, str(number_of_rows_list)]
+        ['source', 'sam_launch.sh']
+        #['python', sam_callable, name_temp, str(number_of_rows_list)]
     )# .add_done_callback(
     #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
     # )
