@@ -2,7 +2,6 @@ import unittest
 import terrplant_model_rest as terrplant_model
 import pandas as pd
 import numpy.testing as npt
-import pandas.util.testing as pdt
 
 
 # load transposed qaqc data for inputs and expected outputs
@@ -31,116 +30,165 @@ class TestTerrplant(unittest.TestCase):
         # teardown called after each test
         # e.g. maybe write test results to some text file
 
-#each of these functions are queued by "run_methods" and have outputs defined as properties in the terrplant qaqc csv
-    # def rundry(self):
-    #     #(self.application_rate/self.incorporation_depth) * self.runoff_fraction
-    #     sip_empty.application_rate = pd.Series([10.], dtype='int')
-    #     sip_empty.incorporation_depth = pd.Series([2.], dtype='int')
-    #     sip_empty.runoff_fraction = pd.Series([.1], dtype='int')
-    #     result = sip_empty.rundry()
-    #     npt.assert_array_almost_equal(result, 0.5, 4, '', True)
-    #     return
-    #
-    # def runsemi(self):
-    #     #self.out_runsemi = (self.application_rate/self.incorporation_depth) * self.runoff_fraction * 10
-    #     sip_empty.out_runsemi = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def spray(self):
-    #     #self.out_spray = self.application_rate * self.drift_fraction
-    #     sip_empty.out_spray = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def totaldry(self):
-    #     #self.out_totaldry = self.out_rundry + self.out_spray
-    #     sip_empty.out_totaldry = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def totalsemi(self):
-    #     #self.out_totalsemi = self.out_runsemi + self.out_spray
-    #     sip_empty.out_totalsemi = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def nms_rq_dry(self):
-    #     #self.out_nms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_monocot
-    #     sip_empty.out_nms_rq_dry = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def nms_rq_semi(self):
-    #     #self.out_nms_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_monocot
-    #     sip_empty.out_nms_rq_semi = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def nms_rq_spray(self):
-    #     #self.out_nms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_monocot
-    #     sip_empty.out_nms_rq_spray = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def lms_rq_dry(self):
-    #     #self.out_lms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_dicot
-    #     sip_empty.out_lms_rq_dry = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def lms_rq_semi(self):
-    #     #self.out_lms_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_dicot
-    #     sip_empty.out_lms_rq_semi = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def lms_rq_spray(self):
-    #     #self.out_lms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_dicot
-    #     sip_empty.out_lms_rq_spray = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def nds_rq_dry(self):
-    #     #self.out_nds_rq_dry = self.out_totaldry/self.noaec_listed_seedling_emergence_monocot
-    #     sip_empty.out_nds_rq_dry = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def nds_rq_semi(self):
-    #     #self.out_nds_rq_semi = self.out_totalsemi/self.noaec_listed_seedling_emergence_monocot
-    #     sip_empty.out_nds_rq_semi = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def nds_rq_spray(self):
-    #     #self.out_nds_rq_spray = self.out_spray/self.noaec_listed_seedling_emergence_monocot
-    #     sip_empty.out_nds_rq_spray = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def lds_rq_dry(self):
-    #     #self.out_lds_rq_dry = self.out_totaldry/self.noaec_listed_seedling_emergence_dicot
-    #     sip_empty.out_lds_rq_dry = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def lds_rq_semi(self):
-    #     #self.out_lds_rq_semi = self.out_totalsemi/self.noaec_listed_seedling_emergence_dicot
-    #     sip_empty.out_lds_rq_semi = pd.Series([##.], dtype='int')
-    #     return
-    #
-    # def lds_rq_spray(self):
-    #     #self.out_lds_rq_spray = self.out_spray/self.noaec_listed_seedling_emergence_dicot
-    #     sip_empty.out_lds_rq_spray = pd.Series([##.], dtype='int')
-    #     return
+# each of these functions are queued by "run_methods" and have outputs defined as properties in the terrplant qaqc csv
+    def test_rundry(self):
+        #(self.application_rate/self.incorporation_depth) * self.runoff_fraction
+        terrplant_empty.application_rate = pd.Series([10.], dtype='int')
+        terrplant_empty.incorporation_depth = pd.Series([2.], dtype='int')
+        terrplant_empty.runoff_fraction = pd.Series([.1], dtype='float')
+        result = terrplant_empty.rundry()
+        npt.assert_array_almost_equal(result, 0.5, '', True)
+        return
+
+    def test_runsemi(self):
+        #self.out_runsemi = (self.application_rate/self.incorporation_depth) * self.runoff_fraction * 10
+        terrplant_empty.application_rate = pd.Series([10.], dtype='int')
+        terrplant_empty.incorporation_depth = pd.Series([2.], dtype='int')
+        terrplant_empty.runoff_fraction = pd.Series([.1], dtype='float')
+        result = terrplant_empty.runsemi()
+        npt.assert_array_almost_equal(result,5, '', True)
+        return
+
+    def test_spray(self):
+        #self.out_spray = self.application_rate * self.drift_fraction
+        terrplant_empty.application_rate = pd.Series([10.], dtype='int')
+        terrplant_empty.drift_fraction = pd.Series([0.5], dtype='float')
+        result = terrplant_empty.spray()
+        npt.assert_array_almost_equal(result, 5, '', True)
+        return
+
+    def test_totaldry(self):
+        #self.out_totaldry = self.out_rundry + self.out_spray
+        terrplant_empty.rundry = pd.Series([0.5], dtype='float')
+        terrplant_empty.spray = pd.Series([5.], dtype='int')
+        result = terrplant_empty.totaldry()
+        npt.assert_array_almost_equal(result, 5.5, '', True)
+        return
+
+    def test_totalsemi(self):
+        #self.out_totalsemi = self.out_runsemi + self.out_spray
+        terrplant_empty.out_runsemi = pd.Series([5.], dtype='int')
+        terrplant_empty.out_spray = pd.Series([5.], dtype='int')
+        result = terrplant_empty.totalsemi()
+        npt.assert_array_almost_equal(result, 10, '', True)
+        return
+
+    def test_nms_rq_dry(self):
+        #self.out_nms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_monocot
+        terrplant_empty.out_totaldry = pd.Series([5.5], dtype='float')
+        terrplant_empty.ec25_nonlisted_seedling_emergence_monocot = pd.Series([0.05], dtype='float')
+        result = terrplant_empty.out_nms_rq_dry()
+        npt.assert_array_almost_equal(result, 110, '', True)
+        return
+
+    def test_nms_rq_semi(self):
+        #self.out_nms_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_monocot
+        terrplant_empty.out_totalsemi = pd.Series([10.], dtype='int')
+        terrplant_empty.ec25_nonlisted_seedling_emergence_monocot = pd.Series([0.05], dtype='float')
+        result = terrplant_empty.out_nms_rq_semi()
+        npt.assert_array_almost_equal(result, 200, '', True)
+        return
+
+    def test_nms_rq_spray(self):
+        #self.out_nms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_monocot
+        terrplant_empty.out_spray = pd.Series([5.], dtype='int')
+        terrplant_empty.ec25_nonlisted_seedling_emergence_monocot = pd.Series([0.05], dtype='float')
+        result = terrplant_empty.out_nms_rq_spray()
+        npt.assert_array_almost_equal(result, 100, '', True)
+        return
+
+    def test_lms_rq_dry(self):
+        #self.out_lms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_dicot
+        terrplant_empty.out_totaldry = pd.Series([5.5], dtype='float')
+        terrplant_empty.ec25_nonlisted_seedling_emergence_dicot = pd.Series([0.01], dtype='float')
+        result = terrplant_empty.out_lms_rq_dry()
+        npt.assert_array_almost_equal(result, 550, '', True)
+        return
+
+    def test_lms_rq_semi(self):
+        #self.out_lms_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_dicot
+        terrplant_empty.out_totalsemi = pd.Series([10.], dtype='int')
+        terrplant_empty.ec25_nonlisted_seedling_emergence_dicot = pd.Series([0.01], dtype='float')
+        result = terrplant_empty.out_lms_rq_semi()
+        npt.assert_array_almost_equal(result, 1000, '', True)
+        return
+
+    def test_lms_rq_spray(self):
+        #self.out_lms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_dicot
+        terrplant_empty.out_spray = pd.Series([5.], dtype='int')
+        terrplant_empty.ec25_nonlisted_seedling_emergence_dicot = pd.Series([0.01], dtype='float')
+        result = terrplant_empty.out_lms_rq_spray()
+        npt.assert_array_almost_equal(result, 500, '', True)
+        return
+
+    def test_nds_rq_dry(self):
+        #self.out_nds_rq_dry = self.out_totaldry/self.noaec_listed_seedling_emergence_monocot
+        terrplant_empty.out_totaldry = pd.Series([5.5], dtype='float')
+        terrplant_empty.noaec_listed_seedling_emergence_monocot = pd.Series([0.02], dtype='float')
+        result = terrplant_empty.out_nds_rq_dry()
+        npt.assert_array_almost_equal(result, 275, '', True)
+        return
+
+    def test_nds_rq_semi(self):
+        #self.out_nds_rq_semi = self.out_totalsemi/self.noaec_listed_seedling_emergence_monocot
+        terrplant_empty.out_totalsemi = pd.Series([10.], dtype='int')
+        terrplant_empty.noaec_listed_seedling_emergence_monocot = pd.Series([0.02], dtype='float')
+        result = terrplant_empty.out_nds_rq_semi()
+        npt.assert_array_almost_equal(result, 500, '', True)
+        return
+
+    def test_nds_rq_spray(self):
+        #self.out_nds_rq_spray = self.out_spray/self.noaec_listed_seedling_emergence_monocot
+        terrplant_empty.out_spray = pd.Series([5.], dtype='int')
+        terrplant_empty.noaec_listed_seedling_emergence_monocot = pd.Series([0.02], dtype='float')
+        result = terrplant_empty.out_nds_rq_spray()
+        npt.assert_array_almost_equal(result, 250, '', True)
+        return
+
+    def test_lds_rq_dry(self):
+        #self.out_lds_rq_dry = self.out_totaldry/self.noaec_listed_seedling_emergence_dicot
+        terrplant_empty.out_totaldry = pd.Series([5.5], dtype='float')
+        terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.1], dtype='float')
+        result = terrplant_empty.out_lds_rq_dry()
+        npt.assert_array_almost_equal(result, 55, '', True)
+        return
+
+    def test_lds_rq_semi(self):
+        #self.out_lds_rq_semi = self.out_totalsemi/self.noaec_listed_seedling_emergence_dicot
+        terrplant_empty.out_totalsemi = pd.Series([10.], dtype='int')
+        terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.1], dtype='float')
+        result = terrplant_empty.out_lds_rq_semi()
+        npt.assert_array_almost_equal(result, 100, '', True)
+        return
+
+    def test_lds_rq_spray(self):
+        #self.out_lds_rq_spray = self.out_spray/self.noaec_listed_seedling_emergence_dicot
+        terrplant_empty.out_spray = pd.Series([5.], dtype='int')
+        terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.1], dtype='float')
+        result = terrplant_empty.out_lds_rq_spray()
+        npt.assert_array_almost_equal(result, 50, '', True)
+        return
 
 
 #the below functions are called in the run methods.
     def test_blackbox_method(self):
         self.blackbox_method_int('rundry')
-        self.blackbox_method_str('runsemi')
-        self.blackbox_method_str('spray')
-        self.blackbox_method_str('totaldry')
-        self.blackbox_method_str('totalsemi')
-        self.blackbox_method_str('nms_rq_dry')
-        self.blackbox_method_str('nms_rq_semi')
-        self.blackbox_method_str('nms_rq_spray')
-        self.blackbox_method_str('lms_rq_dry')
-        self.blackbox_method_str('lms_rq_semi')
-        self.blackbox_method_str('lms_rq_spray')
-        self.blackbox_method_str('nds_rq_dry')
-        self.blackbox_method_str('nds_rq_semi')
-        self.blackbox_method_str('nds_rq_spray')
-        self.blackbox_method_str('lds_rq_dry')
-        self.blackbox_method_str('lds_rq_semi')
-        self.blackbox_method_str('lds_rq_spray')
+        self.blackbox_method_int('runsemi')
+        self.blackbox_method_int('spray')
+        self.blackbox_method_int('totaldry')
+        self.blackbox_method_int('totalsemi')
+        self.blackbox_method_int('nms_rq_dry')
+        self.blackbox_method_int('nms_rq_semi')
+        self.blackbox_method_int('nms_rq_spray')
+        self.blackbox_method_int('lms_rq_dry')
+        self.blackbox_method_int('lms_rq_semi')
+        self.blackbox_method_int('lms_rq_spray')
+        self.blackbox_method_int('nds_rq_dry')
+        self.blackbox_method_int('nds_rq_semi')
+        self.blackbox_method_int('nds_rq_spray')
+        self.blackbox_method_int('lds_rq_dry')
+        self.blackbox_method_int('lds_rq_semi')
+        self.blackbox_method_int('lds_rq_spray')
 
     def blackbox_method_int(self, output):
         """
