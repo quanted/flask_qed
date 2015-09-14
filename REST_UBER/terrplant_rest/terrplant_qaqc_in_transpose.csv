@@ -1,0 +1,4 @@
+,model,version_terrplant,chemical_name,pc_code,use,application_method,application_form,solubility,incorporation_depth,application_rate,drift_fraction,runoff_fraction,ec25_nonlisted_seedling_emergence_monocot,noaec_listed_seedling_emergence_monocot,ec25_nonlisted_seedling_emergence_dicot,noaec_listed_seedling_emergence_dicot,ec25_nonlisted_vegetative_vigor_monocot
+0,terrplant,1.2.2,Alachlor,90501,Corn,Ground,Spray,240,1,4,0.01,0.05,0.0067,0.034,0.0023,0.019,0.068
+1,terrplant,1.2.2,Alachlor,90501,Corn,Ground,Spray,240,1,4,0.01,0.05,0.0067,0.034,0.0023,0.019,0.068
+2,terrplant,1.2.2,Alachlor,90501,Corn,Ground,Spray,240,1,4,0.01,0.05,0.0067,0.034,0.0023,0.019,0.068
