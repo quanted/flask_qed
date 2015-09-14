@@ -19,7 +19,7 @@ mp_logger = multiprocessing.log_to_stderr()
 def multiprocessing_setup():
     nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
     print "max_workers=%s" % nproc
-    return Pool(max_workers = nproc)  # Set number of workers to equal the number of processors available on machin
+    return Pool(max_workers = nproc)  # Set number of workers to equal the number of processors available on machine
 
 
 class SamModelCaller(object):
@@ -52,8 +52,8 @@ class SamModelCaller(object):
                 self.sam_bin_path,
                 self.name_temp,              # Temporary path name for this SuperPRZM run
                 self.two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
-                testing_sections[x]
-                #number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
+                # testing_sections[x]
+                self.number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
                 callback_daily
                 #partial(callback_daily, self.two_digit(x))
@@ -152,7 +152,7 @@ def daily_conc_callable(sam_bin_path, name_temp, section, array_size=320):
 
 def callback_daily(section, future):
     print "Section: ", section
-    print future.result()
+    # print future.result()
 
 
 def main():

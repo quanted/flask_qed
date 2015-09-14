@@ -155,10 +155,22 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
     :return:
     """
 
-    import sam_multiprocessing as mp
+    from concurrent.futures import ThreadPoolExecutor as Pool
+    # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
+    pool = Pool(max_workers=1)
 
-    sam = mp.SamModelCaller(name_temp, number_of_rows_list)
-    sam.sam_multiprocessing()
+    sam_callable = os.path.join(curr_path, 'sam_multiprocessing.py')
+
+    pool.submit(
+        subprocess.call,
+        ['python', sam_callable, name_temp, str(number_of_rows_list)]
+    )# .add_done_callback(
+    #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
+    # )
+
+    # import sam_multiprocessing as mp
+    # sam = mp.SamModelCaller(name_temp, number_of_rows_list)
+    # sam.sam_multiprocessing()
 
 
 def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type):
