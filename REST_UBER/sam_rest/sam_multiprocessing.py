@@ -25,15 +25,25 @@ def multiprocessing_setup():
 class SamModelCaller(object):
     def __init__(self, name_temp, number_of_rows_list, no_of_processes=16):
 
-        if _dll_loaded:
+        # if _dll_loaded:
 
-            self.sam_bin_path = os.path.join(curr_path, 'bin')
-            self.name_temp = name_temp
-            self.number_of_rows_list = number_of_rows_list
-            self.no_of_processes = no_of_processes
+        self.sam_bin_path = os.path.join(curr_path, 'bin')
+        self.name_temp = name_temp
+        self.number_of_rows_list = number_of_rows_list
+        self.no_of_processes = no_of_processes
 
 
     def sam_multiprocessing(self):
+
+        # global pool
+        # if pool is None:
+        #     pool = multiprocessing_setup()
+
+        try:
+            if pool is None:
+                pass
+        except NameError:
+            pool = multiprocessing_setup()
 
         testing_sections = [308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 330]
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
@@ -103,7 +113,7 @@ class SamModelCaller(object):
                 # Middle slices (not first or last)
                 df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
-            number_of_rows_list.append(len(df_slice.count()))  # Save the number of rows for each CSV to be passed to SuperPRZM
+            number_of_rows_list.append(len(df_slice))  # Save the number of rows for each CSV to be passed to SuperPRZM
             df_slice.to_csv(os.path.join(
                 self.sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + self.two_digit(i - 1) + '.csv'
             ), index=False)
@@ -127,17 +137,17 @@ class SamModelCaller(object):
 
 
 def daily_conc_callable(sam_bin_path, name_temp, section, array_size=320):
-        # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
-        # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
+    # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
+    # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
-        #return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
+    #return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
 
-        import sam_callable
+    import sam_callable
 
-        try:
-            sam_callable.run(sam_bin_path, name_temp, section, array_size)
-        except Exception, e:
-            mp_logger.exception(e)
+    try:
+        sam_callable.run(sam_bin_path, name_temp, section, array_size)
+    except Exception, e:
+        mp_logger.exception(e)
 
 
 def callback_daily(section, future):

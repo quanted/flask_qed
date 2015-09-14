@@ -156,7 +156,9 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
     """
 
     import sam_multiprocessing as mp
-    mp.sam_multiprocessing(no_of_processes, name_temp, number_of_rows_list)
+
+    sam = mp.SamModelCaller(name_temp, number_of_rows_list)
+    sam.sam_multiprocessing()
 
 
 def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type):
@@ -350,7 +352,7 @@ def split_csv(number, name_temp):
             # Middle slices (not first or last)
             df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
-        number_of_rows_list.append(len(df_slice.count()))  # Save the number of rows for each CSV to be passed to SuperPRZM
+        number_of_rows_list.append(len(df_slice))  # Save the number of rows for each CSV to be passed to SuperPRZM
         df_slice.to_csv(os.path.join(
             sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + two_digit(i - 1) + '.csv'
         ), index=False)
