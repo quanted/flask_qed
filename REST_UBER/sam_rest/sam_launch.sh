@@ -11,8 +11,8 @@ if [ $# -gt 0 ]; then
     NAME_TEMP=$2
     NUMBER_OF_ROWS_LIST=$3
 
-    sleep 15
-    #python $SAM_PY $NAME_TEMP "$NUMBER_OF_ROWS_LIST"
+    #sleep 15  # Testing
+    python $SAM_PY $NAME_TEMP "$NUMBER_OF_ROWS_LIST"
 else
     echo "Expected arguments missing"
 fi

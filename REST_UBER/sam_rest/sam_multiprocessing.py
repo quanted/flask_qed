@@ -35,9 +35,10 @@ class SamModelCaller(object):
 
     def sam_multiprocessing(self):
 
-        # global pool
-        # if pool is None:
-        #     pool = multiprocessing_setup()
+        try:
+            import subprocess32 as subprocess    # Use subprocess32 for Linux (Python 3.2 backport)
+        except ImportError:
+            import subprocess
 
         try:
             if pool is None:
@@ -48,12 +49,13 @@ class SamModelCaller(object):
         testing_sections = [308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 330]
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
             pool.submit(
-                daily_conc_callable,
-                self.sam_bin_path,
-                self.name_temp,              # Temporary path name for this SuperPRZM run
-                self.two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
+                subprocess.Popen, "sleep 3"  # Testing
+                # daily_conc_callable,
+                # self.sam_bin_path,
+                # self.name_temp,              # Temporary path name for this SuperPRZM run
+                # self.two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
                 # testing_sections[x]
-                self.number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
+                # self.number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
                 partial(callback_daily, self.two_digit(x))
             )
