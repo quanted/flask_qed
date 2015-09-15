@@ -2,7 +2,6 @@ import unittest
 import stir_model_rest as stir_model
 import pandas as pd
 import numpy.testing as npt
-import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs and expected outputs
 csv_transpose_path_in = "./stir_qaqc_in_transpose.csv"
@@ -12,7 +11,7 @@ csv_transpose_path_exp = "./stir_qaqc_exp_transpose.csv"
 pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 # print(pd_obj_exp_out)
 
-# create an instance of sip object with qaqc data
+# create an instance of stir object with qaqc data
 stir_calc = stir_model.stir("batch", pd_obj_inputs, pd_obj_exp_out)
 stir_empty = stir_model.stir("empty", pd_obj_inputs, pd_obj_exp_out)
 test = {}
@@ -21,7 +20,7 @@ class TestStir(unittest.TestCase):
     def setup(self):
         pass
         # setup the test as needed
-        # e.g. pandas to open sip qaqc csv
+        # e.g. pandas to open stir qaqc csv
         #  Read qaqc csv and create pandas DataFrames for inputs and expected outputs
 
     def teardown(self):
@@ -37,7 +36,7 @@ class TestStir(unittest.TestCase):
         # self.sat_air_conc = (self.vapor_pressure * self.molecular_weight * conv)/(pressure * air_vol)
         stir_empty.vapor_pressure = pd.Series([0.000008], dtype='float')
         stir_empty.molecular_weight = pd.Series([200.], dtype='int')
-        result= sip_empty.sat_air_conc
+        result = stir_empty.CalcSatAirConc()
         npt.assert_array_almost_equal(result,0.086105, 4, '', True)
         return
 
@@ -46,7 +45,7 @@ class TestStir(unittest.TestCase):
     def test_CalcInhRateAvian(self):
         # self.inh_rate_avian = magic1 * (self.body_weight_assessed_bird**magic2) * conversion * activity_factor
         stir_empty.body_weight_assessed_bird = pd.Series([0.05], dtype='float')
-        result = stir_empty.inh_rate_avian
+        result = stir_empty.CalcInhRateAvian()
         npt.assert_array_almost_equal(result,5090.9373, 4, '', True)
         return
 
@@ -57,7 +56,7 @@ class TestStir(unittest.TestCase):
         stir_empty.sat_air_conc = pd.Series([200.], dtype='int')
         stir_empty.inh_rate_avian = pd.Series([10.], dtype='int')
         stir_empty.body_weight_assessed_bird = pd.Series([0.05], dtype='float')
-        result = stir_empty.vid_avian
+        result = stir_empty.CalcVidAvian()
         npt.assert_array_almost_equal(result,0.04, 4, '', True)
         return
 
@@ -66,7 +65,7 @@ class TestStir(unittest.TestCase):
     def test_CalcInhRateMammal(self):
         # self.inh_rate_mammal = magic1 * (self.body_weight_assessed_mammal**magic2) * minutes_conversion * activity_factor
         stir_empty.body_weight_assessed_mammal = pd.Series([0.08], dtype='float')
-        result = stir_empty.inh_rate_mammal
+        result = stir_empty.CalcInhRateMammal()
         npt.assert_array_almost_equal(result,9044.4821, 4, '', True)
         return
 
@@ -77,7 +76,7 @@ class TestStir(unittest.TestCase):
         stir_empty.sat_air_conc = pd.Series([100.], dtype='int')
         stir_empty.inh_rate_mammal = pd.Series([50.], dtype='int')
         stir_empty.body_weight_assessed_mammal = pd.Series([0.08], dtype='float')
-        result = stir_empty.vid_mammal
+        result = stir_empty.CalcVidMammal()
         npt.assert_array_almost_equal(result, 0.0625, 4, '', True)
         return
 
@@ -104,7 +103,7 @@ class TestStir(unittest.TestCase):
         stir_empty.direct_spray_duration = pd.Series([0.5], dtype='float')
         stir_empty.spray_drift_fraction = pd.Series([0.75], dtype='float')
         stir_empty.body_weight_assessed_bird = pd.Series([0.02], dtype='float')
-        result = stir_empty.sid_avian
+        result = stir_empty.CalcSidAvian()
         npt.assert_array_almost_equal(result, 468.75, 4, '', True)
         return
 
@@ -117,7 +116,7 @@ class TestStir(unittest.TestCase):
         stir_empty.direct_spray_duration = pd.Series([0.5], dtype='float')
         stir_empty.spray_drift_fraction = pd.Series([0.75], dtype='float')
         stir_empty.body_weight_assessed_mammal = pd.Series([0.08], dtype='float')
-        result = stir_empty.sid_mammal
+        result = stir_empty.CalcSidMammal()
         npt.assert_array_almost_equal(result, 585.9375, 4, '', True)
         return
 
@@ -141,26 +140,24 @@ class TestStir(unittest.TestCase):
     # Carmen
     # eq. 10 Adjusted mammalian inhalation LD50
     def test_CalcAdjustedMammalInhalationLD50(self):
-        magicpower = 0.25
         # self.adjusted_mammal_inhalation_ld50 = self.mammal_inhalation_ld50 * (self.body_weight_tested_mammal/self.body_weight_assessed_mammal)**magicpower
         stir_empty.mammal_inhalation_ld50 = pd.Series([2.], dtype='int')
         stir_empty.body_weight_tested_mammal = pd.Series([0.35], dtype='float')
         stir_empty.body_weight_assessed_mammal = pd.Series([0.2], dtype='float')
-        result = stir_empty.adjusted_mammal_inhalation_ld50
-        npt.assert_array_almost_equal(result, 1.0287, 4, '', True)
+        result = stir_empty.CalcAdjustedMammalInhalationLD50()
+        npt.assert_array_almost_equal(result, 2.3003, 4, '', True)
         return
 
-    Amber
-    #eq. 11 Estimated avian inhalation LD50
-    def CalcEstimatedAvianInhalationLD50(self):
-        #if self.estimated_avian_inhalation_ld50 == -1:
-        #    self.avian_oral_ld50 = float(self.avian_oral_ld50)
-        #    self.mammal_inhalation_ld50 = float(self.mammal_inhalation_ld50)
-        #    self.mammal_oral_ld50 = float(self.mammal_oral_ld50)
-        three_five = 3.5
-        self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50)
-        logging.info(self.estimated_avian_inhalation_ld50)
-        return self.estimated_avian_inhalation_ld50
+    # # Amber
+    # #eq. 11 Estimated avian inhalation LD50
+    # def CalcEstimatedAvianInhalationLD50(self):
+    #     #    self.avian_oral_ld50 = float(self.avian_oral_ld50)
+    #     #    self.mammal_inhalation_ld50 = float(self.mammal_inhalation_ld50)
+    #     #    self.mammal_oral_ld50 = float(self.mammal_oral_ld50)
+    #     three_five = 3.5
+    #     self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50)
+    #     logging.info(self.estimated_avian_inhalation_ld50)
+    #     return self.estimated_avian_inhalation_ld50
 
     # Amber
     # #eq. 12 Adjusted avian inhalation LD50
@@ -275,26 +272,26 @@ class TestStir(unittest.TestCase):
     #     return self.loc_sid_mammal
 
     def test_blackbox_method(self):
-        self.blackbox_method_int('sat_air_conc')
-        self.blackbox_method_int('inh_rate_avian')
-        self.blackbox_method_int('vid_avian')
-        self.blackbox_method_int('inh_rate_mammal')
-        self.blackbox_method_int('vid_mammal')
-        self.blackbox_method_int('air_conc')
-        self.blackbox_method_int('sid_avian')
-        self.blackbox_method_int('sid_mammal')
-        self.blackbox_method_int('mammal_inhalation_ld50')
-        self.blackbox_method_int('adjusted_mammal_inhalation_ld50')
-        self.blackbox_method_int('estimated_avian_inhalation_ld50')
-        self.blackbox_method_int('adjusted_avian_inhalation_ld50')
-        self.blackbox_method_int('ratio_vid_avian')
-        self.blackbox_method_str('loc_vid_avian')
-        self.blackbox_method_int('ratio_sid_avian')
-        self.blackbox_method_str('loc_sid_avian')
-        self.blackbox_method_int('ratio_vid_mammal')
-        self.blackbox_method_str('loc_vid_mammal')
-        self.blackbox_method_int('ratio_sid_mammal')
-        self.blackbox_method_str('loc_sid_mammal')
+        self.blackbox_method_int('CalcSatAirConc')
+        self.blackbox_method_int('CalcInhRateAvian')
+        self.blackbox_method_int('CalcVidAvian')
+        self.blackbox_method_int('CalcInhRateMammal')
+        self.blackbox_method_int('CalcVidMammal')
+        self.blackbox_method_int('CalcConcAir')
+        self.blackbox_method_int('CalcSidAvian')
+        self.blackbox_method_int('CalcSidMammal')
+        # self.blackbox_method_int('CalcConvertMammalInhalationLC50toLD50')
+        self.blackbox_method_int('CalcAdjustedMammalInhalationLD50')
+        # self.blackbox_method_int('estimated_avian_inhalation_ld50')
+        # self.blackbox_method_int('adjusted_avian_inhalation_ld50')
+        # self.blackbox_method_int('ratio_vid_avian')
+        # self.blackbox_method_str('loc_vid_avian')
+        # self.blackbox_method_int('ratio_sid_avian')
+        # self.blackbox_method_str('loc_sid_avian')
+        # self.blackbox_method_int('ratio_vid_mammal')
+        # self.blackbox_method_str('loc_vid_mammal')
+        # self.blackbox_method_int('ratio_sid_mammal')
+        # self.blackbox_method_str('loc_sid_mammal')
 
     def blackbox_method_int(self, output):
         """
@@ -310,3 +307,10 @@ class TestStir(unittest.TestCase):
         result = stir_calc.pd_obj_out[output + "_out"]
         expected = stir_calc.pd_obj_exp[output + "_exp"]
         npt.assert_array_equal(result, expected)
+
+# unittest will
+# 1) call the setup method,
+# 2) then call every method starting with "test",
+# 3) then the teardown method
+if __name__ == '__main__':
+    unittest.main()

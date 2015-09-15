@@ -1,4 +1,6 @@
 # needs to be run whenever the qaqc csv is updated
+import pandas as pd
+
 csv_path = "./stir_qaqc.csv"
 csv_transpose_path_in = "./stir_qaqc_in_transpose.csv"
 csv_transpose_path_exp = "./stir_qaqc_exp_transpose.csv"
