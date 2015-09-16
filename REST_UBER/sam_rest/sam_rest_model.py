@@ -161,9 +161,13 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
 
     sam_callable = os.path.join(curr_path, 'sam_multiprocessing.py')
 
+    number_of_rows_string = ""
+    for item in number_of_rows_list:
+        number_of_rows_string += item + " "
+
     pool.submit(
         subprocess.call,
-        ['source', 'sam_launch.sh']
+        ['source', 'sam_launch.sh', sam_callable, name_temp, number_of_rows_string]
         #['python', sam_callable, name_temp, str(number_of_rows_list)]
     )# .add_done_callback(
     #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))

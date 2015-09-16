@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #Activate the Python virtual environment
-source /var/www/ubertool/ubertool_ecorest/env/bin/activate
-echo python --version
+#source /var/www/ubertool/ubertool_ecorest/env/bin/activate
+#python --version
 
 if [ $# -gt 0 ]; then
     echo '1st command line arg: ' $1
