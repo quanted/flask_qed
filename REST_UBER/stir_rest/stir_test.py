@@ -272,16 +272,16 @@ class TestStir(unittest.TestCase):
     #     return self.loc_sid_mammal
 
     def test_blackbox_method(self):
-        self.blackbox_method_int('CalcSatAirConc')
-        self.blackbox_method_int('CalcInhRateAvian')
-        self.blackbox_method_int('CalcVidAvian')
-        self.blackbox_method_int('CalcInhRateMammal')
-        self.blackbox_method_int('CalcVidMammal')
-        self.blackbox_method_int('CalcConcAir')
-        self.blackbox_method_int('CalcSidAvian')
-        self.blackbox_method_int('CalcSidMammal')
-        # self.blackbox_method_int('CalcConvertMammalInhalationLC50toLD50')
-        self.blackbox_method_int('CalcAdjustedMammalInhalationLD50')
+        self.blackbox_method_int('sat_air_conc')
+        self.blackbox_method_int('inh_rate_avian')
+        self.blackbox_method_int('vid_avian')
+        self.blackbox_method_int('inh_rate_mammal')
+        self.blackbox_method_int('vid_mammal')
+        self.blackbox_method_int('air_conc')
+        self.blackbox_method_int('sid_avian')
+        self.blackbox_method_int('sid_mammal')
+        # self.blackbox_method_int('mammal_inhalation_ld50')
+        self.blackbox_method_int('adjusted_mammal_inhalation_ld50')
         # self.blackbox_method_int('estimated_avian_inhalation_ld50')
         # self.blackbox_method_int('adjusted_avian_inhalation_ld50')
         # self.blackbox_method_int('ratio_vid_avian')
@@ -299,14 +299,15 @@ class TestStir(unittest.TestCase):
         :param output: String; Pandas Series name (e.g. column name) without '_out'
         :return:
         """
-        result = stir_calc.pd_obj_out[output + "_out"]
-        expected = stir_calc.pd_obj_exp[output + "_exp"]
+        result = stir_calc.pd_obj_out
+        expected = stir_calc.pd_obj_exp
         npt.assert_array_almost_equal(result, expected, 4, '', True)
 
-    def blackbox_method_str(self, output):
-        result = stir_calc.pd_obj_out[output + "_out"]
-        expected = stir_calc.pd_obj_exp[output + "_exp"]
-        npt.assert_array_equal(result, expected)
+    # def blackbox_method_str(self, output):
+    #     result = stir_calc.pd_obj_out
+    #     expected = stir_calc.pd_obj_exp
+    #     npt.assert_array_equal(result, expected)
+
 
 # unittest will
 # 1) call the setup method,
