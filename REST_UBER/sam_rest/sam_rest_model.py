@@ -82,11 +82,14 @@ def sam(inputs_json, jid, run_type):
             try:
 
                 if args['output_type'] == '1':  # Daily Concentrations
-                    number_of_rows_list = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
+                    sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
+                    # Divide master HUC12 list CSV into subsets for current run based on 'no_of_processes'
+                    number_of_rows_list = split_csv(no_of_processes, name_temp)
                     sam_daily_conc(no_of_processes, name_temp, number_of_rows_list)
 
                 else:
                     sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)  # Does not use 'number_of_rows_list' for SuperPRZMPesticide.exe runs
+                    split_csv(no_of_processes, name_temp)
                     sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type)
 
             except ImportError, e:
@@ -138,11 +141,6 @@ def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
 
     for x in range(no_of_processes):
         shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
-
-    # Divide master HUC12 list CSV into subsets for current run based on 'no_of_processes'
-    number_of_rows_list = split_csv(no_of_processes, name_temp)
-
-    return number_of_rows_list
 
 
 def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):

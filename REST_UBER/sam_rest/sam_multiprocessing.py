@@ -29,14 +29,17 @@ def multiprocessing_setup():
 
 class SamModelCaller(object):
     def __init__(self, name_temp, number_of_rows_list=None, no_of_processes=16):
-
-        # if _dll_loaded:
+        """
+        Constructor for SamModelCaller class.
+        :param name_temp: string
+        :param number_of_rows_list: list
+        :param no_of_processes: int
+        """
 
         self.sam_bin_path = os.path.join(curr_path, 'bin')
         self.name_temp = name_temp
         self.number_of_rows_list = number_of_rows_list
         self.no_of_processes = no_of_processes
-
 
     def sam_multiprocessing(self):
         """
@@ -167,6 +170,8 @@ def callback_daily(section, future):
     print "Section: ", section
     # print future.result()
 
+def create_number_of_rows_list(list_string):
+    return list_string.split()
 
 def main():
     """
@@ -186,7 +191,13 @@ def main():
     name_temp = sys.argv[1]
     try:  # 'number_of_rows_list' is an optional command line argument that is calculated if not given (split_csv() called)
         number_of_rows_list = sys.argv[2]
-    except:
+        # if isinstance(self.number_of_rows_list, str):
+        number_of_rows_list = create_number_of_rows_list(number_of_rows_list)
+        for item in number_of_rows_list:
+            int(item)
+    except ValueError:  # If the string is none int
+        number_of_rows_list = None
+    except IndexError:  # If the command-line argument is not supplied
         number_of_rows_list = None
     try:  # 'no_of_processes' is an optional command line argument that defaults to 16 if not given
         no_of_processes = int(sys.argv[3])
