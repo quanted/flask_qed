@@ -2,6 +2,7 @@ import unittest
 import stir_model_rest as stir_model
 import pandas as pd
 import numpy.testing as npt
+import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs and expected outputs
 csv_transpose_path_in = "./stir_qaqc_in_transpose.csv"
@@ -30,7 +31,6 @@ class TestStir(unittest.TestCase):
 
     # each of these functions are queued by "run_methods" and have outputs defined as properties in the stir qaqc
 
-    # Carmen
     # eq. 1 saturated air concentration in mg/m^3
     def test_CalcSatAirConc(self):
         # self.sat_air_conc = (self.vapor_pressure * self.molecular_weight * conv)/(pressure * air_vol)
@@ -40,7 +40,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result,0.086105, 4, '', True)
         return
 
-    # Carmen
     # eq. 2 Avian inhalation rate
     def test_CalcInhRateAvian(self):
         # self.inh_rate_avian = magic1 * (self.body_weight_assessed_bird**magic2) * conversion * activity_factor
@@ -49,7 +48,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result,5090.9373, 4, '', True)
         return
 
-    # Carmen
     # eq. 3  Maximum avian vapor inhalation dose
     def test_CalcVidAvian(self):
         # self.vid_avian = (self.sat_air_conc * self.inh_rate_avian * duration_hours)/(conversion_factor * self.body_weight_assessed_bird)
@@ -60,7 +58,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result,0.04, 4, '', True)
         return
 
-    # Carmen
     # eq. 4 Mammalian inhalation rate
     def test_CalcInhRateMammal(self):
         # self.inh_rate_mammal = magic1 * (self.body_weight_assessed_mammal**magic2) * minutes_conversion * activity_factor
@@ -69,7 +66,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result,9044.4821, 4, '', True)
         return
 
-    # Carmen
     # eq. 5 Maximum mammalian vapor inhalation dose
     def test_CalcVidMammal(self):
         # self.vid_mammal = (self.sat_air_conc * self.inh_rate_mammal * duration_hours)/(conversion_factor * self.body_weight_assessed_mammal)
@@ -80,7 +76,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 0.0625, 4, '', True)
         return
 
-    # Carmen
     # eq. 6 Air column concentration after spray
     def test_CalcConcAir(self):
         # conversion_factor = 100. #cm/m
@@ -94,7 +89,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 0.0001121, 4, '', True)
         return
 
-    # Carmen
     # eq. 7 Avian spray droplet inhalation dose
     def test_CalcSidAvian(self):
         # self.sid_avian = (self.air_conc * self.inh_rate_avian * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_bird)
@@ -107,7 +101,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 468.75, 4, '', True)
         return
 
-    # Carmen
     # eq. 8 Mammalian spray droplet inhalation dose
     def test_CalcSidMammal(self):
         # self.sid_mammal = (self.air_conc * self.inh_rate_mammal * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_mammal)
@@ -120,7 +113,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 585.9375, 4, '', True)
         return
 
-    # Carmen
     # eq. 9 Conversion of mammalian LC50 to LD50
     def test_CalcConvertMammalInhalationLC50toLD50(self):
         # activity_factor = 1.
@@ -134,7 +126,6 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 0.14286, 4, '', True)
         return
 
-    # Carmen
     # eq. 10 Adjusted mammalian inhalation LD50
     def test_CalcAdjustedMammalInhalationLD50(self):
         # self.adjusted_mammal_inhalation_ld50 = self.mammal_inhalation_ld50 * (self.body_weight_tested_mammal/self.body_weight_assessed_mammal)**magicpower
@@ -145,128 +136,115 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 2.3003, 4, '', True)
         return
 
-    # # Amber
-    # #eq. 11 Estimated avian inhalation LD50
-    # def CalcEstimatedAvianInhalationLD50(self):
-    #     #    self.avian_oral_ld50 = float(self.avian_oral_ld50)
-    #     #    self.mammal_inhalation_ld50 = float(self.mammal_inhalation_ld50)
-    #     #    self.mammal_oral_ld50 = float(self.mammal_oral_ld50)
-    #     three_five = 3.5
-    #     self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50)
-    #     logging.info(self.estimated_avian_inhalation_ld50)
-    #     return self.estimated_avian_inhalation_ld50
+    #eq. 11 Estimated avian inhalation LD50
+    def CalcEstimatedAvianInhalationLD50(self):
+        # three_five = 3.5
+        # self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50)/(three_five * self.mammal_oral_ld50)
+        stir_empty.avian_oral_ld50 = pd.Series([500.], dtype='int')
+        stir_empty.mammal_inhalation_ld50 = pd.Series([2.], dtype='int')
+        stir_empty.mammal_oral_ld50 = pd.Series([20.], dtype='int')
+        result = stir_empty.CalcEstimatedAvianInhalationLD50()
+        npt.assert_array_almost_equal(result, 14.2857, 4, '', True)
+        return
 
-    # Amber
-    # #eq. 12 Adjusted avian inhalation LD50
-    # def CalcAdjustedAvianInhalationLD50(self):
-    #     #if self.adjusted_avian_inhalation_ld50 == -1:
-    #     #    self.estimated_avian_inhalation_ld50 = float(self.estimated_avian_inhalation_ld50)
-    #     #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
-    #     #    self.body_weight_tested_bird = float(self.body_weight_tested_bird)
-    #     #    self.mineau_scaling_factor = float(self.mineau_scaling_factor)
-    #     self.adjusted_avian_inhalation_ld50 = self.estimated_avian_inhalation_ld50 * (self.body_weight_assessed_bird/self.body_weight_tested_bird)**(self.mineau_scaling_factor - 1)
-    #     logging.info(self.adjusted_avian_inhalation_ld50)
-    #     return self.adjusted_avian_inhalation_ld50
-    #
-    # # ----------------------------------------------
-    # # results
-    # # ----------------------------------------------
-    #
-    # Amber
-    # # results #1: Ratio of avian vapor dose to adjusted inhalation LD50
-    # def ReturnRatioVidAvian(self):
-    #     #if self.ratio_vid_avian == -1:
-    #     #    self.vid_avian = float(self.vid_avian)
-    #     #    self.adjusted_avian_inhalation_ld50 = float(self.adjusted_avian_inhalation_ld50)
-    #     self.ratio_vid_avian = self.vid_avian/self.adjusted_avian_inhalation_ld50
-    #     logging.info(self.ratio_vid_avian)
-    #     return self.ratio_vid_avian
-    #
-    # Amber
-    # # results #2: Level of Concern for avian vapor phase risk
-    # def ReturnLocVidAvian(self):
-    #     #if self.ratio_vid_avian < 0.1:
-    #     #    self.loc_vid_avian = 'Exposure not Likely Significant'
-    #     #else:
-    #     #    self.loc_vid_avian = 'Proceed to Refinements'
-    #     exceed_boolean = self.ratio_vid_avian < 0.1
-    #     self.loc_vid_avian = exceed_boolean.map(lambda x:
-    #                                             'Exposure not Likely Significant' if x == True
-    #                                             else 'Proceed to Refinements')
-    #     logging.info(self.loc_vid_avian)
-    #     return self.loc_vid_avian
-    #
-    # Amber
-    # # results #3: Ratio of avian droplet inhalation dose to adjusted inhalation LD50
-    # def ReturnRatioSidAvian(self):
-    #     #if self.ratio_sid_avian == -1:
-    #     #    self.sid_avian = float(self.sid_avian)
-    #     #    self.adjusted_avian_inhalation_ld50 = float(self.adjusted_avian_inhalation_ld50)
-    #     self.ratio_sid_avian = self.sid_avian/self.adjusted_avian_inhalation_ld50
-    #     logging.info(self.ratio_sid_avian)
-    #     return self.ratio_sid_avian
-    #
-    # Amber
-    # # results #4: Level of Concern for avian droplet inhalation risk
-    # def ReturnLocSidAvian(self):
-    #     #if self.ratio_sid_avian < 0.1:
-    #     #    self.loc_sid_avian = 'Exposure not Likely Significant'
-    #     #else:
-    #     #    self.loc_sid_avian = 'Proceed to Refinements'
-    #     exceed_boolean = self.ratio_sid_avian < 0.1
-    #     self.loc_sid_avian = exceed_boolean.map(lambda x:
-    #                                             'Exposure not Likely Significant' if x == True
-    #                                             else 'Proceed to Refinements')
-    #     logging.info(self.loc_sid_avian)
-    #     return self.loc_sid_avian
-    #
-    # Amber
-    # # results #5: Ratio of mammalian vapor dose to adjusted inhalation LD50
-    # def ReturnRatioVidMammal(self):
-    #     #if self.ratio_vid_mammal == -1:
-    #     #    self.vid_mammal = float(self.vid_mammal)
-    #     #    self.adjusted_mammal_inhalation_ld50 = float(self.adjusted_mammal_inhalation_ld50)
-    #     self.ratio_vid_mammal = self.vid_mammal/self.adjusted_mammal_inhalation_ld50
-    #     logging.info(self.ratio_vid_mammal)
-    #     return self.ratio_vid_mammal
-    #
-    # Amber
-    # # results #6: Level of Concern for mammalian vapor phase risk
-    # def ReturnLocVidMammal(self):
-    #     #if self.ratio_vid_mammal < 0.1:
-    #     #    self.loc_vid_mammal = 'Exposure not Likely Significant'
-    #     #else:
-    #     #    self.loc_vid_mammal = 'Proceed to Refinements'
-    #     exceed_boolean = self.ratio_vid_mammal < 0.1
-    #     self.loc_vid_mammal = exceed_boolean.map(lambda x:
-    #                                              'Exposure not Likely Significant' if x == True
-    #                                              else 'Proceed to Refinements')
-    #     logging.info(self.loc_vid_mammal)
-    #     return self.loc_vid_mammal
-    #
-    # Amber
-    # # results #7: Ratio of mammalian droplet inhalation dose to adjusted inhalation LD50
-    # def ReturnRatioSidMammal(self):
-    #     #if self.ratio_sid_mammal == -1:
-    #     #    self.sid_mammal = float(self.sid_mammal)
-    #     #    self.adjusted_mammal_inhalation_ld50 = float(self.adjusted_mammal_inhalation_ld50)
-    #     self.ratio_sid_mammal = self.sid_mammal/self.adjusted_mammal_inhalation_ld50
-    #     logging.info(self.ratio_sid_mammal)
-    #     return self.ratio_sid_mammal
-    #
-    # Amber
-    # # results #8: Level of Concern for mammaliam droplet inhalation risk
-    # def ReturnLocSidMammal(self):
-    #     #if self.ratio_sid_mammal < 0.1:
-    #     #    self.loc_sid_mammal = 'Exposure not Likely Significant'
-    #     #else:
-    #     #    self.loc_sid_mammal = 'Proceed to Refinements'
-    #     exceed_boolean = self.ratio_sid_mammal < 0.1
-    #     self.loc_sid_mammal = exceed_boolean.map(lambda x:
-    #                                              'Exposure not Likely Significant' if x == True
-    #                                              else 'Proceed to Refinements')
-    #     logging.info(self.loc_sid_mammal)
-    #     return self.loc_sid_mammal
+    #eq. 12 Adjusted avian inhalation LD50
+    def CalcAdjustedAvianInhalationLD50(self):
+        # self.adjusted_avian_inhalation_ld50 = self.estimated_avian_inhalation_ld50 * (self.body_weight_assessed_bird/self.body_weight_tested_bird)**(self.mineau_scaling_factor - 1)
+        stir_empty.estimated_avian_inhalation_ld50 = pd.Series([0.5], dtype='float')
+        stir_empty.body_weight_assessed_bird = pd.Series([0.02], dtype='float')
+        stir_empty.body_weight_tested_bird = pd.Series([0.1], dtype='float')
+        stir_empty.mineau_scaling_factor = pd.Series([2.], dtype='int')
+        result = stir_empty.CalcAdjustedAvianInhalationLD50()
+        npt.assert_array_almost_equal(result, 0.1, 4, '', True)
+        return
+
+    # ----------------------------------------------
+    # results
+    # ----------------------------------------------
+
+    # results #1: Ratio of avian vapor dose to adjusted inhalation LD50
+    def ReturnRatioVidAvian(self):
+        # self.ratio_vid_avian = self.vid_avian/self.adjusted_avian_inhalation_ld50
+        stir_empty.vid_avian = pd.Series([0.04], dtype='float')
+        stir_empty.adjusted_avian_inhalation_ld50 = pd.Series([5.], dtype='int')
+        result = stir_empty.ReturnRatioVidAvian()
+        npt.assert_array_almost_equal(result, 0.008, 4, '', True)
+        return
+
+    # results #2: Level of Concern for avian vapor phase risk
+    def ReturnLocVidAvian(self):
+        #if self.ratio_vid_avian < 0.1:
+        #    self.loc_vid_avian = 'Exposure not Likely Significant'
+        #else:
+        #    self.loc_vid_avian = 'Proceed to Refinements'
+        stir_empty.loc_vid_avian = pd.Series([0.2], dtype='float')
+        result = sip_empty.ReturnLocVidAvian()
+        exp = pd.Series("Proceed to Refinements")
+        pdt.assert_series_equal(result,exp)
+        return
+
+    # results #3: Ratio of avian droplet inhalation dose to adjusted inhalation LD50
+    def ReturnRatioSidAvian(self):
+        # self.ratio_sid_avian = self.sid_avian/self.adjusted_avian_inhalation_ld50
+        stir_empty.sid_avian = pd.Series([4.], dtype='int')
+        stir_empty.adjusted_avian_inhalation_ld50 = pd.Series([10.], dtype='int')
+        result = sip_empty.ReturnRatioSidAvian()
+        npt.assert_array_almost_equal(result, 0.4, 4, '', True)
+        return
+
+    # results #4: Level of Concern for avian droplet inhalation risk
+    def ReturnLocSidAvian(self):
+        #if self.ratio_sid_avian < 0.1:
+        #    self.loc_sid_avian = 'Exposure not Likely Significant'
+        #else:
+        #    self.loc_sid_avian = 'Proceed to Refinements'
+        stir_empty.ratio_sid_avian = pd.Series([0.2], dtype='float')
+        result = sip_empty.ReturnLocSidAvian()
+        exp = pd.Series("Proceed to Refinements")
+        pdt.assert_series_equal(result, exp)
+        return
+
+    # results #5: Ratio of mammalian vapor dose to adjusted inhalation LD50
+    def ReturnRatioVidMammal(self):
+        # self.ratio_vid_mammal = self.vid_mammal/self.adjusted_mammal_inhalation_ld50
+        stir_empty.vid_mammal = pd.Series([4.], dtype='int')
+        stir_empty.adjusted_mammal_inhalation_ld50 = pd.Series([2.], dtype='int')
+        result = sip_empty.ReturnRatioVidMammal()
+        npt.assert_array_almost_equal(result, 2, '', True)
+        return
+
+    # results #6: Level of Concern for mammalian vapor phase risk
+    def ReturnLocVidMammal(self):
+        #if self.ratio_vid_mammal < 0.1:
+        #    self.loc_vid_mammal = 'Exposure not Likely Significant'
+        #else:
+        #    self.loc_vid_mammal = 'Proceed to Refinements'
+        stir_empty.ratio_vid_mammal = pd.Series([0.3], dtype='float')
+        result = sip_empty.ReturnLocVidMammal()
+        exp = pd.Series("Proceed to Refinements")
+        pdt.assert_series_equal(result, exp)
+        return
+
+    # results #7: Ratio of mammalian droplet inhalation dose to adjusted inhalation LD50
+    def ReturnRatioSidMammal(self):
+        # self.ratio_sid_mammal = self.sid_mammal/self.adjusted_mammal_inhalation_ld50
+        stir_empty.sid_mammal = pd.Series([0.5], dtype='float')
+        stir_empty.adjusted_mammal_inhalation_ld50 = pd.Series([2.], dtype='int')
+        result = ReturnRatioSidMammal()
+        npt.assert_array_almost_equal(result, 0.25, 4, '', True)
+        return
+
+    # results #8: Level of Concern for mammaliam droplet inhalation risk
+    def ReturnLocSidMammal(self):
+        #if self.ratio_sid_mammal < 0.1:
+        #    self.loc_sid_mammal = 'Exposure not Likely Significant'
+        #else:
+        #    self.loc_sid_mammal = 'Proceed to Refinements'
+        stir_empty.ratio_sid_mammal = pd.Series([0.6], dtype='float')
+        result = sip_empty.ReturnLocSidMammal()
+        exp = pd.Series("Proceed to Refinements")
+        pdt.assert_series_equal(result, exp)
+        return
 
     def test_blackbox_method(self):
         self.blackbox_method_int('sat_air_conc')
@@ -279,16 +257,16 @@ class TestStir(unittest.TestCase):
         self.blackbox_method_int('sid_mammal')
         self.blackbox_method_int('mammal_inhalation_ld50')
         self.blackbox_method_int('adjusted_mammal_inhalation_ld50')
-        # self.blackbox_method_int('estimated_avian_inhalation_ld50')
-        # self.blackbox_method_int('adjusted_avian_inhalation_ld50')
-        # self.blackbox_method_int('ratio_vid_avian')
-        # self.blackbox_method_str('loc_vid_avian')
-        # self.blackbox_method_int('ratio_sid_avian')
-        # self.blackbox_method_str('loc_sid_avian')
-        # self.blackbox_method_int('ratio_vid_mammal')
-        # self.blackbox_method_str('loc_vid_mammal')
-        # self.blackbox_method_int('ratio_sid_mammal')
-        # self.blackbox_method_str('loc_sid_mammal')
+        self.blackbox_method_int('estimated_avian_inhalation_ld50')
+        self.blackbox_method_int('adjusted_avian_inhalation_ld50')
+        self.blackbox_method_int('ratio_vid_avian')
+        self.blackbox_method_str('loc_vid_avian')
+        self.blackbox_method_int('ratio_sid_avian')
+        self.blackbox_method_str('loc_sid_avian')
+        self.blackbox_method_int('ratio_vid_mammal')
+        self.blackbox_method_str('loc_vid_mammal')
+        self.blackbox_method_int('ratio_sid_mammal')
+        self.blackbox_method_str('loc_sid_mammal')
 
     def blackbox_method_int(self, output):
         """
