@@ -80,19 +80,19 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 0.0625, 4, '', True)
         return
 
-    # # Carmen
-    # # eq. 6 Air column concentration after spray
-    # def test_CalcConcAir(self):
-    #     conversion_factor = 100. #cm/m
-    #     # conversion of application rate from lbs/acre to mg/cm2
-    #     cf_g_lbs = 453.59237
-    #     cf_mg_g = 1000.
-    #     cf_cm2_acre = 40468564.2
-    #     self.ar2 = (self.application_rate*cf_g_lbs*cf_mg_g)/cf_cm2_acre
-    #     logging.info(self.ar2)
-    #     self.air_conc = self.ar2/(self.column_height * conversion_factor)
-    #     logging.info(self.air_conc)
-    #     return self.air_conc
+    # Carmen
+    # eq. 6 Air column concentration after spray
+    def test_CalcConcAir(self):
+        # conversion_factor = 100. #cm/m
+        # cf_g_lbs = 453.59237
+        # cf_mg_g = 1000.
+        # cf_cm2_acre = 40468564.2
+        # self.air_conc = ((self.application_rate*cf_g_lbs*cf_mg_g)/cf_cm2_acre)/(self.column_height * conversion_factor)
+        stir_empty.application_rate = pd.Series([2.], dtype='int')
+        stir_empty.column_height = pd.Series([2.], dtype='int')
+        result = stir_empty.CalcConcAir()
+        npt.assert_array_almost_equal(result, 0.0001121, 4, '', True)
+        return
 
     # Carmen
     # eq. 7 Avian spray droplet inhalation dose
@@ -120,22 +120,19 @@ class TestStir(unittest.TestCase):
         npt.assert_array_almost_equal(result, 585.9375, 4, '', True)
         return
 
-    # # Carmen
-    # # eq. 9 Conversion of mammalian LC50 to LD50
-    # def test_CalcConvertMammalInhalationLC50toLD50(self):
-    #     #if self.mammal_inhalation_ld50 == -1:
-    #     #    self.mammal_inhalation_lc50 = float(self.mammal_inhalation_lc50)
-    #     #    #conversion factor
-    #     #    self.inh_rate_mammal = float(self.inh_rate_mammal)
-    #     #    self.body_weight_tested_mammal = float(self.body_weight_tested_mammal)
-    #     #    self.duration_mammal_inhalation_study = float(self.duration_mammal_inhalation_study)
-    #     self.cf = ((self.inh_rate_mammal * 0.001)/self.body_weight_tested_mammal)
-    #     logging.info(self.cf)
-    #     activity_factor = 1.
-    #     absorption = 1.
-    #     self.mammal_inhalation_ld50 = self.mammal_inhalation_lc50 * absorption * self.cf * self.duration_mammal_inhalation_study * activity_factor
-    #     logging.info(self.mammal_inhalation_ld50)
-    #     return self.mammal_inhalation_ld50
+    # Carmen
+    # eq. 9 Conversion of mammalian LC50 to LD50
+    def test_CalcConvertMammalInhalationLC50toLD50(self):
+        # activity_factor = 1.
+        # absorption = 1.
+        # self.mammal_inhalation_ld50 = self.mammal_inhalation_lc50 * absorption * ((self.inh_rate_mammal * 0.001)/self.body_weight_tested_mammal) * self.duration_mammal_inhalation_study * activity_factor
+        stir_empty.mammal_inhalation_lc50 = pd.Series([0.5], dtype='float')
+        stir_empty.inh_rate_mammal = pd.Series([50.], dtype='int')
+        stir_empty.body_weight_tested_mammal = pd.Series([0.35], dtype='float')
+        stir_empty.duration_mammal_inhalation_study = pd.Series([2.], dtype='float')
+        result = stir_empty.CalcConvertMammalInhalationLC50toLD50()
+        npt.assert_array_almost_equal(result, 0.14286, 4, '', True)
+        return
 
     # Carmen
     # eq. 10 Adjusted mammalian inhalation LD50
@@ -280,7 +277,7 @@ class TestStir(unittest.TestCase):
         self.blackbox_method_int('air_conc')
         self.blackbox_method_int('sid_avian')
         self.blackbox_method_int('sid_mammal')
-        # self.blackbox_method_int('mammal_inhalation_ld50')
+        self.blackbox_method_int('mammal_inhalation_ld50')
         self.blackbox_method_int('adjusted_mammal_inhalation_ld50')
         # self.blackbox_method_int('estimated_avian_inhalation_ld50')
         # self.blackbox_method_int('adjusted_avian_inhalation_ld50')
@@ -303,10 +300,10 @@ class TestStir(unittest.TestCase):
         expected = stir_calc.pd_obj_exp
         npt.assert_array_almost_equal(result, expected, 4, '', True)
 
-    # def blackbox_method_str(self, output):
-    #     result = stir_calc.pd_obj_out
-    #     expected = stir_calc.pd_obj_exp
-    #     npt.assert_array_equal(result, expected)
+    def blackbox_method_str(self, output):
+        result = stir_calc.pd_obj_out
+        expected = stir_calc.pd_obj_exp
+        npt.assert_array_equal(result, expected)
 
 
 # unittest will
