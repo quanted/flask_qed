@@ -1,9 +1,8 @@
 import unittest
-import sip_model_rest as sip_model
 import pandas as pd
 import numpy.testing as npt
+from .. import sip_model_rest as sip_model
 import pandas.util.testing as pdt
-
 
 # load transposed qaqc data for inputs and expected outputs
 csv_transpose_path_in = "./sip_qaqc_in_transpose.csv"
@@ -69,4 +68,5 @@ class TestSip(unittest.TestCase):
 # 2) then call every method starting with "test",
 # 3) then the teardown method
 if __name__ == '__main__':
-    unittest.main()
+    #unittest.main()
+    pass

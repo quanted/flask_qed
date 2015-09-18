@@ -1,8 +1,9 @@
 import unittest
-import sip_model_rest as sip_model
 import pandas as pd
 import numpy.testing as npt
 import pandas.util.testing as pdt
+#import sip_model_rest as sip_model
+from .. import sip_model_rest as sip_model
 
 # create empty pandas dataframes to create empty sip object for testing
 df_empty = pd.DataFrame()
@@ -26,12 +27,12 @@ class TestSip(unittest.TestCase):
         # e.g. maybe write test results to some text file
 
     def test_fw_bird(self):
-        result = sip_calc.fw_bird()
+        result = sip_empty.fw_bird()
         npt.assert_array_almost_equal(result, 0.0162, 4, '', True)
         return
 
     def test_fw_mamm(self):
-        result = sip_calc.fw_mamm()
+        result = sip_empty.fw_mamm()
         npt.assert_array_almost_equal(result, 0.172, 4, '', True)
         return
 
@@ -231,3 +232,4 @@ class TestSip(unittest.TestCase):
 # 3) then the teardown method
 if __name__ == '__main__':
     unittest.main()
+    #pass
