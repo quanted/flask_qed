@@ -178,7 +178,7 @@ class TestStir(unittest.TestCase):
         #else:
         #    self.loc_vid_avian = 'Proceed to Refinements'
         stir_empty.loc_vid_avian = pd.Series([0.2], dtype='float')
-        result = sip_empty.ReturnLocVidAvian()
+        result = stir_empty.ReturnLocVidAvian()
         exp = pd.Series("Proceed to Refinements")
         pdt.assert_series_equal(result,exp)
         return
@@ -188,7 +188,7 @@ class TestStir(unittest.TestCase):
         # self.ratio_sid_avian = self.sid_avian/self.adjusted_avian_inhalation_ld50
         stir_empty.sid_avian = pd.Series([4.], dtype='int')
         stir_empty.adjusted_avian_inhalation_ld50 = pd.Series([10.], dtype='int')
-        result = sip_empty.ReturnRatioSidAvian()
+        result = stir_empty.ReturnRatioSidAvian()
         npt.assert_array_almost_equal(result, 0.4, 4, '', True)
         return
 
@@ -199,7 +199,7 @@ class TestStir(unittest.TestCase):
         #else:
         #    self.loc_sid_avian = 'Proceed to Refinements'
         stir_empty.ratio_sid_avian = pd.Series([0.2], dtype='float')
-        result = sip_empty.ReturnLocSidAvian()
+        result = stir_empty.ReturnLocSidAvian()
         exp = pd.Series("Proceed to Refinements")
         pdt.assert_series_equal(result, exp)
         return
@@ -209,7 +209,7 @@ class TestStir(unittest.TestCase):
         # self.ratio_vid_mammal = self.vid_mammal/self.adjusted_mammal_inhalation_ld50
         stir_empty.vid_mammal = pd.Series([4.], dtype='int')
         stir_empty.adjusted_mammal_inhalation_ld50 = pd.Series([2.], dtype='int')
-        result = sip_empty.ReturnRatioVidMammal()
+        result = stir_empty.ReturnRatioVidMammal()
         npt.assert_array_almost_equal(result, 2, '', True)
         return
 
@@ -220,7 +220,7 @@ class TestStir(unittest.TestCase):
         #else:
         #    self.loc_vid_mammal = 'Proceed to Refinements'
         stir_empty.ratio_vid_mammal = pd.Series([0.3], dtype='float')
-        result = sip_empty.ReturnLocVidMammal()
+        result = stir_empty.ReturnLocVidMammal()
         exp = pd.Series("Proceed to Refinements")
         pdt.assert_series_equal(result, exp)
         return
@@ -230,7 +230,7 @@ class TestStir(unittest.TestCase):
         # self.ratio_sid_mammal = self.sid_mammal/self.adjusted_mammal_inhalation_ld50
         stir_empty.sid_mammal = pd.Series([0.5], dtype='float')
         stir_empty.adjusted_mammal_inhalation_ld50 = pd.Series([2.], dtype='int')
-        result = ReturnRatioSidMammal()
+        result = stir_empty.ReturnRatioSidMammal()
         npt.assert_array_almost_equal(result, 0.25, 4, '', True)
         return
 
@@ -241,7 +241,7 @@ class TestStir(unittest.TestCase):
         #else:
         #    self.loc_sid_mammal = 'Proceed to Refinements'
         stir_empty.ratio_sid_mammal = pd.Series([0.6], dtype='float')
-        result = sip_empty.ReturnLocSidMammal()
+        result = stir_empty.ReturnLocSidMammal()
         exp = pd.Series("Proceed to Refinements")
         pdt.assert_series_equal(result, exp)
         return
