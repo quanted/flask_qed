@@ -8,4 +8,4 @@ python:
 install: "pip install -r requirements.txt"
 
 # command to run tests
-script: nosetests
+script: nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.sip_rest.sip_model_rest -v
