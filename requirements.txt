@@ -6,6 +6,6 @@ requests
 pytz
 bottle
 futures
-nosetests
+nose
 coverage
 pylint
