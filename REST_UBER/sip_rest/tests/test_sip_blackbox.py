@@ -5,10 +5,12 @@ from .. import sip_model_rest as sip_model
 import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs and expected outputs
-csv_transpose_path_in = "./sip_qaqc_in_transpose.csv"
+csv_transpose_path_in = "./tests/sip_qaqc_in_transpose.csv"
+#csv_transpose_path_in = "./sip_qaqc_in_transpose.csv"
 pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
 # print(pd_obj_inputs)
-csv_transpose_path_exp = "./sip_qaqc_exp_transpose.csv"
+csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
+#csv_transpose_path_exp = "./sip_qaqc_exp_transpose.csv"
 pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 # print(pd_obj_exp_out)
 
@@ -31,21 +33,50 @@ class TestSip(unittest.TestCase):
         # e.g. maybe write test results to some text file
 
 #Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
-    def test_blackbox_method(self):
+    def test_blackbox_dose_bird(self):
          self.blackbox_method_int('dose_bird')
+
+    def test_blackbox_dose_mamm(self):
          self.blackbox_method_int('dose_mamm')
+
+    def test_blackbox_at_bird(self):
          self.blackbox_method_int('at_bird')
+
+    def test_blackbox_at_mamm(self):
          self.blackbox_method_int('at_mamm')
-       #  self.blackbox_method('fi_bird')
+
+    def test_blackbox_fi_bird(self):
+        #self.blackbox_method('fi_bird')
+        pass
+
+    def test_blackbox_det(self):
          self.blackbox_method_int('det')
+
+    def test_blackbox_act(self):
          self.blackbox_method_int('act')
+
+    def test_blackbox_acute_bird(self):
          self.blackbox_method_int('acute_bird')
+
+    def test_blackbox_acuconb(self):
          self.blackbox_method_str('acuconb')
+
+    def test_blackbox_acute_mamm(self):
          self.blackbox_method_int('acute_mamm')
+
+    def test_blackbox_acuconm(self):
          self.blackbox_method_str('acuconm')
+
+    def test_blackbox_chron_bird(self):
          self.blackbox_method_int('chron_bird')
+
+    def test_blackbox_chronconb(self):
          self.blackbox_method_str('chronconb')
+
+    def test_blackbox_chron_mamm(self):
          self.blackbox_method_int('chron_mamm')
+
+    def test_blackbox_chronconm(self):
          self.blackbox_method_str('chronconm')
 
     def blackbox_method_int(self, output):
