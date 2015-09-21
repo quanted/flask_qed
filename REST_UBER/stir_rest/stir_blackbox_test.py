@@ -21,27 +21,46 @@ class TestStir(unittest.TestCase):
         # setup the test as needed
         # e.g. pandas to open stir qaqc csv
         #  Read qaqc csv and create pandas DataFrames for inputs and expected outputs
-
-    def test_blackbox_method(self):
+#Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
+    def test_sat_air_conc(self):
         self.blackbox_method_int('sat_air_conc')
+    def test_inh_rate_avian(self):
         self.blackbox_method_int('inh_rate_avian')
+    def test_vid_avian(self):
         self.blackbox_method_int('vid_avian')
+    def test_inh_rate_mammal(self):
         self.blackbox_method_int('inh_rate_mammal')
+    def test_vid_mammal(self):
         self.blackbox_method_int('vid_mammal')
+    def test_air_conc(self):
         self.blackbox_method_int('air_conc')
+    def test_sid_avian(self):
         self.blackbox_method_int('sid_avian')
+    def test_sid_mammal(self):
         self.blackbox_method_int('sid_mammal')
+    def test_mammal_inhalation_ld50(self):
         self.blackbox_method_int('mammal_inhalation_ld50')
+    def test_adjusted_mammal_inhalation_ld50(self):
         self.blackbox_method_int('adjusted_mammal_inhalation_ld50')
+    def test_estimated_avian_inhalation_ld50(self):
         self.blackbox_method_int('estimated_avian_inhalation_ld50')
+    def test_adjusted_avian_inhalation_ld50(self):
         self.blackbox_method_int('adjusted_avian_inhalation_ld50')
+    def test_ratio_vid_avian(self):
         self.blackbox_method_int('ratio_vid_avian')
+    def test_loc_vid_avian(self):
         self.blackbox_method_str('loc_vid_avian')
+    def test_ratio_sid_avian(self):
         self.blackbox_method_int('ratio_sid_avian')
+    def test_loc_sid_avian(self):
         self.blackbox_method_str('loc_sid_avian')
+    def test_ratio_vid_mammal(self):
         self.blackbox_method_int('ratio_vid_mammal')
+    def test_loc_vid_mammal(self):
         self.blackbox_method_str('loc_vid_mammal')
+    def test_ratio_sid_mammal(self):
         self.blackbox_method_int('ratio_sid_mammal')
+    def test_loc_sid_mammal(self):
         self.blackbox_method_str('loc_sid_mammal')
 
     def blackbox_method_int(self, output):
