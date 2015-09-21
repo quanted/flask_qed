@@ -5,13 +5,14 @@ from .. import sip_model_rest as sip_model
 import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs
-#csv_transpose_path_in = "./tests/sip_qaqc_in_transpose.csv"
-csv_transpose_path_in = "./sip_qaqc_in_transpose.csv"
+#nosetests:
+csv_transpose_path_in = "./tests/sip_qaqc_in_transpose.csv"
 pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
 # print(pd_obj_inputs)
+
 # load transposed qaqc data for inputs
-#csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
-csv_transpose_path_exp = "./sip_qaqc_exp_transpose.csv"
+#nosetests
+csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
 pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 # print(pd_obj_exp_out)
 

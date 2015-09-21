@@ -2,7 +2,10 @@ import unittest
 import pandas as pd
 import numpy.testing as npt
 import pandas.util.testing as pdt
+#following works when running test script in parent directory as package:
+# python -m tests.test_sip_unittest
 #import sip_model_rest as sip_model
+#following works for running as nosetests from parent directory:
 from .. import sip_model_rest as sip_model
 
 # create empty pandas dataframes to create empty sip object for testing
@@ -11,7 +14,6 @@ df_empty = pd.DataFrame()
 sip_empty = sip_model.sip("empty", df_empty, df_empty)
 
 test = {}
-
 
 class TestSip(unittest.TestCase):
     def setup(self):
