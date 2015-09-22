@@ -1,19 +1,28 @@
 import unittest
 import pandas as pd
 import numpy.testing as npt
+import pkgutil
+from StringIO import StringIO
 from .. import sip_model_rest as sip_model
 import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs
-#works for local nosetests, but not for travis container that calls nosestests:
-csv_transpose_path_in = "./tests/sip_qaqc_in_transpose.csv"
-pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
+#works for local nosetests from parent directory
+# but not for travis container that calls nosestests:
+#csv_transpose_path_in = "./tests/sip_qaqc_in_transpose.csv"
+#pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
+#this works for both local nosetests and travis deploy
+data_inputs = StringIO(pkgutil.get_data(__package__, 'sip_qaqc_in_transpose.csv'))
+pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
 # print(pd_obj_inputs)
 
 # load transposed qaqc data for inputs
 #works for local nosetests, but not for travis container that calls nosetests:
-csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
-pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
+#csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
+#pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
+#this works for both local nosetests and travis deploy
+data_exp_outputs = StringIO(pkgutil.get_data(__package__, 'sip_qaqc_exp_transpose.csv'))
+pd_obj_exp_out = pd.read_csv(data_exp_outputs, index_col=0, engine='python')
 # print(pd_obj_exp_out)
 
 # create an instance of sip object with qaqc data
