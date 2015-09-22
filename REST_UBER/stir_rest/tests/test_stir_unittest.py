@@ -1,5 +1,4 @@
 import unittest
-import stir_model_rest as stir_model
 import pandas as pd
 import numpy.testing as npt
 import pandas.util.testing as pdt
