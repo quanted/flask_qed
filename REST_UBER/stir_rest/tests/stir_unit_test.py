@@ -3,17 +3,24 @@ import stir_model_rest as stir_model
 import pandas as pd
 import numpy.testing as npt
 import pandas.util.testing as pdt
+#following works when running test script in parent directory as package:
+# python -m tests.stir_unit_test
+# following works for running as nosetests from parent directory:
+from .. import stir_model_rest as stir_model
 
-# load transposed qaqc data for inputs and expected outputs
-csv_transpose_path_in = "./stir_qaqc_in_transpose.csv"
-pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
-# print(pd_obj_inputs)
-csv_transpose_path_exp = "./stir_qaqc_exp_transpose.csv"
-pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
-# print(pd_obj_exp_out)
+# # load transposed qaqc data for inputs and expected outputs
+# csv_transpose_path_in = "./stir_qaqc_in_transpose.csv"
+# pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
+# # print(pd_obj_inputs)
+# csv_transpose_path_exp = "./stir_qaqc_exp_transpose.csv"
+# pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
+# # print(pd_obj_exp_out)
 
-# create an instance of stir object with qaqc data
-stir_empty = stir_model.stir("empty", pd_obj_inputs, pd_obj_exp_out)
+# create empty pandas dataframes to create empty stir object
+df_empty = pd.DataFrame()
+stir_empty = stir_model.stir("empty", df_empty, df_empty)
+
+test = {}
 
 class TestStir(unittest.TestCase):
     def setup(self):
