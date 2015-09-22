@@ -9,6 +9,7 @@ pd_obj_inputs = pd_obj_inputs.drop(labels=pd_obj_inputs.columns[range(4)], axis=
 pd_obj_inputs.index.name = None
 pd_obj_inputs.columns -= 5
 pd_obj_inputs_transposed = pd_obj_inputs.transpose()
+pd_obj_inputs_transposed.transpose()
 pd_obj_inputs_transposed.to_csv(csv_in)
 
 pd_obj_exp_out = pd.read_csv(csv_path, index_col=0, header=None, skiprows=33, engine='python')
