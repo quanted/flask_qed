@@ -21,10 +21,10 @@ pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
 # pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 # this works for both local nosetests and travis deploy
 data_exp_outputs = StringIO(pkgutil.get_data(__package__, 'stir_qaqc_exp_transpose.csv'))
-pd_obj_exp_out = pd.read_csv(data_exp_outputs, index_col=0, engine='python')
+pd_obj_exp= pd.read_csv(data_exp_outputs, index_col=0, engine='python')
 
 # create an instance of stir object with qaqc data
-stir_calc = stir_model.stir("batch", pd_obj_inputs, pd_obj_exp_out)
+stir_calc = stir_model.stir("batch", pd_obj_inputs, pd_obj_exp)
 test = {}
 
 

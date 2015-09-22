@@ -93,25 +93,6 @@ class stir(object):
         # create pandas properties for acceptance testing
         self.pd_obj_out = pd_obj_out
 
-    def populate_input_properties(self):
-        # Inputs: Assign object attribute variables from the input Pandas DataFrame
-        self.chemical_name = self.pd_obj["chemical_name"]
-        self.application_rate = self.pd_obj["application_rate"]
-        self.column_height = self.pd_obj["column_height"]
-        self.spray_drift_fraction = self.pd_obj["spray_drift_fraction"]
-        self.direct_spray_duration = self.pd_obj["direct_spray_duration"]
-        self.molecular_weight = self.pd_obj["molecular_weight"]
-        self.vapor_pressure = self.pd_obj["vapor_pressure"]
-        self.avian_oral_ld50 = self.pd_obj["avian_oral_ld50"]
-        self.body_weight_assessed_bird = self.pd_obj["body_weight_assessed_bird"]
-        self.body_weight_tested_bird = self.pd_obj["body_weight_tested_bird"]
-        self.mineau_scaling_factor = self.pd_obj["mineau_scaling_factor"]
-        self.mammal_inhalation_lc50 = self.pd_obj["mammal_inhalation_lc50"]
-        self.duration_mammal_inhalation_study = self.pd_obj["duration_mammal_inhalation_study"]
-        self.body_weight_assessed_mammal = self.pd_obj["body_weight_assessed_mammal"]
-        self.body_weight_tested_mammal = self.pd_obj["body_weight_tested_mammal"]
-        self.mammal_oral_ld50 = self.pd_obj["mammal_oral_ld50"]
-
     def create_output_properties(self):
         # Outputs: Assign object attribute variables to Pandas Series
         self.sat_air_conc = pd.Series(name="sat_air_conc")
@@ -136,6 +117,25 @@ class stir(object):
         self.loc_sid_avian = pd.Series(name="loc_sid_avian")
         self.loc_vid_mammal = pd.Series(name="loc_vid_mammal")
         self.loc_sid_mammal = pd.Series(name="loc_sid_mammal")
+
+    def populate_input_properties(self):
+        # Inputs: Assign object attribute variables from the input Pandas DataFrame
+        self.chemical_name = self.pd_obj["chemical_name"]
+        self.application_rate = self.pd_obj["application_rate"]
+        self.column_height = self.pd_obj["column_height"]
+        self.spray_drift_fraction = self.pd_obj["spray_drift_fraction"]
+        self.direct_spray_duration = self.pd_obj["direct_spray_duration"]
+        self.molecular_weight = self.pd_obj["molecular_weight"]
+        self.vapor_pressure = self.pd_obj["vapor_pressure"]
+        self.avian_oral_ld50 = self.pd_obj["avian_oral_ld50"]
+        self.body_weight_assessed_bird = self.pd_obj["body_weight_assessed_bird"]
+        self.body_weight_tested_bird = self.pd_obj["body_weight_tested_bird"]
+        self.mineau_scaling_factor = self.pd_obj["mineau_scaling_factor"]
+        self.mammal_inhalation_lc50 = self.pd_obj["mammal_inhalation_lc50"]
+        self.duration_mammal_inhalation_study = self.pd_obj["duration_mammal_inhalation_study"]
+        self.body_weight_assessed_mammal = self.pd_obj["body_weight_assessed_mammal"]
+        self.body_weight_tested_mammal = self.pd_obj["body_weight_tested_mammal"]
+        self.mammal_oral_ld50 = self.pd_obj["mammal_oral_ld50"]
 
     #eq. 1 saturated air concentration in mg/m^3
     def CalcSatAirConc(self):
