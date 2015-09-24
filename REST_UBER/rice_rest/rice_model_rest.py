@@ -56,6 +56,7 @@ class rice(object):
         self.Calccw()
 
     # The mass of the sediment at equilibrium with the water column
+    # Sediment depth (dsed) * Area of rice paddy (area) * Bulk density of sediment(mass/volume) pb
     def Calcmsed(self):
         # if self.msed == -1:
         #     try:
