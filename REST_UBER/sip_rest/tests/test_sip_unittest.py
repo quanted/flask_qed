@@ -228,39 +228,6 @@ class TestSip(unittest.TestCase):
         pdt.assert_series_equal(result, exp)
         return
 
-#Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
-    def test_blackbox_method(self):
-         self.blackbox_method_int('dose_bird')
-         self.blackbox_method_int('dose_mamm')
-         self.blackbox_method_int('at_bird')
-         self.blackbox_method_int('at_mamm')
-         self.blackbox_method_int('fi_bird')
-        # self.blackbox_method_int('det')
-         self.blackbox_method_int('act')
-         self.blackbox_method_int('acute_bird')
-         self.blackbox_method_str('acuconb')
-         self.blackbox_method_int('acute_mamm')
-         self.blackbox_method_str('acuconm')
-         self.blackbox_method_int('chron_bird')
-         self.blackbox_method_str('chronconb')
-         self.blackbox_method_int('chron_mamm')
-         self.blackbox_method_str('chronconm')
-
-    def blackbox_method_int(self, output):
-        """
-        Helper method to reuse code for testing numpy array outputs from SIP model
-        :param output: String; Pandas Series name (e.g. column name) without '_out'
-        :return:
-        """
-        result = sip_calc.pd_obj_out[output + "_out"]
-        expected = sip_calc.pd_obj_exp[output + "_exp"]
-        npt.assert_array_almost_equal(result, expected, 4, '', True)
-
-    def blackbox_method_str(self, output):
-        result = sip_calc.pd_obj_out[output + "_out"]
-        expected = sip_calc.pd_obj_exp[output + "_exp"]
-        npt.assert_array_equal(result, expected)
-
 # unittest will
 # 1) call the setup method,
 # 2) then call every method starting with "test",

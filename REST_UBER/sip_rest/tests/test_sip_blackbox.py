@@ -14,7 +14,7 @@ import pandas.util.testing as pdt
 #this works for both local nosetests and travis deploy
 data_inputs = StringIO(pkgutil.get_data(__package__, 'sip_qaqc_in_transpose.csv'))
 pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
-# print(pd_obj_inputs)
+print(pd_obj_inputs)
 
 # load transposed qaqc data for inputs
 #works for local nosetests, but not for travis container that calls nosetests:
@@ -23,7 +23,7 @@ pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
 #this works for both local nosetests and travis deploy
 data_exp_outputs = StringIO(pkgutil.get_data(__package__, 'sip_qaqc_exp_transpose.csv'))
 pd_obj_exp_out = pd.read_csv(data_exp_outputs, index_col=0, engine='python')
-# print(pd_obj_exp_out)
+print(pd_obj_exp_out)
 
 # create an instance of sip object with qaqc data
 sip_calc = sip_model.sip("batch", pd_obj_inputs, pd_obj_exp_out)
