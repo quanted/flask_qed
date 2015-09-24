@@ -28,17 +28,17 @@ class TestSip(unittest.TestCase):
         # teardown called after each test
         # e.g. maybe write test results to some text file
 
-    def test_fw_bird(self):
+    def unittest_fw_bird(self):
         result = sip_empty.fw_bird()
         npt.assert_array_almost_equal(result, 0.0162, 4, '', True)
         return
 
-    def test_fw_mamm(self):
+    def unittest_fw_mamm(self):
         result = sip_empty.fw_mamm()
         npt.assert_array_almost_equal(result, 0.172, 4, '', True)
         return
 
-    def test_dose_bird(self):
+    def unittest_dose_bird(self):
         #(self.fw_bird_out * self.solubility)/(self.bodyweight_assessed_bird / 1000.)
         sip_empty.fw_bird_out = pd.Series([10.], dtype='int')
         sip_empty.solubility = pd.Series([100.], dtype='int')
@@ -47,7 +47,7 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 1000000., 4, '', True)
         return
 
-    def test_dose_mamm(self):
+    def unittest_dose_mamm(self):
         #(self.fw_mamm_out * self.solubility)/(self.bodyweight_assessed_mammal / 1000)
         sip_empty.fw_mamm_out = pd.Series([20.], dtype='int')
         sip_empty.solubility = pd.Series([400.], dtype='int')
@@ -56,7 +56,7 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 8000000., 4, '', True)
         return
 
-    def test_at_bird(self):
+    def unittest_at_bird(self):
         #(self.ld50_avian_water) * ((self.bodyweight_assessed_bird / self.bodyweight_tested_bird)**(self.mineau_scaling_factor - 1.))
         sip_empty.ld50_avian_water = pd.Series([2000.], dtype='int')
         sip_empty.bodyweight_assessed_bird = pd.Series([100.], dtype='int')
@@ -66,7 +66,7 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 1000., 4, '', True)
         return
 
-    def test_at_mamm(self):
+    def unittest_at_mamm(self):
         #(self.ld50_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
         sip_empty.ld50_mammal_water = pd.Series([10.], dtype='int')
         sip_empty.bodyweight_tested_mammal = pd.Series([100.], dtype='int')
@@ -75,14 +75,14 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 8.408964, 4, '', True)
         return
 
-    def test_fi_bird(self):
+    def unittest_fi_bird(self):
         #0.0582 * ((bw_grams / 1000.)**0.651)
         sip_empty.bw_grams = pd.Series([100.], dtype='int')
         result = sip_empty.fi_bird(sip_empty.bw_grams)
         npt.assert_array_almost_equal(result, 0.012999, 4, '', True)
         return
 
-    def test_act(self):
+    def unittest_act(self):
         #(self.noael_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
         sip_empty.noael_mammal_water = pd.Series([10.], dtype='int')
         sip_empty.bodyweight_tested_mammal = pd.Series([500.], dtype='int')
@@ -92,7 +92,7 @@ class TestSip(unittest.TestCase):
         return
 
 #Weird equation. Let's talk about this one.
-    def test_det(self):
+    def unittest_det(self):
         """
         Dose Equiv. Toxicity:
 
@@ -138,7 +138,7 @@ class TestSip(unittest.TestCase):
     #     npt.assert_array_almost_equal(result, 4666, 4)
     #     return
 
-    def test_acute_bird(self):
+    def unittest_acute_bird(self):
         # self.acute_bird_out = self.dose_bird_out / self.at_bird_out
         sip_empty.dose_bird_out = pd.Series([100.], dtype='int')
         sip_empty.at_bird_out = pd.Series([10.], dtype='int')
@@ -146,7 +146,7 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 10., 4)
         return
 
-    def test_acuconb(self):
+    def unittest_acuconb(self):
         """
         Message stating whether or not a risk is present
         """
@@ -164,7 +164,7 @@ class TestSip(unittest.TestCase):
         pdt.assert_series_equal(result, exp)
         return
 
-    def test_acute_mamm(self):
+    def unittest_acute_mamm(self):
         # self.acute_mamm_out = self.dose_mamm_out / self.at_mamm_out
         sip_empty.dose_mamm_out = pd.Series([100.], dtype='int')
         sip_empty.at_mamm_out = pd.Series([10.], dtype='int')
@@ -172,7 +172,7 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 10., 4)
         return
 
-    def test_acuconm(self):
+    def unittest_acuconm(self):
         """
         Message stating whether or not a risk is present
         """
@@ -191,7 +191,7 @@ class TestSip(unittest.TestCase):
         pdt.assert_series_equal(result, exp)
         return
 
-    def test_chron_bird(self):
+    def unittest_chron_bird(self):
     #self.chron_bird_out = self.dose_bird_out / self.det_out
         sip_empty.dose_bird_out = pd.Series([5.], dtype='int')
         sip_empty.det_out = pd.Series([10.], dtype='int')
@@ -199,7 +199,7 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 0.5, 4, '', True)
         return
 
-    def test_chronconb(self):
+    def unittest_chronconb(self):
     #boolean = self.chron_bird_out < 1
         #self.chronconb_out = boolean.map(lambda x:
          #   'Drinking water exposure alone is NOT a potential concern for birds' if x == True
@@ -210,7 +210,7 @@ class TestSip(unittest.TestCase):
         pdt.assert_series_equal(result, exp)
         return
 
-    def test_chron_mamm(self):
+    def unittest_chron_mamm(self):
          # self.chron_mamm_out = self.dose_mamm_out / self.act_out
         sip_empty.dose_mamm_out = pd.Series([8.], dtype='int')
         sip_empty.act_out = pd.Series([4.], dtype='int')
@@ -218,7 +218,7 @@ class TestSip(unittest.TestCase):
         npt.assert_array_almost_equal(result, 2, 4, '', True)
         return
 
-    def test_chronconm(self):
+    def unittest_chronconm(self):
         # self.chronconm_out = boolean.map(lambda x:
          #   'Drinking water exposure alone is NOT a potential concern for mammals' if x == True
          #   else 'Exposure through drinking water alone is a potential concern for mammals')
