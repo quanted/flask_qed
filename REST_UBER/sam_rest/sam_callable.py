@@ -1,7 +1,6 @@
 __author__ = 'jflaisha'
 
 import logging, numpy as np, requests, json, cPickle
-from bson import BSON
 
 try:
     import superprzm  #  Import superprzm.dll / .so

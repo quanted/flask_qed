@@ -335,8 +335,9 @@ def split_csv(number, name_temp):
     print "number = ", number
     import pandas as pd
     df = pd.read_csv(os.path.join(
-        sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'
-    ))
+        sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'),
+        dtype={'HUC_12': object, 'COMID': object}  # Set columns 'HUC_12' & 'COMID' to 'object' (~eq. to string)
+    )
 
     if number > 99:
         number = 99

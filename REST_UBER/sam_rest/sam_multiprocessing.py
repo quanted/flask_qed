@@ -3,6 +3,7 @@ __author__ = 'jflaisha'
 from functools import partial
 from concurrent.futures import ProcessPoolExecutor as Pool
 import multiprocessing, logging, sys, os, numpy as np
+import sam_callable
 
 try:
     import superprzm  #  Import superprzm.dll / .so
@@ -58,7 +59,7 @@ class SamModelCaller(object):
             pool = multiprocessing_setup()
 
         if self.number_of_rows_list is None \
-                or type(self.number_of_rows_list) is not 'list':
+                or not isinstance(self.number_of_rows_list, list):  # Make sure 'self.number_of_rows_list' is a list and not None
             self.number_of_rows_list = self.split_csv()
 
         testing_sections = [308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 330]  # Temporary for testing
@@ -94,8 +95,9 @@ class SamModelCaller(object):
         print "number = ", self.no_of_processes
         import pandas as pd
         df = pd.read_csv(os.path.join(
-            self.sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'
-        ))
+            self.sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'),
+            dtype={'HUC_12': object, 'COMID': object}  # Set columns 'HUC_12' & 'COMID' to 'object' (~eq. to string)
+        )                                              # This preserves any leading zeros present in the HUC12_IDs
 
         if self.no_of_processes > 99:
             self.no_of_processes = 99
@@ -157,8 +159,6 @@ def daily_conc_callable(sam_bin_path, name_temp, section, array_size=320):
     # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
     #return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
-
-    import sam_callable
 
     try:
         sam_callable.run(sam_bin_path, name_temp, section, int(array_size))
