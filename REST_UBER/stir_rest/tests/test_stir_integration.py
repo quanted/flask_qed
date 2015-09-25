@@ -4,6 +4,7 @@ import numpy.testing as npt
 import pkgutil
 from StringIO import StringIO
 from .. import stir_model_rest as stir_model
+from tabulate import tabulate
 
 # load transposed qaqc data for inputs
 # works for local nosetests from parent directory
@@ -13,6 +14,12 @@ from .. import stir_model_rest as stir_model
 # this works for both local nosetests and travis deploy
 data_inputs = StringIO(pkgutil.get_data(__package__, 'stir_qaqc_in_transpose.csv'))
 pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
+print("stir inputs")
+print(pd_obj_inputs.shape)
+print(tabulate(pd_obj_inputs.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_inputs.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_inputs.iloc[:,11:13], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_inputs.iloc[:,14:17], headers='keys', tablefmt='fancy_grid'))
 
 # load transposed qaqc data for expected outputs
 # works for local nosetests from parent directory
@@ -22,6 +29,13 @@ pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
 # this works for both local nosetests and travis deploy
 data_exp_outputs = StringIO(pkgutil.get_data(__package__, 'stir_qaqc_exp_transpose.csv'))
 pd_obj_exp= pd.read_csv(data_exp_outputs, index_col=0, engine='python')
+print("stir expected outputs")
+print(pd_obj_exp.shape)
+print(tabulate(pd_obj_exp.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:,11:13], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:,14:17], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:,18:22], headers='keys', tablefmt='fancy_grid'))
 
 # create an instance of stir object with qaqc data
 stir_calc = stir_model.stir("batch", pd_obj_inputs, pd_obj_exp)
@@ -102,14 +116,20 @@ class TestStir(unittest.TestCase):
         :param output: String; Pandas Series name (e.g. column name) without '_out'
         :return:
         """
-        result = stir_calc.pd_obj_out
-        expected = stir_calc.pd_obj_exp
+        result = stir_calc.pd_obj_out[output]
+        expected = stir_calc.pd_obj_exp["exp_" + output]
+        tab = pd.concat([result, expected], axis=1)
+        print(" ")
+        print(tabulate(tab, headers='keys', tablefmt='fancy_grid'))
         npt.assert_array_almost_equal(result, expected, 4, '', True)
 
 
     def blackbox_method_str(self, output):
-        result = stir_calc.pd_obj_out
-        expected = stir_calc.pd_obj_exp
+        result = stir_calc.pd_obj_out[output]
+        expected = stir_calc.pd_obj_exp["exp_" + output]
+        tab = pd.concat([result, expected], axis=1)
+        print(" ")
+        print(tabulate(tab, headers='keys', tablefmt='fancy_grid'))
         npt.assert_array_equal(result, expected)
 
 
