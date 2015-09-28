@@ -1,5 +1,4 @@
 import unittest
-import terrplant_model_rest as terrplant_model
 import pandas as pd
 import numpy.testing as npt
 import pkgutil
