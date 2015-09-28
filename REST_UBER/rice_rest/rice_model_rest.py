@@ -5,15 +5,10 @@ class rice(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
 
         logging.info ("====== Rice constructor")
-        # Inputs: Assign object attribute variables from the input Pandas DataFrame
-        self.chemical_name = pd_obj["chemical_name"]
-        self.mai = pd_obj["mai"]
-        self.dsed = pd_obj["dsed"]
-        self.area = pd_obj["area"]
-        self.pb = pd_obj["pb"]
-        self.dw = pd_obj["dw"]
-        self.osed = pd_obj["osed"]
-        self.Kd = pd_obj["Kd"]
+        self.run_type = run_type
+        self.pd_obj = pd_obj
+        self.pd_obj_exp = pd_obj_exp
+
         # Outputs: Assign object attribute variables to Pandas Series
         self.out_msed = pd.Series(name="out_msed")
         self.out_vw = pd.Series(name="out_vw")
@@ -21,8 +16,44 @@ class rice(object):
         self.out_cw = pd.Series(name="out_cw")
 
         #run meth
+        # Execute model methods if requested
+        if self.run_type != "empty":
+            self.execute_model()
+
+    def execute_model(self):
+        self.populate_input_properties()
+        self.create_output_properties()
         self.run_methods()
-        
+        self.create_output_dataframe()
+        # Callable from Bottle that returns JSON
+        self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
+
+    def populate_input_properties(self):
+        # Inputs: Assign object attribute variables from the input Pandas DataFrame
+        # Inputs: Assign object attribute variables from the input Pandas DataFrame
+        self.chemical_name = self.pd_obj["chemical_name"]
+        self.mai = self.pd_obj["mai"]
+        self.dsed = self.pd_obj["dsed"]
+        self.area = self.pd_obj["area"]
+        self.pb = self.pd_obj["pb"]
+        self.dw = self.pd_obj["dw"]
+        self.osed = self.pd_obj["osed"]
+        self.Kd = self.pd_obj["Kd"]
+
+    def create_output_properties(self):
+        # Outputs: Assign object attribute variables to Pandas Series
+        self.out_msed = pd.Series(name = "out_msed")
+        self.out_vw = pd.Series(name = "out_vw")
+        self.out_mass_area = pd.Series(name = "out_mass_area")
+        self.out_cw = pd.Series(name = "out_cw")
+
+    def run_methods(self):
+        self.Calcmsed()
+        self.Calcvw()
+        self.Calcmass_area()
+        self.Calccw()
+
+     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
             'out_msed' : self.out_msed,
@@ -32,7 +63,7 @@ class rice(object):
         })
 
         # Callable from Bottle that returns JSON
-        self.json = self.json(pd_obj, pd_obj_out, pd_obj_exp)
+        self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
     def json(self, pd_obj, pd_obj_out, pd_obj_exp):
         """
@@ -49,11 +80,7 @@ class rice(object):
         
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
-    def run_methods(self):
-        self.Calcmsed()
-        self.Calcvw()
-        self.Calcmass_area()
-        self.Calccw()
+
 
     # The mass of the sediment at equilibrium with the water column
     # Sediment depth (dsed) * Area of rice paddy (area) * Bulk density of sediment(mass/volume) pb
@@ -215,3 +242,4 @@ class rice(object):
         #         ('kd=g% is a non-physical value.' % self.kd)
         self.out_cw = (self.out_mass_area / (self.dw + (self.dsed * (self.osed + (self.pb * self.Kd*1e-5)))))*100
         return self.out_cw
+

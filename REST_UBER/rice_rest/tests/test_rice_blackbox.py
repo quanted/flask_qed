@@ -1,31 +1,31 @@
 import unittest
 import pandas as pd
 import numpy.testing as npt
-from .. import sip_model_rest as sip_model
+from .. import rice_model_rest as rice_model
 import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs
-#csv_transpose_path_in = "./tests/sip_qaqc_in_transpose.csv"
-csv_transpose_path_in = "./sip_qaqc_in_transpose.csv"
+#csv_transpose_path_in = "./tests/rice_qaqc_in_transpose.csv"
+csv_transpose_path_in = "./rice_qaqc_in_transpose.csv"
 pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
 # print(pd_obj_inputs)
 # load transposed qaqc data for inputs
-#csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
-csv_transpose_path_exp = "./sip_qaqc_exp_transpose.csv"
+#csv_transpose_path_exp = "./tests/rice_qaqc_exp_transpose.csv"
+csv_transpose_path_exp = "./rice_qaqc_exp_transpose.csv"
 pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 # print(pd_obj_exp_out)
 
-# create an instance of sip object with qaqc data
-sip_calc = sip_model.sip("batch", pd_obj_inputs, pd_obj_exp_out)
+# create an instance of rice object with qaqc data
+rice_calc = rice_model.rice("batch", pd_obj_inputs, pd_obj_exp_out)
 test = {}
 
 
-class TestSip(unittest.TestCase):
+class Testrice(unittest.TestCase):
     def setup(self):
         pass
-        # sip2 = sip_model.sip(0, pd_obj_inputs, pd_obj_exp_out)
+        # rice2 = rice_model.rice(0, pd_obj_inputs, pd_obj_exp_out)
         # setup the test as needed
-        # e.g. pandas to open sip qaqc csv
+        # e.g. pandas to open rice qaqc csv
         #  Read qaqc csv and create pandas DataFrames for inputs and expected outputs
 
     def teardown(self):
@@ -35,7 +35,7 @@ class TestSip(unittest.TestCase):
 
 #Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
     def test_blackbox_dose_bird(self):
-         self.blackbox_method_int('dose_bird')
+         self.blackbox_method_float('dose_bird')
 
     def test_blackbox_dose_mamm(self):
          self.blackbox_method_int('dose_mamm')
@@ -80,19 +80,21 @@ class TestSip(unittest.TestCase):
     def test_blackbox_chronconm(self):
          self.blackbox_method_str('chronconm')
 
-    def blackbox_method_int(self, output):
+
+
+    def blackbox_method_float(self, output):
         """
-        Helper method to reuse code for testing numpy array outputs from SIP model
+        Helper method to reuse code for testing numpy array outputs from rice model
         :param output: String; Pandas Series name (e.g. column name) without '_out'
         :return:
         """
-        result = sip_calc.pd_obj_out[output + "_out"]
-        expected = sip_calc.pd_obj_exp[output + "_exp"]
+        result = rice_calc.pd_obj_out[output + "_out"]
+        expected = rice_calc.pd_obj_exp[output + "_exp"]
         npt.assert_array_almost_equal(result, expected, 4, '', True)
 
     def blackbox_method_str(self, output):
-        result = sip_calc.pd_obj_out[output + "_out"]
-        expected = sip_calc.pd_obj_exp[output + "_exp"]
+        result = rice_calc.pd_obj_out[output + "_out"]
+        expected = rice_calc.pd_obj_exp[output + "_exp"]
         npt.assert_array_equal(result, expected)
 
 # unittest will

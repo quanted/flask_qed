@@ -50,9 +50,9 @@ class TestRice(unittest.TestCase):
     # (self.mai/self.area)*10000
     def test_Calcmass_area(self):
         rice_empty.area = pd.Series([1000.0], dtype='float')
-        rice_empty.mai = pd.Series([55.5.], dtype='float')
+        rice_empty.mai = pd.Series([55.5], dtype='float')
         result = rice_empty.Calcmass_area()
-        npt.assert_array_almost_equal(result, 5.55., 4, '', True)
+        npt.assert_array_almost_equal(result, 5.55, 4, '', True)
         return
 
     # (self.out_mass_area / (self.dw + (self.dsed * (self.osed + (self.pb * self.Kd*1e-5)))))*100
