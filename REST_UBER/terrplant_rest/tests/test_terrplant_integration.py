@@ -38,7 +38,7 @@ print(tabulate(pd_obj_exp.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
 print(tabulate(pd_obj_exp.iloc[:,11:14], headers='keys', tablefmt='fancy_grid'))
 print(tabulate(pd_obj_exp.iloc[:,15:16], headers='keys', tablefmt='fancy_grid'))
 
-# create an instance of sip object with qaqc data
+# create an instance of terrplant object with qaqc data
 terrplant_calc = terrplant_model.terrplant("batch", pd_obj_inputs, pd_obj_exp)
 test = {}
 

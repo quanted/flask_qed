@@ -25,7 +25,7 @@ class TestTerrplant(unittest.TestCase):
     def setup(self):
         pass
         # setup the test as needed
-        # e.g. pandas to open sip qaqc csv
+        # e.g. pandas to open terrplant qaqc csv
         #  Read qaqc csv and create pandas DataFrames for inputs and expected outputs
 
     def teardown(self):
