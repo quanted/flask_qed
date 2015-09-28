@@ -1,71 +1,67 @@
 import pandas as pd
 import logging
-class terrplant(object):
 
+class terrplant(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
 
         # logging.info(pd_obj)
 
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
         self.run_type = run_type
-        
-        self.version_terrplant = pd_obj['version_terrplant']
-        self.application_rate = pd_obj['application_rate']
-        self.incorporation_depth = pd_obj['incorporation_depth']
-        self.runoff_fraction = pd_obj['runoff_fraction']
-        self.drift_fraction = pd_obj['drift_fraction']
-        self.chemical_name = pd_obj['chemical_name']
-        self.pc_code = pd_obj['pc_code']
-        self.use = pd_obj['use']
-        self.application_method = pd_obj['application_method']
-        self.application_form = pd_obj['application_form']
-        self.solubility = pd_obj['solubility']
-        self.ec25_nonlisted_seedling_emergence_monocot = pd_obj["ec25_nonlisted_seedling_emergence_monocot"]
-        self.ec25_nonlisted_seedling_emergence_dicot = pd_obj["ec25_nonlisted_seedling_emergence_dicot"]
-        self.noaec_listed_seedling_emergence_monocot = pd_obj["noaec_listed_seedling_emergence_monocot"]
-        self.noaec_listed_seedling_emergence_dicot = pd_obj["noaec_listed_seedling_emergence_dicot"]
-        self.ec25_nonlisted_vegetative_vigor_monocot = pd_obj["ec25_nonlisted_vegetative_vigor_monocot"]
-        self.ec25_nonlisted_vegetative_vigor_dicot = pd_obj["ec25_nonlisted_vegetative_vigor_dicot"]
-        self.noaec_listed_vegetative_vigor_monocot = pd_obj["noaec_listed_vegetative_vigor_monocot"]
-        self.noaec_listed_vegetative_vigor_dicot = pd_obj["noaec_listed_vegetative_vigor_dicot"]
+        self.pd_obj = pd_obj
+        self.pd_obj_exp = pd_obj_exp
 
+        # Execute model methods if requested
+        if self.run_type != "empty":
+            self.execute_model()
 
-        # Outputs: Assign object attribute variables to Pandas Series
-        self.out_rundry = pd.Series(name="out_rundry")
-        self.out_runsemi = pd.Series(name="out_runsemi")
-        self.out_totaldry = pd.Series(name="out_totaldry")
-        self.out_totalsemi = pd.Series(name="out_totalsemi")
-        self.out_spray = pd.Series(name="out_spray")
-        self.out_nms_rq_dry = pd.Series(name="out_nms_rq_dry")
-        self.out_nms_loc_dry = pd.Series(name="out_nms_loc_dry")
-        self.out_nms_rq_semi = pd.Series(name="out_nms_rq_semi")
-        self.out_nms_loc_semi = pd.Series(name="out_nms_loc_semi")
-        self.out_nms_rq_spray = pd.Series(name="out_nms_rq_spray")
-        self.out_nms_loc_spray = pd.Series(name="out_nms_loc_spray")
-        self.out_lms_rq_dry = pd.Series(name="out_lms_rq_dry")
-        self.out_lms_loc_dry = pd.Series(name="out_lms_loc_dry")
-        self.out_lms_rq_semi = pd.Series(name="out_lms_rq_semi")
-        self.out_lms_loc_semi = pd.Series(name="out_lms_loc_semi")
-        self.out_lms_rq_spray = pd.Series(name="out_lms_rq_spray")
-        self.out_lms_loc_spray = pd.Series(name="out_lms_loc_spray")
-        self.out_nds_rq_dry = pd.Series(name="out_nds_rq_dry")
-        self.out_nds_loc_dry = pd.Series(name="out_nds_loc_dry")
-        self.out_nds_rq_semi = pd.Series(name="out_nds_rq_semi")
-        self.out_nds_loc_semi = pd.Series(name="out_nds_loc_semi")
-        self.out_nds_rq_spray = pd.Series(name="out_nds_rq_spray")
-        self.out_nds_loc_spray = pd.Series(name="out_nds_loc_spray")
-        self.out_lds_rq_dry = pd.Series(name="out_lds_rq_dry")
-        self.out_lds_loc_dry = pd.Series(name="out_lds_loc_dry")
-        self.out_lds_rq_semi = pd.Series(name="out_lds_rq_semi")
-        self.out_lds_loc_semi = pd.Series(name="out_lds_loc_semi")
-        self.out_lds_rq_spray = pd.Series(name="out_lds_rq_spray")
-        self.out_lds_loc_spray = pd.Series(name="out_lds_loc_spray")
-
-
-        # Now that the output member variables are defined, run the model methods
+    def execute_model(self):
+        self.populate_input_properties()
+        self.create_output_properties()
         self.run_methods()
-        
+        self.create_output_dataframe()
+        # Callable from Bottle that returns JSON
+        self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
+    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
+        """
+            Convert DataFrames to JSON, returning a tuple
+            of JSON strings (inputs, outputs, exp_out)
+        """
+
+        pd_obj_json = pd_obj.to_json()
+        pd_obj_out_json = pd_obj_out.to_json()
+        try:
+            pd_obj_exp_json = pd_obj_exp.to_json()
+        except:
+            pd_obj_exp_json = "{}"
+
+        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
+
+    # Begin model methods
+    def run_methods(self):
+        try:
+            self.rundry()
+            self.runsemi()
+            self.spray()
+            self.totaldry()
+            self.totalsemi()
+            self.nmsRQdry()
+            self.nmsRQsemi()
+            self.nmsRQspray()
+            self.lmsRQdry()
+            self.lmsRQsemi()
+            self.lmsRQspray()
+            self.ndsRQdry()
+            self.ndsRQsemi()
+            self.ndsRQspray()
+            self.ldsRQdry()
+            self.ldsRQsemi()
+            self.ldsRQspray()
+        except TypeError:
+            print "Type Error: Your variables are not set correctly."
+
+    def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
             'out_rundry' : self.out_rundry,
@@ -99,50 +95,63 @@ class terrplant(object):
             'out_lds_loc_spray' : self.out_lds_loc_spray
         })
 
+        #create pandas properties for acceptance testing
+        self.pd_obj_out = pd_obj_out
 
-        # Callable from Bottle that returns JSON
-        self.json = self.json(pd_obj, pd_obj_out, pd_obj_exp)      
-        
+    def create_output_properties(self):
+        # Outputs: Assign object attribute variables to Pandas Series
+        self.out_rundry = pd.Series(name="out_rundry")
+        self.out_runsemi = pd.Series(name="out_runsemi")
+        self.out_totaldry = pd.Series(name="out_totaldry")
+        self.out_totalsemi = pd.Series(name="out_totalsemi")
+        self.out_spray = pd.Series(name="out_spray")
+        self.out_nms_rq_dry = pd.Series(name="out_nms_rq_dry")
+        self.out_nms_loc_dry = pd.Series(name="out_nms_loc_dry")
+        self.out_nms_rq_semi = pd.Series(name="out_nms_rq_semi")
+        self.out_nms_loc_semi = pd.Series(name="out_nms_loc_semi")
+        self.out_nms_rq_spray = pd.Series(name="out_nms_rq_spray")
+        self.out_nms_loc_spray = pd.Series(name="out_nms_loc_spray")
+        self.out_lms_rq_dry = pd.Series(name="out_lms_rq_dry")
+        self.out_lms_loc_dry = pd.Series(name="out_lms_loc_dry")
+        self.out_lms_rq_semi = pd.Series(name="out_lms_rq_semi")
+        self.out_lms_loc_semi = pd.Series(name="out_lms_loc_semi")
+        self.out_lms_rq_spray = pd.Series(name="out_lms_rq_spray")
+        self.out_lms_loc_spray = pd.Series(name="out_lms_loc_spray")
+        self.out_nds_rq_dry = pd.Series(name="out_nds_rq_dry")
+        self.out_nds_loc_dry = pd.Series(name="out_nds_loc_dry")
+        self.out_nds_rq_semi = pd.Series(name="out_nds_rq_semi")
+        self.out_nds_loc_semi = pd.Series(name="out_nds_loc_semi")
+        self.out_nds_rq_spray = pd.Series(name="out_nds_rq_spray")
+        self.out_nds_loc_spray = pd.Series(name="out_nds_loc_spray")
+        self.out_lds_rq_dry = pd.Series(name="out_lds_rq_dry")
+        self.out_lds_loc_dry = pd.Series(name="out_lds_loc_dry")
+        self.out_lds_rq_semi = pd.Series(name="out_lds_rq_semi")
+        self.out_lds_loc_semi = pd.Series(name="out_lds_loc_semi")
+        self.out_lds_rq_spray = pd.Series(name="out_lds_rq_spray")
+        self.out_lds_loc_spray = pd.Series(name="out_lds_loc_spray")
 
-    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
-        """
-            Convert DataFrames to JSON, returning a tuple 
-            of JSON strings (inputs, outputs, exp_out)
-        """
-        
-        pd_obj_json = pd_obj.to_json()
-        pd_obj_out_json = pd_obj_out.to_json()
-        try:
-            pd_obj_exp_json = pd_obj_exp.to_json()
-        except:
-            pd_obj_exp_json = "{}"
-        
-        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
+    def populate_input_properties(self):
+        # Inputs: Assign object attribute variables from the input Pandas Dataframe
+        self.version_terrplant = self.pd_obj['version_terrplant']
+        self.application_rate = self.pd_obj['application_rate']
+        self.incorporation_depth = self.pd_obj['incorporation_depth']
+        self.runoff_fraction = self.pd_obj['runoff_fraction']
+        self.drift_fraction = self.pd_obj['drift_fraction']
+        self.chemical_name = self.pd_obj['chemical_name']
+        self.pc_code = self.pd_obj['pc_code']
+        self.use = self.pd_obj['use']
+        self.application_method = self.pd_obj['application_method']
+        self.application_form = self.pd_obj['application_form']
+        self.solubility = self.pd_obj['solubility']
+        self.ec25_nonlisted_seedling_emergence_monocot = self.pd_obj["ec25_nonlisted_seedling_emergence_monocot"]
+        self.ec25_nonlisted_seedling_emergence_dicot = self.pd_obj["ec25_nonlisted_seedling_emergence_dicot"]
+        self.noaec_listed_seedling_emergence_monocot = self.pd_obj["noaec_listed_seedling_emergence_monocot"]
+        self.noaec_listed_seedling_emergence_dicot = self.pd_obj["noaec_listed_seedling_emergence_dicot"]
+        self.ec25_nonlisted_vegetative_vigor_monocot = self.pd_obj["ec25_nonlisted_vegetative_vigor_monocot"]
+        self.ec25_nonlisted_vegetative_vigor_dicot = self.pd_obj["ec25_nonlisted_vegetative_vigor_dicot"]
+        self.noaec_listed_vegetative_vigor_monocot = self.pd_obj["noaec_listed_vegetative_vigor_monocot"]
+        self.noaec_listed_vegetative_vigor_dicot = self.pd_obj["noaec_listed_vegetative_vigor_dicot"]
 
-
-    # Begin model methods
-    def run_methods(self):
-        
-        try:
-            self.rundry()
-            self.runsemi()
-            self.spray()
-            self.totaldry()
-            self.totalsemi()
-            self.nmsRQdry()
-            self.nmsRQsemi()
-            self.nmsRQspray()
-            self.lmsRQdry()
-            self.lmsRQsemi()
-            self.lmsRQspray()
-            self.ndsRQdry()
-            self.ndsRQsemi()
-            self.ndsRQspray()
-            self.ldsRQdry()
-            self.ldsRQsemi()
-            self.ldsRQspray()
-        except TypeError:
-            print "Type Error: Your variables are not set correctly."
 
     # EEC for runoff for dry areas
     def rundry(self):
@@ -176,6 +185,7 @@ class terrplant(object):
         #     ('runoff_fraction must be positive.')
         # if self.out_rundry == -1:
         self.out_rundry = (self.application_rate/self.incorporation_depth) * self.runoff_fraction
+        logging.info(self.out_rundry)
         return self.out_rundry
 
     # EEC for runoff to semi-aquatic areas
@@ -207,6 +217,7 @@ class terrplant(object):
         #     ('runoff_fraction must be positive.')
         # if self.out_runsemi == -1:
         self.out_runsemi = (self.application_rate/self.incorporation_depth) * self.runoff_fraction * 10
+        logging.info(self.out_runsemi)
         return self.out_runsemi
 
     # EEC for spray drift
@@ -231,6 +242,7 @@ class terrplant(object):
         #     ('drift_fraction must be positive.')
         # if self.out_spray == -1:
         self.out_spray = self.application_rate * self.drift_fraction
+        logging.info(self.out_spray)
         return self.out_spray
 
     # EEC total for dry areas
@@ -248,6 +260,7 @@ class terrplant(object):
             # except ZeroDivisionError:
             #     raise ZeroDivisionError\
             #     ('The incorporation_depth must be non-zero.')
+        logging.info(self.out_totaldry)
         return self.out_totaldry
 
 
@@ -266,6 +279,7 @@ class terrplant(object):
             # except ZeroDivisionError:
             #     raise ZeroDivisionError\
             #     ('The incorporation_depth must be non-zero.')
+        logging.info(self.out_totalsemi)
         return self.out_totalsemi
 
 
@@ -312,6 +326,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('Either the out_totaldry variable equals None and therefor this function cannot be run.')
         self.out_nms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_monocot
+        logging.info(self.out_nms_rq_dry)
         return self.out_nms_rq_dry
 
 
@@ -339,6 +354,7 @@ class terrplant(object):
             # except ZeroDivisionError:
             #     raise ZeroDivisionError\
             #     ('The incorporation_depth must be non-zero.')
+        logging.info(self.out_nms_loc_dry)
         return self.out_nms_loc_dry
 
     # Risk Quotient for NON-LISTED MONOCOT seedlings exposed to Pesticide X in a SEMI-AQUATIC area
@@ -369,6 +385,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('Either the out_totaldry variable equals None and therefor this function cannot be run.')
         self.out_nms_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_monocot
+        logging.info(self.out_nms_rq_semi)
         return self.out_nms_rq_semi
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide X in a semi-aquatic area
@@ -389,6 +406,7 @@ class terrplant(object):
         else:
             self.out_nms_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
             ' pesticide via runoff to a semi-aquatic area indicates that potential risk is minimal.')
+        logging.info(self.out_nms_loc_semi)
         return self.out_nms_loc_semi
 
 
@@ -416,6 +434,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('Either the out_spray variable equals None and therefor this function cannot be run.')
         self.out_nms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_monocot
+        logging.info(self.out_nms_rq_spray)
         return self.out_nms_rq_spray
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide via spray drift
@@ -436,6 +455,7 @@ class terrplant(object):
         else:
             self.out_nms_loc_spray = ('The risk quotient for non-listed monocot seedlings exposed to the'\
         ' pesticide via spray drift indicates that potential risk is minimal.')
+        logging.info(self.out_nms_loc_spray)
         return self.out_nms_loc_spray
 
 
@@ -467,6 +487,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('Either the out_spray variable equals None and therefor this function cannot be run.')
         self.out_lms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_dicot
+        logging.info(self.out_lms_rq_dry)
         return self.out_lms_rq_dry
 
     # Level of concern for listed monocot seedlings exposed to pesticide
@@ -488,6 +509,7 @@ class terrplant(object):
         else:
             self.out_lms_loc_dry = ('The risk quotient for listed monocot seedlings exposed to the'\
             ' pesticide via runoff to a dry area indicates that potential risk is minimal.')
+        logging.info(self.out_lms_loc_dry)
         return self.out_lms_loc_dry
 
 
@@ -519,6 +541,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('Either the out_totalsemi variable equals None and therefor this function cannot be run.')
         self.out_lms_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_dicot
+        logging.info(self.out_lms_rq_semi)
         return self.out_lms_rq_semi
 
     # Level of concern for listed monocot seedlings exposed to pesticide X in semi-aquatic areas
@@ -539,6 +562,7 @@ class terrplant(object):
         else:
             self.out_lms_loc_semi = ('The risk quotient for listed monocot seedlings exposed to the'\
             ' pesticide via runoff to a semi-aquatic area indicates that potential risk is minimal.')
+        logging.info(self.out_lms_loc_semi)
         return self.out_lms_loc_semi
 
 
@@ -569,6 +593,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('The out_spray variable equals None and therefor this function cannot be run.')
         self.out_lms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_dicot
+        logging.info(self.out_lms_rq_spray)
         return self.out_lms_rq_spray
 
     # Level of concern for listed monocot seedlings exposed to pesticide X via spray drift
@@ -589,6 +614,7 @@ class terrplant(object):
         else:
             self.out_lms_loc_spray = ('The risk quotient for listed monocot seedlings exposed to the'\
             ' pesticide via spray drift indicates that potential risk is minimal.')
+        logging.info(self.out_lms_loc_spray)
         return self.out_lms_loc_spray
 
 
@@ -619,6 +645,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('The out_totaldry variable equals None and therefor this function cannot be run.')
         self.out_nds_rq_dry = self.out_totaldry/self.noaec_listed_seedling_emergence_monocot
+        logging.info(self.out_nds_rq_dry)
         return self.out_nds_rq_dry
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X in dry areas
@@ -639,6 +666,7 @@ class terrplant(object):
         else:
             self.out_nds_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to the'\
             ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
+        logging.info(self.out_nds_loc_dry)
         return self.out_nds_loc_dry
 
 
@@ -669,6 +697,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('The out_totalsemi variable equals None and therefor this function cannot be run.')
         self.out_nds_rq_semi = self.out_totalsemi/self.noaec_listed_seedling_emergence_monocot
+        logging.info(self.out_nds_rq_semi)
         return self.out_nds_rq_semi
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X in semi-aquatic areas
@@ -689,6 +718,7 @@ class terrplant(object):
         else:
             self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
             ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+        logging.info(self.out_nds_loc_semi)
         return self.out_nds_loc_semi
 
     # Risk Quotient for NON-LISTED DICOT seedlings exposed to Pesticide X via SPRAY drift
@@ -718,6 +748,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('The out_spray variable equals None and therefor this function cannot be run.')
         self.out_nds_rq_spray = self.out_spray/self.noaec_listed_seedling_emergence_monocot
+        logging.info(self.out_nds_rq_spray)
         return self.out_nds_rq_spray
 
     # Level of concern for non-listed dicot seedlings exposed to pesticide X via spray drift
@@ -738,6 +769,7 @@ class terrplant(object):
         else:
             self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
             ' pesticide via spray drift indicates that potential risk is minimal.')
+        logging.info(self.out_nds_loc_semi)
         return self.out_nds_loc_semi
 
     # Risk Quotient for LISTED DICOT seedlings exposed to Pesticide X in DRY areas
@@ -767,6 +799,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('The out_totaldry variable equals None and therefor this function cannot be run.')
         self.out_lds_rq_dry = self.out_totaldry/self.noaec_listed_seedling_emergence_dicot
+        logging.info(self.out_lds_rq_dry)
         return self.out_lds_rq_dry
 
     # Level of concern for listed dicot seedlings exposed to pesticideX in dry areas
@@ -787,6 +820,7 @@ class terrplant(object):
         else:
             self.out_lds_loc_dry = ('The risk quotient for listed monocot seedlings exposed to the'\
             ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
+        logging.info(self.out_lds_loc_dry)
         return self.out_lds_loc_dry
 
     # Risk Quotient for LISTED DICOT seedlings exposed to Pesticide X in SEMI-AQUATIC areas
@@ -816,6 +850,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('The out_totalsemi variable equals None and therefor this function cannot be run.')
         self.out_lds_rq_semi = self.out_totalsemi/self.noaec_listed_seedling_emergence_dicot
+        logging.info(self.out_lds_rq_semi)
         return self.out_lds_rq_semi
 
     # Level of concern for listed dicot seedlings exposed to pesticide X in dry areas
@@ -836,6 +871,7 @@ class terrplant(object):
         else:
             self.out_lds_loc_semi = ('The risk quotient for listed monocot seedlings exposed to the'\
             ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+        logging.info(self.out_lds_loc_semi)
         return self.out_lds_loc_semi
 
     # Risk Quotient for LISTED DICOT seedlings exposed to Pesticide X via SPRAY drift
@@ -865,6 +901,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('The out_spray variable equals None and therefor this function cannot be run.')
         self.out_lds_rq_spray = self.out_spray/self.noaec_listed_seedling_emergence_dicot
+        logging.info(self.out_lds_rq_spray)
         return self.out_lds_rq_spray
 
     # Level of concern for listed dicot seedlings exposed to pesticide X via spray drift
@@ -885,4 +922,5 @@ class terrplant(object):
         else:
             self.out_lds_loc_spray = ('The risk quotient for listed monocot seedlings exposed to the'\
             ' pesticide via spray drift indicates that potential risk is minimal.')
+        logging.info(self.out_lds_loc_spray)
         return self.out_lds_loc_spray
