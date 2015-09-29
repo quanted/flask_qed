@@ -4,7 +4,7 @@ csv_in = "./terrplant_qaqc_in_transpose.csv"
 csv_exp = "./terrplant_qaqc_exp_transpose.csv"
 import pandas as pd
 
-pd_obj_inputs = pd.read_csv(csv_path, index_col=0, header=None, skiprows=1, skipfooter=49, engine='python')
+pd_obj_inputs = pd.read_csv(csv_path, index_col=0, header=None, skiprows=1, skipfooter=46, engine='python')
 pd_obj_inputs = pd_obj_inputs.drop(labels=pd_obj_inputs.columns[range(4)], axis=1)
 pd_obj_inputs.index.name = None
 pd_obj_inputs.columns -= 5
