@@ -1,6 +1,7 @@
 import unittest
 import pandas as pd
 import numpy.testing as npt
+import pandas.util.testing as pdt
 # the following works when running test script in parent directory as package:
 # python -m tests.test_terrplant_unittest
 # the following works for running as nosetests from parent directory:
@@ -120,6 +121,25 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
+    def test_nms_loc_dry(self):
+        """
+        unittest for function terrplant.nms_loc_dry
+        """
+        # if self.out_nms_rq_dry >= 1.0:
+        #     self.out_nms_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to a dry area indicates a potential risk.')
+        # else:
+        #     self.out_nms_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to a dry area indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_nms_rq_dry = pd.Series([3.4], dtype='float')
+            result = terrplant_empty.LOCnmsdry()
+            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to a dry area indicates a potential risk.")
+            pdt.assert_series_equal(result, exp, True)
+        finally:
+            pass
+        return
+
     def test_nms_rq_semi(self):
         """
         unittest for function terrplant.nms_rq_semi
@@ -130,6 +150,25 @@ class TestTerrplant(unittest.TestCase):
             terrplant_empty.ec25_nonlisted_seedling_emergence_monocot = pd.Series([0.05], dtype='float')
             result = terrplant_empty.nmsRQsemi()
             npt.assert_array_almost_equal(result, 200, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_out_nms_loc_semi(self):
+        """
+        unittest for function terrplant.nms_loc_semi
+        """
+        # if self.out_nms_rq_semi >= 1.0:
+        #     self.out_nms_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to a semi-aquatic area indicates a potential risk.')
+        # else:
+        #     self.out_nms_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
+        #     ' pesticide via runoff to a semi-aquatic area indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_nms_rq_semi = pd.Series([2.7], dtype= 'float')
+            result = terrplant_empty.LOCnmssemi()
+            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to a semi-aquatic area indicates a potential risk.")
+            pdt.assert_series_equal(result, exp)
         finally:
             pass
         return
@@ -148,6 +187,25 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
+    def test_nms_loc_spray(self):
+        """
+        unittest for function terrplant.nms_loc_spray
+        """
+        # if self.out_nms_rq_spray >= 1.0:
+        #     self.out_nms_loc_spray = ('The risk quotient for non-listed monocot seedlings exposed to'\
+        # ' the pesticide via spray drift indicates a potential risk.')
+        # else:
+        #     self.out_nms_loc_spray = ('The risk quotient for non-listed monocot seedlings exposed to the'\
+        # ' pesticide via spray drift indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_nms_rq_spray = pd.Series([2.2], dtype= 'float')
+            result = terrplant_empty.LOCnmsspray()
+            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.")
+            pdt.assert_series_equal(result, exp)
+        finally:
+            pass
+        return
+
     def test_lms_rq_dry(self):
         """
         unittest for function terrplant.lms_rq_dry
@@ -158,6 +216,25 @@ class TestTerrplant(unittest.TestCase):
             terrplant_empty.ec25_nonlisted_seedling_emergence_dicot = pd.Series([0.01], dtype='float')
             result = terrplant_empty.lmsRQdry()
             npt.assert_array_almost_equal(result, 550, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_lms_loc_dry(self):
+        """
+        unittest for function terrplant.lms_loc_dry
+        """
+        # if self.out_lms_rq_dry >= 1.0:
+        #     self.out_lms_loc_dry = ('The risk quotient for listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to a dry area indicates a potential risk.')
+        # else:
+        #     self.out_lms_loc_dry = ('The risk quotient for listed monocot seedlings exposed to the'\
+        #     ' pesticide via runoff to a dry area indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_lms_rq_dry = pd.Series([1.6], dtype='float')
+            result = terrplant_empty.LOClmsdry()
+            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to a dry area indicates a potential risk.")
+            pdt.assert_series_equal(result, exp)
         finally:
             pass
         return
@@ -176,6 +253,25 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
+    def test_lms_loc_semi(self):
+        """
+        unittest for function terrplant.lms_loc_semi
+        """
+        # if self.out_lms_rq_semi >= 1.0:
+        #     self.out_lms_loc_semi = ('The risk quotient for listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to a semi-aquatic area indicates a potential risk.')
+        # else:
+        #     self.out_lms_loc_semi = ('The risk quotient for listed monocot seedlings exposed to the'\
+        #     ' pesticide via runoff to a semi-aquatic area indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_lms_rq_semi = pd.Series([0.9], dtype= 'float')
+            result = terrplant_empty.LOClmssemi()
+            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to a semi-aquatic area indicates that potential risk is minimal.")
+            pdt.assert_series_equal(result, exp)
+        finally:
+            pass
+        return
+
     def test_lms_rq_spray(self):
         """
         unittest for function terrplant.lms_rq_spray
@@ -186,6 +282,25 @@ class TestTerrplant(unittest.TestCase):
             terrplant_empty.ec25_nonlisted_seedling_emergence_dicot = pd.Series([0.01], dtype='float')
             result = terrplant_empty.lmsRQspray()
             npt.assert_array_almost_equal(result, 500, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_lms_loc_spray(self):
+        """
+        unittest for function terrplant.lms_loc_spray
+        """
+        # if self.out_lms_rq_spray >= 1.0:
+        #     self.out_lms_loc_spray = ('The risk quotient for listed monocot seedlings exposed to'\
+        #     ' the pesticide via spray drift indicates a potential risk.')
+        # else:
+        #     self.out_lms_loc_spray = ('The risk quotient for listed monocot seedlings exposed to the'\
+        #     ' pesticide via spray drift indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_lms_rq_spray = pd.Series([1.1], dtype= 'float')
+            result = terrplant_empty.LOClmsspray()
+            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.")
+            pdt.assert_series_equal(result, exp)
         finally:
             pass
         return
@@ -204,6 +319,25 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
+    def test_nds_loc_dry(self):
+        """
+        unittest for function terrplant.nds_loc_dry
+        """
+        # if self.out_nds_rq_dry >= 1.0:
+        #     self.out_nds_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to dry areas indicates a potential risk.')
+        # else:
+        #     self.out_nds_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to the'\
+        #     ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_nds_rq_dry = pd.Series([3.7], dtype= 'float')
+            result = terrplant_empty.LOCndsdry()
+            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.")
+            pdt.assert_series_equal(result, exp)
+        finally:
+            pass
+        return
+
     def test_nds_rq_semi(self):
         """
         unittest for function terrplant.nds_rq_semi
@@ -214,6 +348,25 @@ class TestTerrplant(unittest.TestCase):
             terrplant_empty.noaec_listed_seedling_emergence_monocot = pd.Series([0.02], dtype='float')
             result = terrplant_empty.ndsRQsemi()
             npt.assert_array_almost_equal(result, 500, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_nds_loc_semi(self):
+        """
+        unittest for function terrplant.nds_loc_semi
+        """
+        # if self.out_nds_rq_semi >= 1.0:
+        #     self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to semi-aquatic areas indicates a potential risk.')
+        # else:
+        #     self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
+        #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_nds_rq_semi = pd.Series([0.7], dtype='float')
+            result = terrplant_empty.LOCndssemi()
+            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.")
+            pdt.assert_series_equal(result, exp)
         finally:
             pass
         return
@@ -232,6 +385,25 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
+    def test_nds_loc_spray(self):
+        """
+        unittest for function terrplant.nds_loc_spray
+        """
+        # if self.out_nds_rq_spray >= 1.0:
+        #     self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to'\
+        #     ' the pesticide via spray drift indicates a potential risk.')
+        # else:
+        #     self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
+        #     ' pesticide via spray drift indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_nds_rq_spray = pd.Series([0.2], dtype='float')
+            result = terrplant_empty.LOCndsspray()
+            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.")
+            pdt.assert_series_equal(result, exp)
+        finally:
+            pass
+        return
+
     def test_lds_rq_dry(self):
         """
         unittest for function terrplant.lds_rq_dry
@@ -242,6 +414,25 @@ class TestTerrplant(unittest.TestCase):
             terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.1], dtype='float')
             result = terrplant_empty.ldsRQdry()
             npt.assert_array_almost_equal(result, 55, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_lds_loc_dry(self):
+        """
+        unittest for function terrplant.lds_loc_dry
+        """
+        # if self.out_lds_rq_dry >= 1.0:
+        #     self.out_lds_loc_dry = ('The risk quotient for listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to dry areas indicates a potential risk.')
+        # else:
+        #     self.out_lds_loc_dry = ('The risk quotient for listed monocot seedlings exposed to the'\
+        #     ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_lds_rq_dry = pd.Series([1.5], dtype= 'float')
+            result = terrplant_empty.LOCldsdry()
+            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.")
+            pdt.assert_series_equal(result, exp)
         finally:
             pass
         return
@@ -260,6 +451,25 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
+    def test_lds_loc_semi(self):
+        """
+        unittest for function terrplant.lds_loc_semi
+        """
+        # if self.out_lds_rq_semi >= 1.0:
+        #     self.out_lds_loc_semi = ('The risk quotient for listed monocot seedlings exposed to'\
+        #     ' the pesticide via runoff to semi-aquatic areas indicates a potential risk.')
+        # else:
+        #     self.out_lds_loc_semi = ('The risk quotient for listed monocot seedlings exposed to the'\
+        #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_lds_rq_semi = pd.Series([4.5], dtype= 'float')
+            result = terrplant_empty.LOCldssemi()
+            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.")
+            pdt.assert_series_equal(result, exp)
+        finally:
+            pass
+        return
+
     def test_lds_rq_spray(self):
         """
         unittest for function terrplant.lds_rq_spray
@@ -270,6 +480,25 @@ class TestTerrplant(unittest.TestCase):
             terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.1], dtype='float')
             result = terrplant_empty.ldsRQspray()
             npt.assert_array_almost_equal(result, 50, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_lds_loc_spray(self):
+        """
+        unittest for function terrplant.lds_loc_spray
+        """
+        # if self.out_lds_rq_spray >= 1.0:
+        #     self.out_lds_loc_spray = ('The risk quotient for listed monocot seedlings exposed to'\
+        #     ' the pesticide via spray drift indicates a potential risk.')
+        # else:
+        #     self.out_lds_loc_spray = ('The risk quotient for listed monocot seedlings exposed to the'\
+        #     ' pesticide via spray drift indicates that potential risk is minimal.')
+        try:
+            terrplant_empty.out_lds_rq_spray = pd.Series([0.8], dtype='float')
+            result = terrplant_empty.LOCldsspray()
+            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.")
+            pdt.assert_series_equal(result, exp)
         finally:
             pass
         return

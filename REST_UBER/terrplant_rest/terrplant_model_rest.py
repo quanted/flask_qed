@@ -4,7 +4,7 @@ import logging
 class terrplant(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
 
-        # logging.info(pd_obj)
+        logging.info(pd_obj)
 
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
         self.run_type = run_type
@@ -16,11 +16,16 @@ class terrplant(object):
             self.execute_model()
 
     def execute_model(self):
+        logging.info("1")
         self.populate_input_properties()
+        logging.info("2")
         self.create_output_properties()
+        logging.info("3")
         self.run_methods()
+        logging.info("4")
         self.create_output_dataframe()
         # Callable from Bottle that returns JSON
+        logging.info("5")
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
     def json(self, pd_obj, pd_obj_out, pd_obj_exp):
@@ -47,17 +52,29 @@ class terrplant(object):
             self.totaldry()
             self.totalsemi()
             self.nmsRQdry()
+            self.LOCnmsdry()
             self.nmsRQsemi()
+            self.LOCnmssemi()
             self.nmsRQspray()
+            self.LOCnmsspray()
             self.lmsRQdry()
+            self.LOClmsdry()
             self.lmsRQsemi()
+            self.LOClmssemi()
             self.lmsRQspray()
+            self.LOClmsspray()
             self.ndsRQdry()
+            self.LOCndsdry()
             self.ndsRQsemi()
+            self.LOCndssemi()
             self.ndsRQspray()
+            self.LOCndsspray()
             self.ldsRQdry()
+            self.LOCldsdry()
             self.ldsRQsemi()
+            self.LOCldssemi()
             self.ldsRQspray()
+            self.LOCldsspray()
         except TypeError:
             print "Type Error: Your variables are not set correctly."
 
@@ -96,6 +113,8 @@ class terrplant(object):
         })
 
         #create pandas properties for acceptance testing
+        logging.info("here is the output object")
+        logging.info(pd_obj_out)
         self.pd_obj_out = pd_obj_out
 
     def create_output_properties(self):
@@ -217,6 +236,7 @@ class terrplant(object):
         #     ('runoff_fraction must be positive.')
         # if self.out_runsemi == -1:
         self.out_runsemi = (self.application_rate/self.incorporation_depth) * self.runoff_fraction * 10
+        logging.info("runsemi")
         logging.info(self.out_runsemi)
         return self.out_runsemi
 
@@ -242,6 +262,7 @@ class terrplant(object):
         #     ('drift_fraction must be positive.')
         # if self.out_spray == -1:
         self.out_spray = self.application_rate * self.drift_fraction
+        logging.info("spray")
         logging.info(self.out_spray)
         return self.out_spray
 
@@ -260,6 +281,7 @@ class terrplant(object):
             # except ZeroDivisionError:
             #     raise ZeroDivisionError\
             #     ('The incorporation_depth must be non-zero.')
+        logging.info("totaldry")
         logging.info(self.out_totaldry)
         return self.out_totaldry
 
@@ -279,6 +301,7 @@ class terrplant(object):
             # except ZeroDivisionError:
             #     raise ZeroDivisionError\
             #     ('The incorporation_depth must be non-zero.')
+        logging.info("totalsemi")
         logging.info(self.out_totalsemi)
         return self.out_totalsemi
 
@@ -326,6 +349,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('Either the out_totaldry variable equals None and therefor this function cannot be run.')
         self.out_nms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_monocot
+        logging.info("nmsRQdry")
         logging.info(self.out_nms_rq_dry)
         return self.out_nms_rq_dry
 
@@ -346,14 +370,13 @@ class terrplant(object):
                 #     ('nmsRQdry variable equals None and therefor this function cannot be run.')
                 # elif self.out_nms_rq_dry >= 1.0:
         if self.out_nms_rq_dry >= 1.0:
-            self.out_nms_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to'\
-            ' the pesticide via runoff to a dry area indicates a potential risk.')
+            self.out_nms_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to a dry area indicates a potential risk.')
         else:
-            self.out_nms_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to'\
-            ' the pesticide via runoff to a dry area indicates that potential risk is minimal.')
+            self.out_nms_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to a dry area indicates that potential risk is minimal.')
             # except ZeroDivisionError:
             #     raise ZeroDivisionError\
             #     ('The incorporation_depth must be non-zero.')
+        logging.info("LOCnmsdry")
         logging.info(self.out_nms_loc_dry)
         return self.out_nms_loc_dry
 

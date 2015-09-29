@@ -40,6 +40,8 @@ print(tabulate(pd_obj_exp.iloc[:,15:16], headers='keys', tablefmt='fancy_grid'))
 
 # create an instance of terrplant object with qaqc data
 terrplant_calc = terrplant_model.terrplant("batch", pd_obj_inputs, pd_obj_exp)
+print("####")
+print(terrplant_calc)
 test = {}
 
 
@@ -106,12 +108,30 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+    def test_nms_loc_dry(self):
+        """
+        Integration test for terrplant.nms_loc_dry
+        """
+        try:
+            self.blackbox_method_str('nms_loc_dry')
+        finally:
+            pass
+        return
     def test_nms_rq_semi(self):
         """
         Integration test for terrplant.nms_rq_semi
         """
         try:
             self.blackbox_method_int('nms_rq_semi')
+        finally:
+            pass
+        return
+    def test_nms_loc_semi(self):
+        """
+        Integration test for terrplant.nms_loc_semi
+        """
+        try:
+            self.blackbox_method_str('nms_loc_semi')
         finally:
             pass
         return
@@ -124,12 +144,30 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+    def test_nms_loc_spray(self):
+        """
+        Integration test for terrplant.nms_loc_spray
+        """
+        try:
+            self.blackbox_method_str('nms_loc_spray')
+        finally:
+            pass
+        return
     def test_lms_rq_dry(self):
         """
         Integration test for terrplant.lms_rq_dry
         """
         try:
             self.blackbox_method_int('lms_rq_dry')
+        finally:
+            pass
+        return
+    def test_lms_loc_dry(self):
+        """
+        Integration test for terrplant.lms_loc_dry
+        """
+        try:
+            self.blackbox_method_str('lms_loc_dry')
         finally:
             pass
         return
@@ -142,12 +180,30 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+    def test_lms_loc_semi(self):
+        """
+        Integration test for terrplant.lms_loc_semi
+        """
+        try:
+            self.blackbox_method_str('lms_loc_semi')
+        finally:
+            pass
+        return
     def test_lms_rq_spray(self):
         """
         Integration test for terrplant.lms_rq_spray
         """
         try:
             self.blackbox_method_int('lms_rq_spray')
+        finally:
+            pass
+        return
+    def test_lms_loc_spray(self):
+        """
+        Integration test for terrplant.lms_loc_spray
+        """
+        try:
+            self.blackbox_method_str('lms_loc_spray')
         finally:
             pass
         return
@@ -160,12 +216,30 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+    def test_nds_loc_dry(self):
+        """
+        Integration test for terrplant.nds_loc_dry
+        """
+        try:
+            self.blackbox_method_str('nds_loc_dry')
+        finally:
+            pass
+        return
     def test_nds_rq_semi(self):
         """
         Integration test for terrplant.nds_rq_semi
         """
         try:
             self.blackbox_method_int('nds_rq_semi')
+        finally:
+            pass
+        return
+    def test_nds_loc_semi(self):
+        """
+        Integration test for terrplant.nds_loc_semi
+        """
+        try:
+            self.blackbox_method_str('nds_loc_semi')
         finally:
             pass
         return
@@ -178,12 +252,30 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+    def test_nds_loc_spray(self):
+        """
+        Integration test for terrplant.nds_loc_spray
+        """
+        try:
+            self.blackbox_method_str('nds_loc_spray')
+        finally:
+            pass
+        return
     def test_lds_rq_dry(self):
         """
         Integration test for terrplant.lds_rq_dry
         """
         try:
             self.blackbox_method_int('lds_rq_dry')
+        finally:
+            pass
+        return
+    def test_lds_loc_dry(self):
+        """
+        Integration test for terrplant.lds_loc_dry
+        """
+        try:
+            self.blackbox_method_str('lds_loc_dry')
         finally:
             pass
         return
@@ -196,6 +288,15 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+    def test_lds_loc_semi(self):
+        """
+        Integration test for terrplant.lds_loc_semi
+        """
+        try:
+            self.blackbox_method_str('lds_loc_semi')
+        finally:
+            pass
+        return
     def test_lds_rq_spray(self):
         """
         Integration test for terrplant.lds_rq_spray
@@ -205,7 +306,15 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
-
+    def test_lds_loc_spray(self):
+        """
+        Integration test for terrplant.lds_loc_spray
+        """
+        try:
+            self.blackbox_method_str('lds_loc_spray')
+        finally:
+            pass
+        return
     def blackbox_method_int(self, output):
         """
         Helper method to reuse code for testing numpy array outputs from TerrPlant model
