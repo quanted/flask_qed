@@ -53,7 +53,7 @@ class rice(object):
         self.Calcmass_area()
         self.Calccw()
 
-     def create_output_dataframe(self):
+    def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
             'out_msed' : self.out_msed,

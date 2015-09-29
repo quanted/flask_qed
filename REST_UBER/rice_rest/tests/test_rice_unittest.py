@@ -49,10 +49,10 @@ class TestRice(unittest.TestCase):
 
     # (self.mai/self.area)*10000
     def test_Calcmass_area(self):
-        rice_empty.area = pd.Series([1000.0], dtype='float')
-        rice_empty.mai = pd.Series([55.5], dtype='float')
+        rice_empty.area = pd.Series([100.0], dtype='float')
+        rice_empty.mai = pd.Series([90.0], dtype='float')
         result = rice_empty.Calcmass_area()
-        npt.assert_array_almost_equal(result, 5.55, 4, '', True)
+        npt.assert_array_almost_equal(result, 9000.0, 4, '', True)
         return
 
     # (self.out_mass_area / (self.dw + (self.dsed * (self.osed + (self.pb * self.Kd*1e-5)))))*100
@@ -61,9 +61,10 @@ class TestRice(unittest.TestCase):
         rice_empty.dsed = pd.Series([4.0], dtype='float')
         rice_empty.osed = pd.Series([3.0], dtype='float')
         rice_empty.pb = pd.Series([2.0], dtype='float')
-        rice_empty.kd = pd.Series([100000.], dtype='float')
+        rice_empty.Kd = pd.Series([100000.0], dtype='float')
+        rice_empty.out_mass_area = pd.Series([400.0], dtype='float')
         result = rice_empty.Calccw()
-        npt.assert_array_almost_equal(result, 25., 4, '', True)
+        npt.assert_array_almost_equal(result, 1600.0, 4, '', True)
         return
 
 
