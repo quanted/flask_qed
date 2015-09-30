@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import numpy.testing as npt
-from .. import rice_model_rest as rice_model
+from rice_rest import rice_model_rest as rice_model
 import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs
@@ -35,51 +35,16 @@ class Testrice(unittest.TestCase):
 
 #Note: commented-out rows contain output files that are not running properly in the subsequent blackbox_method test.
     def test_blackbox_dose_bird(self):
-         self.blackbox_method_float('dose_bird')
+         self.blackbox_method_float('Calcmsed')
 
     def test_blackbox_dose_mamm(self):
-         self.blackbox_method_int('dose_mamm')
+         self.blackbox_method_int('Calcvw')
 
     def test_blackbox_at_bird(self):
-         self.blackbox_method_int('at_bird')
+         self.blackbox_method_int('Calcmass_area')
 
     def test_blackbox_at_mamm(self):
-         self.blackbox_method_int('at_mamm')
-
-    def test_blackbox_fi_bird(self):
-        #self.blackbox_method('fi_bird')
-        pass
-
-    def test_blackbox_det(self):
-         self.blackbox_method_int('det')
-
-    def test_blackbox_act(self):
-         self.blackbox_method_int('act')
-
-    def test_blackbox_acute_bird(self):
-         self.blackbox_method_int('acute_bird')
-
-    def test_blackbox_acuconb(self):
-         self.blackbox_method_str('acuconb')
-
-    def test_blackbox_acute_mamm(self):
-         self.blackbox_method_int('acute_mamm')
-
-    def test_blackbox_acuconm(self):
-         self.blackbox_method_str('acuconm')
-
-    def test_blackbox_chron_bird(self):
-         self.blackbox_method_int('chron_bird')
-
-    def test_blackbox_chronconb(self):
-         self.blackbox_method_str('chronconb')
-
-    def test_blackbox_chron_mamm(self):
-         self.blackbox_method_int('chron_mamm')
-
-    def test_blackbox_chronconm(self):
-         self.blackbox_method_str('chronconm')
-
+         self.blackbox_method_int('Calccw')
 
 
     def blackbox_method_float(self, output):
