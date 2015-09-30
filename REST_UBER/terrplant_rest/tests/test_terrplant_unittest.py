@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 import pandas as pd
 import numpy.testing as npt
@@ -165,7 +166,7 @@ class TestTerrplant(unittest.TestCase):
         #     self.out_nms_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
         #     ' pesticide via runoff to a semi-aquatic area indicates that potential risk is minimal.')
         try:
-            terrplant_empty.out_nms_rq_semi = pd.Series([2.7], dtype= 'float')
+            terrplant_empty.out_nms_rq_semi = pd.Series([2.7], dtype='float')
             result = terrplant_empty.LOCnmssemi()
             exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.")
             pdt.assert_series_equal(result, exp)
@@ -198,7 +199,7 @@ class TestTerrplant(unittest.TestCase):
         #     self.out_nms_loc_spray = ('The risk quotient for non-listed monocot seedlings exposed to the'\
         # ' pesticide via spray drift indicates that potential risk is minimal.')
         try:
-            terrplant_empty.out_nms_rq_spray = pd.Series([2.2], dtype= 'float')
+            terrplant_empty.out_nms_rq_spray = pd.Series([2.2], dtype='float')
             result = terrplant_empty.LOCnmsspray()
             exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.")
             pdt.assert_series_equal(result, exp)

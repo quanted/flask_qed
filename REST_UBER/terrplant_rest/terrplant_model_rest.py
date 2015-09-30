@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pandas as pd
 import logging
 
@@ -91,7 +93,7 @@ class terrplant(object):
             'out_nms_rq_semi' : self.out_nms_rq_semi,
             'out_nms_loc_semi' : self.out_nms_loc_semi,
             'out_nms_rq_spray' : self.out_nms_rq_spray,
-            'out_nms_loc_spray ' : self.out_nms_loc_spray ,
+            'out_nms_loc_spray' : self.out_nms_loc_spray,
             'out_lms_rq_dry' : self.out_lms_rq_dry,
             'out_lms_loc_dry' : self.out_lms_loc_dry,
             'out_lms_rq_semi' : self.out_lms_rq_semi,
