@@ -7,35 +7,35 @@ use,use,na,string,na,Corn,Corn,Corn
 application_method,application_method,na,string,na,Ground,Ground,Ground
 application_form,application_form,na,string,na,Spray,Spray,Spray
 solubility,solubility,ppm,string,na,240,240,240
-incorporation_depth,incorporation_depth,inches,integer,"[1,2,3,4,5,6]",1,1,1
-application_rate,application_rate,lbs ai/A,float,"[0, inf)",4,4,4
-drift_fraction,drift_fraction,unitless,float,"[0, .01, .05]",0.01,0.01,0.01
-runoff_fraction,runoff_fraction,unitless,float,"[0.01,0.02, 0.05]",0.05,0.05,0.05
-ec25_nonlisted_seedling_emergence_monocot,ec25_nonlisted_seedling_emergence_monocot,lbs ai/acre,float,"[0,inf)",0.0067,0.0067,0.0067
-noaec_listed_seedling_emergence_monocot,noaec_listed_seedling_emergence_monocot,lbs ai/acre,float,"[0,inf)",0.034,0.034,0.034
-ec25_nonlisted_seedling_emergence_dicot,ec25_nonlisted_seedling_emergence_dicot,lbs ai/acre,float,"[0,inf)",0.0023,0.0023,0.0023
-noaec_listed_seedling_emergence_dicot,noaec_listed_seedling_emergence_dicot,lbs ai/acre,float,"[0,inf)",0.019,0.019,0.019
-ec25_nonlisted_vegetative_vigor_monocot,ec25_nonlisted_vegetative_vigor_monocot,lbs ai/acre,float,"[0,inf)",0.068,0.068,0.068
-noaec_listed_vegetative_vigor_monocot,noaec_listed_vegetative_vigor_monocot,lbs ai/acre,float,"[0,inf)",1.4,1.4,1.4
-ec25_nonlisted_vegetative_vigor_dicot,ec25_nonlisted_vegetative_vigor_dicot,lbs ai/acre,float,"[0,inf)",0.037,0.037,0.037
-noaec_listed_vegetative_vigor_dicot,noaec_listed_vegetative_vigor_dicot,lbs ai/acre,float,"[0,inf)",0.67,0.67,0.67
-out_rundry,out_rundry,lbs ai/A,float,"[0,inf)",,,
-out_runsemi,out_runsemi,lbs ai/A,float,"[0,inf)",,,
-out_spray,out_spray,lbs ai/A,float,"[0,inf)",,,
-out_totaldry,out_totaldry,lbs ai/A,float,"[0,inf)",,,
-out_totalsemi,out_totalsemi,lbs ai/A,float,"[0,inf)",,,
-out_nms_rq_dry,out_nms_rq_dry,unitless,float,"[0,inf)",,,
-out_lms_rq_dry,out_lms_rq_dry,unitless,float,"[0,inf)",,,
-out_nds_rq_dry,out_nds_rq_dry,unitless,float,"[0,inf)",,,
-out_lds_rq_dry,out_lds_rq_dry,unitless,float,"[0,inf)",,,
-out_nms_rq_semi,out_nms_rq_semi,unitless,float,"[0,inf)",,,
-out_lms_rq_semi,out_lms_rq_semi,unitless,float,"[0,inf)",,,
-out_nds_rq_semi,out_nds_rq_semi,unitless,float,"[0,inf)",,,
-out_lds_rq_semi,out_lds_rq_semi,unitless,float,"[0,inf)",,,
-out_nms_rq_spray,out_nms_rq_spray,unitless,float,"[0,inf)",,,
-out_lms_rq_spray,out_lms_rq_spray,unitless,float,"[0,inf)",,,
-out_nds_rq_spray,out_nds_rq_spray,unitless,float,"[0,inf)",,,
-out_lds_rq_spray,out_lds_rq_spray,unitless,float,"[0,inf)",,,
+incorporation_depth,incorporation_depth,inches,integer,[1_2_3_4_5_6],1,1,1
+application_rate,application_rate,lbs ai/A,float,[0_ inf),4,4,4
+drift_fraction,drift_fraction,unitless,float,[0_ .01_ .05],0.01,0.01,0.01
+runoff_fraction,runoff_fraction,unitless,float,[0.01_0.02_ 0.05],0.05,0.05,0.05
+ec25_nonlisted_seedling_emergence_monocot,ec25_nonlisted_seedling_emergence_monocot,lbs ai/acre,float,[0_inf),0.0067,0.0067,0.0067
+noaec_listed_seedling_emergence_monocot,noaec_listed_seedling_emergence_monocot,lbs ai/acre,float,[0_inf),0.034,0.034,0.034
+ec25_nonlisted_seedling_emergence_dicot,ec25_nonlisted_seedling_emergence_dicot,lbs ai/acre,float,[0_inf),0.0023,0.0023,0.0023
+noaec_listed_seedling_emergence_dicot,noaec_listed_seedling_emergence_dicot,lbs ai/acre,float,[0_inf),0.019,0.019,0.019
+ec25_nonlisted_vegetative_vigor_monocot,ec25_nonlisted_vegetative_vigor_monocot,lbs ai/acre,float,[0_inf),0.068,0.068,0.068
+noaec_listed_vegetative_vigor_monocot,noaec_listed_vegetative_vigor_monocot,lbs ai/acre,float,[0_inf),1.4,1.4,1.4
+ec25_nonlisted_vegetative_vigor_dicot,ec25_nonlisted_vegetative_vigor_dicot,lbs ai/acre,float,[0_inf),0.037,0.037,0.037
+noaec_listed_vegetative_vigor_dicot,noaec_listed_vegetative_vigor_dicot,lbs ai/acre,float,[0_inf),0.67,0.67,0.67
+out_rundry,out_rundry,lbs ai/A,float,[0_inf),,,
+out_runsemi,out_runsemi,lbs ai/A,float,[0_inf),,,
+out_spray,out_spray,lbs ai/A,float,[0_inf),,,
+out_totaldry,out_totaldry,lbs ai/A,float,[0_inf),,,
+out_totalsemi,out_totalsemi,lbs ai/A,float,[0_inf),,,
+out_nms_rq_dry,out_nms_rq_dry,unitless,float,[0_inf),,,
+out_lms_rq_dry,out_lms_rq_dry,unitless,float,[0_inf),,,
+out_nds_rq_dry,out_nds_rq_dry,unitless,float,[0_inf),,,
+out_lds_rq_dry,out_lds_rq_dry,unitless,float,[0_inf),,,
+out_nms_rq_semi,out_nms_rq_semi,unitless,float,[0_inf),,,
+out_lms_rq_semi,out_lms_rq_semi,unitless,float,[0_inf),,,
+out_nds_rq_semi,out_nds_rq_semi,unitless,float,[0_inf),,,
+out_lds_rq_semi,out_lds_rq_semi,unitless,float,[0_inf),,,
+out_nms_rq_spray,out_nms_rq_spray,unitless,float,[0_inf),,,
+out_lms_rq_spray,out_lms_rq_spray,unitless,float,[0_inf),,,
+out_nds_rq_spray,out_nds_rq_spray,unitless,float,[0_inf),,,
+out_lds_rq_spray,out_lds_rq_spray,unitless,float,[0_inf),,,
 out_nms_loc_dry,out_nms_loc_dry,unitless,String,na,,,
 out_nms_loc_semi,out_nms_loc_semi,unitless,String,na,,,
 out_nms_loc_spray,out_nms_loc_spray,unitless,String,na,,,
@@ -48,20 +48,32 @@ out_nds_loc_spray,out_nds_loc_spray,unitless,String,na,,,
 out_lds_loc_dry,out_lds_loc_dry,unitless,String,na,,,
 out_lds_loc_semi,out_lds_loc_semi,unitless,String,na,,,
 out_lds_loc_spray,out_lds_loc_spray,unitless,String,na,,,
-exp_rundry,exp_rundry,lbs ai/A,float,"[0,inf)",0.2,0.2,0.2
-exp_runsemi,exp_runsemi,lbs ai/A,float,"[0,inf)",2,2,2
-exp_spray,exp_spray,lbs ai/A,float,"[0,inf)",0.04,0.04,0.04
-exp_totaldry,exp_totaldry,lbs ai/A,float,"[0,inf)",0.24,0.24,0.24
-exp_totalsemi,exp_totalsemi,lbs ai/A,float,"[0,inf)",2.04,2.04,2.04
-exp_nms_rq_dry,exp_nms_rq_dry,unitless,float,"[0,inf)",35.82,35.82,35.82
-exp_lms_rq_dry,exp_lms_rq_dry,unitless,float,"[0,inf)",104.35,104.35,104.35
-exp_nds_rq_dry,exp_nds_rq_dry,unitless,float,"[0,inf)",7.06,7.06,7.06
-exp_lds_rq_dry,exp_lds_rq_dry,unitless,float,"[0,inf)",12.63,12.63,12.63
-exp_nms_rq_semi,exp_nms_rq_semi,unitless,float,"[0,inf)",304.48,304.48,304.48
-exp_lms_rq_semi,exp_lms_rq_semi,unitless,float,"[0,inf)",886.96,886.96,886.96
-exp_nds_rq_semi,exp_nds_rq_semi,unitless,float,"[0,inf)",60,60,60
-exp_lds_rq_semi,exp_lds_rq_semi,unitless,float,"[0,inf)",107.37,107.37,107.37
-exp_nms_rq_spray,exp_nms_rq_spray,unitless,float,"[0,inf)",5.97,5.97,5.97
-exp_lms_rq_spray,exp_lms_rq_spray,unitless,float,"[0,inf)",17.39,17.39,17.39
-exp_nds_rq_spray,exp_nds_rq_spray,unitless,float,"[0,inf)",1.18,1.18,1.18
-exp_lds_rq_spray,exp_lds_rq_spray,unitless,float,"[0,inf)",2.11,2.11,2.11
+exp_rundry,exp_rundry,lbs ai/A,float,[0_inf),0.2,0.2,0.2
+exp_runsemi,exp_runsemi,lbs ai/A,float,[0_inf),2,2,2
+exp_spray,exp_spray,lbs ai/A,float,[0_inf),0.04,0.04,0.04
+exp_totaldry,exp_totaldry,lbs ai/A,float,[0_inf),0.24,0.24,0.24
+exp_totalsemi,exp_totalsemi,lbs ai/A,float,[0_inf),2.04,2.04,2.04
+exp_nms_rq_dry,exp_nms_rq_dry,unitless,float,[0_inf),35.82,35.82,35.82
+exp_lms_rq_dry,exp_lms_rq_dry,unitless,float,[0_inf),104.35,104.35,104.35
+exp_nds_rq_dry,exp_nds_rq_dry,unitless,float,[0_inf),7.06,7.06,7.06
+exp_lds_rq_dry,exp_lds_rq_dry,unitless,float,[0_inf),12.63,12.63,12.63
+exp_nms_rq_semi,exp_nms_rq_semi,unitless,float,[0_inf),304.48,304.48,304.48
+exp_lms_rq_semi,exp_lms_rq_semi,unitless,float,[0_inf),886.96,886.96,886.96
+exp_nds_rq_semi,exp_nds_rq_semi,unitless,float,[0_inf),60,60,60
+exp_lds_rq_semi,exp_lds_rq_semi,unitless,float,[0_inf),107.37,107.37,107.37
+exp_nms_rq_spray,exp_nms_rq_spray,unitless,float,[0_inf),5.97,5.97,5.97
+exp_lms_rq_spray,exp_lms_rq_spray,unitless,float,[0_inf),17.39,17.39,17.39
+exp_nds_rq_spray,exp_nds_rq_spray,unitless,float,[0_inf),1.18,1.18,1.18
+exp_lds_rq_spray,exp_lds_rq_spray,unitless,float,[0_inf),2.11,2.11,2.11
+exp_nms_loc_dry,exp_nms_loc_dry,unitless,String,na,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+exp_nms_loc_semi,exp_nms_loc_semi,unitless,String,na,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+exp_nms_loc_spray,exp_nms_loc_spray,unitless,String,na,The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+exp_lms_loc_dry,exp_lms_loc_dry,unitless,String,na,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+exp_lms_loc_semi,exp_lms_loc_semi,unitless,String,na,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+exp_lms_loc_spray,exp_lms_loc_spray,unitless,String,na,The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+exp_nds_loc_dry,exp_nds_loc_dry,unitless,String,na,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+exp_nds_loc_semi,exp_nds_loc_semi,unitless,String,na,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+exp_nds_loc_spray,exp_nds_loc_spray,unitless,String,na,The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+exp_lds_loc_dry,exp_lds_loc_dry,unitless,String,na,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+exp_lds_loc_semi,exp_lds_loc_semi,unitless,String,na,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+exp_lds_loc_spray,exp_lds_loc_spray,unitless,String,na,The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.,The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
