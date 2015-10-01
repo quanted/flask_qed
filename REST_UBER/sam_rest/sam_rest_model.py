@@ -3,7 +3,6 @@
 
 import os
 import shutil
-import numpy
 import string
 import random
 import keys_Picloud_S3
@@ -55,6 +54,7 @@ def sam(inputs_json, jid, run_type):
     retrieval.
     """
     args = json.loads(inputs_json)
+    list_of_julian_days = None
 
     # Generate random name for current run
     name_temp = id_generator()
@@ -82,10 +82,10 @@ def sam(inputs_json, jid, run_type):
             try:
 
                 if args['output_type'] == '1':  # Daily Concentrations
-                    sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
+                    list_of_julian_days = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
                     # Divide master HUC12 list CSV into subsets for current run based on 'no_of_processes'
                     number_of_rows_list = split_csv(no_of_processes, name_temp)
-                    sam_daily_conc(no_of_processes, name_temp, number_of_rows_list)
+                    sam_daily_conc(no_of_processes, name_temp, number_of_rows_list, list_of_julian_days)
 
                 else:
                     sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)  # Does not use 'number_of_rows_list' for SuperPRZMPesticide.exe runs
@@ -103,7 +103,7 @@ def sam(inputs_json, jid, run_type):
                 pool.submit(subprocess.Popen, "timeout 3")
 
             # Create MongoDB document skeleton for SAM run output
-            sam_db.create_mongo_document(jid, run_type, args)
+            sam_db.create_mongo_document(jid, run_type, args, list_of_julian_days)
 
             return jid
 
@@ -136,14 +136,15 @@ def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
 
     sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
 
-    # Generate "SAM.inp" file
-    sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
+    # Generate "SAM.inp" file and return list of 'Julian' days for the simulation
+    list_of_julian_days = sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
 
     for x in range(no_of_processes):
         shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
 
+    return list_of_julian_days
 
-def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
+def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list, list_of_julian_days):
     """
     Wrapper method for firing off SAM daily runs (e.g. SuperPRZM dll).  This will eventually be used for all SAM runs.
 
@@ -166,8 +167,7 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list):
     pool.submit(
         subprocess.call,
         ['source', 'sam_launch.sh', sam_callable, name_temp, number_of_rows_string]
-        #['python', sam_callable, name_temp, str(number_of_rows_list)]
-    )# .add_done_callback(
+    )# .add_done_callback(  # This callback will only keep track of the job being done
     #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
     # )
 

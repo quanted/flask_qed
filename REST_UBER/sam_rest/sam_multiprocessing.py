@@ -154,14 +154,14 @@ class SamModelCaller(object):
         return number_string
 
 
-def daily_conc_callable(sam_bin_path, name_temp, section, array_size=320):
+def daily_conc_callable(sam_bin_path, name_temp, section, list_of_julian_days, array_size=320):
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
     # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
     #return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
 
     try:
-        sam_callable.run(sam_bin_path, name_temp, section, int(array_size))
+        sam_callable.run(sam_bin_path, name_temp, section, int(array_size), list_of_julian_days)
     except Exception, e:
         mp_logger.exception(e)
 

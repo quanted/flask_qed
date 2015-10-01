@@ -413,20 +413,12 @@ def inputs_preprocessing(inputs):
     inputs['sim_date_last_year'] = end_datetime_object.year
     inputs['sim_no_of_years'] = inputs['sim_date_last_year'] - inputs['sim_date_1st_year'] + 1
     inputs['sim_no_of_days'] = inputs['sim_date_end_since1900'] - inputs['sim_date_start_since1900'] + 1
-
-    sim_day_lists = sim_date_index_list(inputs['sim_date_start_since1900'], inputs['sim_date_end_since1900'], start_datetime_object)
-    inputs['sim_day_index_list'] = sim_day_lists[0]
-    inputs['sim_day_date_list'] = sim_day_lists[1]
-
+    inputs['sim_day_index_list'], inputs['sim_day_date_list'] = sim_date_index_list(
+            inputs['sim_date_start_since1900'], inputs['sim_date_end_since1900'],
+            start_datetime_object)
     inputs['crop_list_no'] = inputs['crop_list_no'].split(',')
-
-    app_num_record_list = app_num_record(inputs)
-    inputs['app_num_record'] = app_num_record_list[0]
-    inputs['app_record_day_since_1900'] = app_num_record_list[1]
-    inputs['app_rate'] = app_num_record_list[2]
-    inputs['app_method'] = app_num_record_list[3]
-    inputs['total_no_of_apps'] = app_num_record_list[4]
-
+    inputs['app_num_record'], inputs['app_record_day_since_1900'], \
+            inputs['app_rate'], inputs['app_method'], inputs['total_no_of_apps'] = app_num_record(inputs)
     inputs['output_time_avg_conc'] = output_time_avg_options(inputs['output_time_avg_option'])
 
     return inputs
@@ -603,5 +595,4 @@ def generate_sam_input_file(args, sam_input_file_path):
 
     myfile.close()
 
-
-    return sam_input_file_path
+    return inputs['sim_day_index_list']  #, sam_input_file_path  NOT NEEDED; COULD BE USED TO REMOVE HARD CODED STRINGS FROM FORTRAN AND BE PASSED IN AS COMMAND LINE ARH INSTEAD

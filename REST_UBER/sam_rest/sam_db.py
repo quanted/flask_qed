@@ -4,7 +4,7 @@ import keys_Picloud_S3
 import requests
 
 
-def create_mongo_document(jid, run_type, args):
+def create_mongo_document(jid, run_type, args, list_of_julian_days):
     """
     Create MongoDB document skeleton for SAM run output
     :param jid, run_type:
@@ -30,11 +30,15 @@ def create_mongo_document(jid, run_type, args):
             "run_type": run_type,
             "model_object_dict": {
                 'filename': filename,
-                'input': args
+                'input': args,
+                'sim_days': list_of_julian_days
             }
         }
         try:
-            db['sam'].insert(document)
+            # db['sam'].insert(document)  # PyMongo driver version (DEPRECATED)
+            url = 'http://localhost:8787/sam/daily/' + jid
+            http_headers = {'Content-Type': 'application/json'}
+            requests.post(url, data=document, headers=http_headers, timeout=30) #  Motor/Tornado driver version
         except:
             logging.exception(Exception)
 
