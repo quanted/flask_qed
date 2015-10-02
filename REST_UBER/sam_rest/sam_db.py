@@ -36,7 +36,8 @@ def create_mongo_document(jid, run_type, args, list_of_julian_days):
         }
         try:
             # db['sam'].insert(document)  # PyMongo driver version (DEPRECATED)
-            url = 'http://localhost:8787/sam/daily/' + jid
+            # Send SAM run Meatadata document to Mongo server
+            url = 'http://localhost:8787/sam/metadata/' + jid
             http_headers = {'Content-Type': 'application/json'}
             requests.post(url, data=document, headers=http_headers, timeout=30) #  Motor/Tornado driver version
         except:

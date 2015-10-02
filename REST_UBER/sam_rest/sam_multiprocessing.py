@@ -24,12 +24,14 @@ def multiprocessing_setup():
     :return: ProcessPoolExecutor object reference
     """
     nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
+    if nproc < 16:  # Force 'nproc' to be 16
+        nproc = 16
     print "max_workers=%s" % nproc
     return Pool(max_workers = nproc)  # Set number of workers to equal the number of processors available on machine
 
 
 class SamModelCaller(object):
-    def __init__(self, name_temp, number_of_rows_list=None, no_of_processes=16):
+    def __init__(self, jid, name_temp, number_of_rows_list=None, no_of_processes=16):
         """
         Constructor for SamModelCaller class.
         :param name_temp: string
@@ -38,6 +40,7 @@ class SamModelCaller(object):
         """
 
         self.sam_bin_path = os.path.join(curr_path, 'bin')
+        self.jid = jid
         self.name_temp = name_temp
         self.number_of_rows_list = number_of_rows_list
         self.no_of_processes = no_of_processes
@@ -62,7 +65,7 @@ class SamModelCaller(object):
                 or not isinstance(self.number_of_rows_list, list):  # Make sure 'self.number_of_rows_list' is a list and not None
             self.number_of_rows_list = self.split_csv()
 
-        testing_sections = [308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 308, 330]  # Temporary for testing
+        testing_sections = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]  # Temporary for testing
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
             pool.submit(
                 # subprocess.Popen, "sleep 3"  # Testing
@@ -154,14 +157,14 @@ class SamModelCaller(object):
         return number_string
 
 
-def daily_conc_callable(sam_bin_path, name_temp, section, list_of_julian_days, array_size=320):
+def daily_conc_callable(jid, sam_bin_path, name_temp, section, array_size=320):
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
     # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
     #return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
 
     try:
-        sam_callable.run(sam_bin_path, name_temp, section, int(array_size), list_of_julian_days)
+        sam_callable.run(jid, sam_bin_path, name_temp, section, int(array_size))
     except Exception, e:
         mp_logger.exception(e)
 
@@ -189,8 +192,9 @@ def main():
 
     # Get command line arguments
     name_temp = sys.argv[1]
+    jid = sys.argv[2]
     try:  # 'number_of_rows_list' is an optional command line argument that is calculated if not given (split_csv() called)
-        number_of_rows_list = sys.argv[2]
+        number_of_rows_list = sys.argv[3]
         # if isinstance(self.number_of_rows_list, str):
         number_of_rows_list = create_number_of_rows_list(number_of_rows_list)
         for item in number_of_rows_list:
@@ -200,10 +204,10 @@ def main():
     except IndexError:  # If the command-line argument is not supplied
         number_of_rows_list = None
     try:  # 'no_of_processes' is an optional command line argument that defaults to 16 if not given
-        no_of_processes = int(sys.argv[3])
-        sam = SamModelCaller(name_temp, number_of_rows_list, no_of_processes)
+        no_of_processes = int(sys.argv[4])
+        sam = SamModelCaller(jid, name_temp, number_of_rows_list, no_of_processes)
     except:
-        sam = SamModelCaller(name_temp, number_of_rows_list)
+        sam = SamModelCaller(jid, name_temp, number_of_rows_list)
 
     sam.sam_multiprocessing()
 

@@ -85,7 +85,7 @@ def sam(inputs_json, jid, run_type):
                     list_of_julian_days = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
                     # Divide master HUC12 list CSV into subsets for current run based on 'no_of_processes'
                     number_of_rows_list = split_csv(no_of_processes, name_temp)
-                    sam_daily_conc(no_of_processes, name_temp, number_of_rows_list, list_of_julian_days)
+                    sam_daily_conc(jid, no_of_processes, name_temp, number_of_rows_list)
 
                 else:
                     sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)  # Does not use 'number_of_rows_list' for SuperPRZMPesticide.exe runs
@@ -144,7 +144,7 @@ def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
 
     return list_of_julian_days
 
-def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list, list_of_julian_days):
+def sam_daily_conc(jid, no_of_processes, name_temp, number_of_rows_list):
     """
     Wrapper method for firing off SAM daily runs (e.g. SuperPRZM dll).  This will eventually be used for all SAM runs.
 
@@ -162,11 +162,11 @@ def sam_daily_conc(no_of_processes, name_temp, number_of_rows_list, list_of_juli
 
     number_of_rows_string = ""
     for item in number_of_rows_list:
-        number_of_rows_string += item + " "
+        number_of_rows_string += str(item) + " "
 
     pool.submit(
         subprocess.call,
-        ['source', 'sam_launch.sh', sam_callable, name_temp, number_of_rows_string]
+        ['source', 'sam_launch.sh', sam_callable, jid, name_temp, number_of_rows_string]
     )# .add_done_callback(  # This callback will only keep track of the job being done
     #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
     # )
