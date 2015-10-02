@@ -62,10 +62,11 @@ class SamModelCaller(object):
             pool = multiprocessing_setup()
 
         if self.number_of_rows_list is None \
-                or not isinstance(self.number_of_rows_list, list):  # Make sure 'self.number_of_rows_list' is a list and not None
+                or not isinstance(self.number_of_rows_list, list) \
+                or len(self.number_of_rows_list) == 0:  # Make sure 'self.number_of_rows_list' is a list and not None
             self.number_of_rows_list = self.split_csv()
 
-        testing_sections = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]  # Temporary for testing
+        # testing_sections = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]  # Temporary for testing
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
             pool.submit(
                 # subprocess.Popen, "sleep 3"  # Testing
