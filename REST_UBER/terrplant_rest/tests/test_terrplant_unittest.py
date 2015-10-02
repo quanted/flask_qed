@@ -333,7 +333,7 @@ class TestTerrplant(unittest.TestCase):
         try:
             terrplant_empty.out_nds_rq_dry = pd.Series([3.7], dtype= 'float')
             result = terrplant_empty.LOCndsdry()
-            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.")
+            exp = pd.Series("The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.")
             pdt.assert_series_equal(result, exp)
         finally:
             pass
@@ -366,7 +366,7 @@ class TestTerrplant(unittest.TestCase):
         try:
             terrplant_empty.out_nds_rq_semi = pd.Series([0.7], dtype='float')
             result = terrplant_empty.LOCndssemi()
-            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.")
+            exp = pd.Series("The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.")
             pdt.assert_series_equal(result, exp)
         finally:
             pass
@@ -399,7 +399,7 @@ class TestTerrplant(unittest.TestCase):
         try:
             terrplant_empty.out_nds_rq_spray = pd.Series([0.2], dtype='float')
             result = terrplant_empty.LOCndsspray()
-            exp = pd.Series("The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.")
+            exp = pd.Series("The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.")
             pdt.assert_series_equal(result, exp)
         finally:
             pass
@@ -432,7 +432,7 @@ class TestTerrplant(unittest.TestCase):
         try:
             terrplant_empty.out_lds_rq_dry = pd.Series([1.5], dtype= 'float')
             result = terrplant_empty.LOCldsdry()
-            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.")
+            exp = pd.Series("The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.")
             pdt.assert_series_equal(result, exp)
         finally:
             pass
@@ -465,7 +465,7 @@ class TestTerrplant(unittest.TestCase):
         try:
             terrplant_empty.out_lds_rq_semi = pd.Series([4.5], dtype= 'float')
             result = terrplant_empty.LOCldssemi()
-            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.")
+            exp = pd.Series("The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.")
             pdt.assert_series_equal(result, exp)
         finally:
             pass
@@ -498,7 +498,7 @@ class TestTerrplant(unittest.TestCase):
         try:
             terrplant_empty.out_lds_rq_spray = pd.Series([0.8], dtype='float')
             result = terrplant_empty.LOCldsspray()
-            exp = pd.Series("The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.")
+            exp = pd.Series("The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.")
             pdt.assert_series_equal(result, exp)
         finally:
             pass

@@ -83,35 +83,35 @@ class terrplant(object):
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
-            'out_rundry' : self.out_rundry,
-            'out_runsemi' : self.out_runsemi,
-            'out_totaldry' : self.out_totaldry,
-            'out_totalsemi' : self.out_totalsemi,
-            'out_spray' : self.out_spray,
-            'out_nms_rq_dry' : self.out_nms_rq_dry,
-            'out_nms_loc_dry' : self.out_nms_loc_dry,
-            'out_nms_rq_semi' : self.out_nms_rq_semi,
-            'out_nms_loc_semi' : self.out_nms_loc_semi,
-            'out_nms_rq_spray' : self.out_nms_rq_spray,
-            'out_nms_loc_spray' : self.out_nms_loc_spray,
-            'out_lms_rq_dry' : self.out_lms_rq_dry,
-            'out_lms_loc_dry' : self.out_lms_loc_dry,
-            'out_lms_rq_semi' : self.out_lms_rq_semi,
-            'out_lms_loc_semi' : self.out_lms_loc_semi,
-            'out_lms_rq_spray' : self.out_lms_rq_spray,
-            'out_lms_loc_spray' : self.out_lms_loc_spray,
-            'out_nds_rq_dry' : self.out_nds_rq_dry,
-            'out_nds_loc_dry' : self.out_nds_loc_dry,
-            'out_nds_rq_semi' : self.out_nds_rq_semi,
-            'out_nds_loc_semi' : self.out_nds_loc_semi,
-            'out_nds_rq_spray' : self.out_nds_rq_spray,
-            'out_nds_loc_spray' : self.out_nds_loc_spray,
-            'out_lds_rq_dry' : self.out_lds_rq_dry,
-            'out_lds_loc_dry' : self.out_lds_loc_dry,
-            'out_lds_rq_semi' : self.out_lds_rq_semi,
-            'out_lds_loc_semi' : self.out_lds_loc_semi,
-            'out_lds_rq_spray' : self.out_lds_rq_spray,
-            'out_lds_loc_spray' : self.out_lds_loc_spray
+            'out_rundry': self.out_rundry,
+            'out_runsemi': self.out_runsemi,
+            'out_totaldry': self.out_totaldry,
+            'out_totalsemi': self.out_totalsemi,
+            'out_spray': self.out_spray,
+            'out_nms_rq_dry': self.out_nms_rq_dry,
+            'out_nms_loc_dry': self.out_nms_loc_dry,
+            'out_nms_rq_semi': self.out_nms_rq_semi,
+            'out_nms_loc_semi': self.out_nms_loc_semi,
+            'out_nms_rq_spray': self.out_nms_rq_spray,
+            'out_nms_loc_spray': self.out_nms_loc_spray,
+            'out_lms_rq_dry': self.out_lms_rq_dry,
+            'out_lms_loc_dry': self.out_lms_loc_dry,
+            'out_lms_rq_semi': self.out_lms_rq_semi,
+            'out_lms_loc_semi': self.out_lms_loc_semi,
+            'out_lms_rq_spray': self.out_lms_rq_spray,
+            'out_lms_loc_spray': self.out_lms_loc_spray,
+            'out_nds_rq_dry': self.out_nds_rq_dry,
+            'out_nds_loc_dry': self.out_nds_loc_dry,
+            'out_nds_rq_semi': self.out_nds_rq_semi,
+            'out_nds_loc_semi': self.out_nds_loc_semi,
+            'out_nds_rq_spray': self.out_nds_rq_spray,
+            'out_nds_loc_spray': self.out_nds_loc_spray,
+            'out_lds_rq_dry': self.out_lds_rq_dry,
+            'out_lds_loc_dry': self.out_lds_loc_dry,
+            'out_lds_rq_semi': self.out_lds_rq_semi,
+            'out_lds_loc_semi': self.out_lds_loc_semi,
+            'out_lds_rq_spray': self.out_lds_rq_spray,
+            'out_lds_loc_spray': self.out_lds_loc_spray
         })
 
         #create pandas properties for acceptance testing
@@ -728,8 +728,8 @@ class terrplant(object):
         #     ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
         exceed_boolean = self.out_nds_rq_dry>= 1.0
         self.out_nds_loc_dry = exceed_boolean.map(lambda x:
-                                                  'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.')
+                                                  'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.' if x == True
+                                                  else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.')
         logging.info("LOCndsdry")
         logging.info(self.out_nds_loc_dry)
         return self.out_nds_loc_dry
@@ -786,8 +786,8 @@ class terrplant(object):
         #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         exceed_boolean = self.out_nds_rq_semi>= 1.0
         self.out_nds_loc_semi= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+                                                  'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
+                                                  else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         logging.info("LOCndssemi")
         logging.info(self.out_nds_loc_semi)
         return self.out_nds_loc_semi
@@ -843,8 +843,8 @@ class terrplant(object):
         #     ' pesticide via spray drift indicates that potential risk is minimal.')
         exceed_boolean = self.out_nds_rq_spray>= 1.0
         self.out_nds_loc_spray= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
+                                                  'The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
+                                                  else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
         logging.info("LOCndsspray")
         logging.info(self.out_nds_loc_spray)
         return self.out_nds_loc_spray
@@ -900,8 +900,8 @@ class terrplant(object):
         #     ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
         exceed_boolean = self.out_lds_rq_dry>= 1.0
         self.out_lds_loc_dry= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.')
+                                                  'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.' if x == True
+                                                  else 'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.')
         logging.info("LOCldsdry")
         logging.info(self.out_lds_loc_dry)
         return self.out_lds_loc_dry
@@ -957,8 +957,8 @@ class terrplant(object):
         #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         exceed_boolean = self.out_lds_rq_semi>= 1.0
         self.out_lds_loc_semi= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+                                                  'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
+                                                  else 'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         logging.info("LOCldssemi")
         logging.info(self.out_lds_loc_semi)
         return self.out_lds_loc_semi
@@ -1014,8 +1014,8 @@ class terrplant(object):
         #     ' pesticide via spray drift indicates that potential risk is minimal.')
         exceed_boolean = self.out_lds_rq_spray>= 1.0
         self.out_lds_loc_spray= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
+                                                  'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
+                                                  else 'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
         logging.info("LOCldsspray")
         logging.info(self.out_lds_loc_spray)
         return self.out_lds_loc_spray
