@@ -9,5 +9,6 @@ setup(name='ubertool',
       author='Tom Purucker',
       author_email='purucker.tom@epa.gov',
       url='https://github.com/puruckertom/ubertool_ecorest',
-      py_modules=['REST_UBER.sip_rest.sip_model_rest','REST_UBER.stir_rest.stir_model_rest'],
+      py_modules=['REST_UBER.sip_rest.sip_model_rest','REST_UBER.stir_rest.stir_model_rest',
+                  'REST_UBER.rice_rest.rice_model_rest', 'REST_UBER.terrplant_rest.terrplant_model_rest'],
       )

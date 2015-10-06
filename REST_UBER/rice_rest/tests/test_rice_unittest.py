@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 import unittest
 
 import numpy.testing as npt
 import pandas as pd
 import pandas.util.testing as pdt
 
+#importing as a package (specified in ../../setup.py)
 from .. import rice_model_rest as rice_model
 
 # create empty pandas dataframes to create empty sip object for testing
