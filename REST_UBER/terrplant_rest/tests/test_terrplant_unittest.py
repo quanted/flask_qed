@@ -504,6 +504,57 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
+    def test_min_nms_spray(self):
+        """
+        unittest for function terrplant.min_nms_spray
+        """
+        try:
+            terrplant_empty.ec25_nonlisted_seedling_emergence_monocot = pd.Series([0.0501], dtype='float')
+            terrplant_empty.ec25_nonlisted_vegetative_vigor_monocot = pd.Series([0.0801], dtype='float')
+            result = terrplant_empty.minnmsspray()
+            npt.assert_array_almost_equal(result, 0.0501, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_min_lms_spray(self):
+        """
+        unittest for function terrplant.min_lms_spray
+        """
+        try:
+            terrplant_empty.noaec_listed_vegetative_vigor_monocot = pd.Series([0.0211], dtype='float')
+            terrplant_empty.noaec_listed_seedling_emergence_monocot = pd.Series([0.0205], dtype='float')
+            result = terrplant_empty.minlmsspray()
+            npt.assert_array_almost_equal(result, 0.0205, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_min_nds_spray(self):
+        """
+        unittest for function terrplant.min_nds_spray
+        """
+        try:
+            terrplant_empty.ec25_nonlisted_vegetative_vigor_dicot = pd.Series([0.0325], dtype='float')
+            terrplant_empty.ec25_nonlisted_seedling_emergence_dicot = pd.Series([0.5022], dtype='float')
+            result = terrplant_empty.minndsspray()
+            npt.assert_array_almost_equal(result, 0.0325, 4, '', True)
+        finally:
+            pass
+        return
+
+    def test_min_lds_spray(self):
+        """
+        unittest for function terrplant.min_lds_spray
+        """
+        try:
+            terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.3206], dtype='float')
+            terrplant_empty.noaec_listed_vegetative_vigor_dicot = pd.Series([0.5872], dtype='float')
+            result = terrplant_empty.minldsspray()
+            npt.assert_array_almost_equal(result, 0.3206, 4, '', True)
+        finally:
+            pass
+        return
 
 # unittest will
 # 1) call the setup method,
