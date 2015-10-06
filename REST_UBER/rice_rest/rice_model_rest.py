@@ -82,8 +82,6 @@ class rice(object):
         
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
-
-
     # The mass of the sediment at equilibrium with the water column
     # Sediment depth (dsed) * Area of rice paddy (area) * Bulk density of sediment(mass/volume) pb
     def Calcmsed(self):
@@ -116,8 +114,6 @@ class rice(object):
         #         ('pb=%g is a non-physical value.' % self.pb)
         self.out_msed = self.dsed * self.area * self.pb
         return self.out_msed
-
-
 
     # The volume of the water column plus pore water
     def Calcvw(self):
