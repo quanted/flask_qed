@@ -1,8 +1,10 @@
 import unittest
-import pandas as pd
+
 import numpy.testing as npt
+import pandas as pd
 import pandas.util.testing as pdt
-from rice_rest import rice_model_rest as rice_model
+
+from .. import rice_model_rest as rice_model
 
 # create empty pandas dataframes to create empty sip object for testing
 df_empty = pd.DataFrame()
