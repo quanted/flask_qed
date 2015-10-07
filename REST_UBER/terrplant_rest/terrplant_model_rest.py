@@ -87,39 +87,39 @@ class terrplant(object):
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
-            'out_rundry': self.out_rundry,
-            'out_runsemi': self.out_runsemi,
-            'out_totaldry': self.out_totaldry,
-            'out_totalsemi': self.out_totalsemi,
-            'out_spray': self.out_spray,
-            'out_nms_rq_dry': self.out_nms_rq_dry,
-            'out_nms_loc_dry': self.out_nms_loc_dry,
-            'out_nms_rq_semi': self.out_nms_rq_semi,
-            'out_nms_loc_semi': self.out_nms_loc_semi,
-            'out_nms_rq_spray': self.out_nms_rq_spray,
-            'out_nms_loc_spray': self.out_nms_loc_spray,
-            'out_lms_rq_dry': self.out_lms_rq_dry,
-            'out_lms_loc_dry': self.out_lms_loc_dry,
-            'out_lms_rq_semi': self.out_lms_rq_semi,
-            'out_lms_loc_semi': self.out_lms_loc_semi,
-            'out_lms_rq_spray': self.out_lms_rq_spray,
-            'out_lms_loc_spray': self.out_lms_loc_spray,
-            'out_nds_rq_dry': self.out_nds_rq_dry,
-            'out_nds_loc_dry': self.out_nds_loc_dry,
-            'out_nds_rq_semi': self.out_nds_rq_semi,
-            'out_nds_loc_semi': self.out_nds_loc_semi,
-            'out_nds_rq_spray': self.out_nds_rq_spray,
-            'out_nds_loc_spray': self.out_nds_loc_spray,
-            'out_lds_rq_dry': self.out_lds_rq_dry,
-            'out_lds_loc_dry': self.out_lds_loc_dry,
-            'out_lds_rq_semi': self.out_lds_rq_semi,
-            'out_lds_loc_semi': self.out_lds_loc_semi,
-            'out_lds_rq_spray': self.out_lds_rq_spray,
-            'out_lds_loc_spray': self.out_lds_loc_spray,
-            'out_min_nms_spray': self.out_min_nms_spray,
-            'out_min_lms_spray': self.out_min_lms_spray,
-            'out_min_nds_spray': self.out_min_nds_spray,
-            'out_min_lds_spray': self.out_min_lds_spray
+            "out_rundry": self.out_rundry,
+            "out_runsemi": self.out_runsemi,
+            "out_totaldry": self.out_totaldry,
+            "out_totalsemi": self.out_totalsemi,
+            "out_spray": self.out_spray,
+            "out_nms_rq_dry": self.out_nms_rq_dry,
+            "out_nms_loc_dry": self.out_nms_loc_dry,
+            "out_nms_rq_semi": self.out_nms_rq_semi,
+            "out_nms_loc_semi": self.out_nms_loc_semi,
+            "out_nms_rq_spray": self.out_nms_rq_spray,
+            "out_nms_loc_spray": self.out_nms_loc_spray,
+            "out_lms_rq_dry": self.out_lms_rq_dry,
+            "out_lms_loc_dry": self.out_lms_loc_dry,
+            "out_lms_rq_semi": self.out_lms_rq_semi,
+            "out_lms_loc_semi": self.out_lms_loc_semi,
+            "out_lms_rq_spray": self.out_lms_rq_spray,
+            "out_lms_loc_spray": self.out_lms_loc_spray,
+            "out_nds_rq_dry": self.out_nds_rq_dry,
+            "out_nds_loc_dry": self.out_nds_loc_dry,
+            "out_nds_rq_semi": self.out_nds_rq_semi,
+            "out_nds_loc_semi": self.out_nds_loc_semi,
+            "out_nds_rq_spray": self.out_nds_rq_spray,
+            "out_nds_loc_spray": self.out_nds_loc_spray,
+            "out_lds_rq_dry": self.out_lds_rq_dry,
+            "out_lds_loc_dry": self.out_lds_loc_dry,
+            "out_lds_rq_semi": self.out_lds_rq_semi,
+            "out_lds_loc_semi": self.out_lds_loc_semi,
+            "out_lds_rq_spray": self.out_lds_rq_spray,
+            "out_lds_loc_spray": self.out_lds_loc_spray,
+            "out_min_nms_spray": self.out_min_nms_spray,
+            "out_min_lms_spray": self.out_min_lms_spray,
+            "out_min_nds_spray": self.out_min_nds_spray,
+            "out_min_lds_spray": self.out_min_lds_spray
         })
 
         #create pandas properties for acceptance testing
@@ -165,17 +165,17 @@ class terrplant(object):
 
     def populate_input_properties(self):
         # Inputs: Assign object attribute variables from the input Pandas Dataframe
-        self.version_terrplant = self.pd_obj['version_terrplant']
-        self.application_rate = self.pd_obj['application_rate']
-        self.incorporation_depth = self.pd_obj['incorporation_depth']
-        self.runoff_fraction = self.pd_obj['runoff_fraction']
-        self.drift_fraction = self.pd_obj['drift_fraction']
-        self.chemical_name = self.pd_obj['chemical_name']
-        self.pc_code = self.pd_obj['pc_code']
-        self.use = self.pd_obj['use']
-        self.application_method = self.pd_obj['application_method']
-        self.application_form = self.pd_obj['application_form']
-        self.solubility = self.pd_obj['solubility']
+        self.version_terrplant = self.pd_obj["version_terrplant"]
+        self.application_rate = self.pd_obj["application_rate"]
+        self.incorporation_depth = self.pd_obj["incorporation_depth"]
+        self.runoff_fraction = self.pd_obj["runoff_fraction"]
+        self.drift_fraction = self.pd_obj["drift_fraction"]
+        self.chemical_name = self.pd_obj["chemical_name"]
+        self.pc_code = self.pd_obj["pc_code"]
+        self.use = self.pd_obj["use"]
+        self.application_method = self.pd_obj["application_method"]
+        self.application_form = self.pd_obj["application_form"]
+        self.solubility = self.pd_obj["solubility"]
         self.ec25_nonlisted_seedling_emergence_monocot = self.pd_obj["ec25_nonlisted_seedling_emergence_monocot"]
         self.ec25_nonlisted_seedling_emergence_dicot = self.pd_obj["ec25_nonlisted_seedling_emergence_dicot"]
         self.noaec_listed_seedling_emergence_monocot = self.pd_obj["noaec_listed_seedling_emergence_monocot"]
@@ -480,7 +480,10 @@ class terrplant(object):
         #     if self.out_spray == None:
         #         raise ValueError\
         #         ('Either the out_spray variable equals None and therefor this function cannot be run.')
-        self.out_nms_rq_spray = self.out_spray/min(self.ec25_nonlisted_vegetative_vigor_monocot, self.ec25_nonlisted_seedling_emergence_monocot)
+        # li = [self.ec25_nonlisted_vegetative_vigor_monocot, self.ec25_nonlisted_seedling_emergence_monocot]
+        
+        # m = pd.Series([min(li, key=lambda x:float(x))])
+        self.out_nms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_monocot
         logging.info("nmsRQspray")
         logging.info(self.out_nms_rq_spray)
         return self.out_nms_rq_spray
@@ -657,7 +660,7 @@ class terrplant(object):
         #     if self.out_spray == None:
         #         raise ValueError\
         #         ('The out_spray variable equals None and therefor this function cannot be run.')
-        self.out_lms_rq_spray = self.out_spray/min(self.noaec_listed_vegetative_vigor_monocot, self.noaec_listed_seedling_emergence_monocot)
+        self.out_lms_rq_spray = self.out_spray/min(self.noaec_listed_vegetative_vigor_monocot, self.noaec_listed_seedling_emergence_monocot, key=self.minlmsspray())
         logging.info("lmsRQspray")
         logging.info(self.out_lms_rq_spray)
         return self.out_lms_rq_spray
