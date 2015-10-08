@@ -53,6 +53,10 @@ class terrplant(object):
             self.spray()
             self.totaldry()
             self.totalsemi()
+            self.minnmsspray()
+            self.minlmsspray()
+            self.minndsspray()
+            self.minldsspray()
             self.nmsRQdry()
             self.LOCnmsdry()
             self.nmsRQsemi()
@@ -77,10 +81,6 @@ class terrplant(object):
             self.LOCldssemi()
             self.ldsRQspray()
             self.LOCldsspray()
-            self.minnmsspray()
-            self.minlmsspray()
-            self.minndsspray()
-            self.minldsspray()
         except TypeError:
             print "Type Error: Your variables are not set correctly."
 
@@ -483,7 +483,7 @@ class terrplant(object):
         # li = [self.ec25_nonlisted_vegetative_vigor_monocot, self.ec25_nonlisted_seedling_emergence_monocot]
         
         # m = pd.Series([min(li, key=lambda x:float(x))])
-        self.out_nms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_monocot
+        self.out_nms_rq_spray = self.out_spray/self.out_min_nms_spray
         logging.info("nmsRQspray")
         logging.info(self.out_nms_rq_spray)
         return self.out_nms_rq_spray
@@ -660,7 +660,7 @@ class terrplant(object):
         #     if self.out_spray == None:
         #         raise ValueError\
         #         ('The out_spray variable equals None and therefor this function cannot be run.')
-        self.out_lms_rq_spray = self.out_spray/min(self.noaec_listed_vegetative_vigor_monocot, self.noaec_listed_seedling_emergence_monocot, key=self.minlmsspray())
+        self.out_lms_rq_spray = self.out_spray/self.out_min_lms_spray
         logging.info("lmsRQspray")
         logging.info(self.out_lms_rq_spray)
         return self.out_lms_rq_spray
@@ -833,7 +833,7 @@ class terrplant(object):
         #     if self.out_spray == None:
         #         raise ValueError\
         #         ('The out_spray variable equals None and therefor this function cannot be run.')
-        self.out_nds_rq_spray = self.out_spray/min(self.ec25_nonlisted_seedling_emergence_dicot, self.ec25_nonlisted_vegetative_vigor_dicot)
+        self.out_nds_rq_spray = self.out_spray / self.out_min_nds_spray
         logging.info("ndsRQspray")
         logging.info(self.out_nds_rq_spray)
         return self.out_nds_rq_spray
@@ -1004,7 +1004,7 @@ class terrplant(object):
         #     if self.out_spray == None:
         #         raise ValueError\
         #         ('The out_spray variable equals None and therefor this function cannot be run.')
-        self.out_lds_rq_spray = self.out_spray/min(self.noaec_listed_vegetative_vigor_dicot, self.noaec_listed_seedling_emergence_dicot)
+        self.out_lds_rq_spray = self.out_spray/self.out_min_lds_spray
         logging.info("ldsRQspray")
         logging.info(self.out_lds_rq_spray)
         return self.out_lds_rq_spray
@@ -1038,7 +1038,10 @@ class terrplant(object):
     def minnmsspray(self):
         # determine minimum toxicity concentration used for RQ spray drift values
         # non-listed monocot EC25 and NOAEC
-        self.out_min_nms_spray = min(self.ec25_nonlisted_vegetative_vigor_monocot, self.ec25_nonlisted_seedling_emergence_monocot)
+        s1 = pd.Series(self.ec25_nonlisted_seedling_emergence_monocot, name='seedling')
+        s2 = pd.Series(self.ec25_nonlisted_vegetative_vigor_monocot, name='vegetative')
+        df = pd.concat([s1,s2], axis=1)
+        self.out_min_nms_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minnmsspray")
         logging.info(self.out_min_nms_spray)
         return self.out_min_nms_spray
@@ -1046,7 +1049,10 @@ class terrplant(object):
     def minlmsspray(self):
         # determine minimum toxicity concentration used for RQ spray drift values
         # listed monocot EC25 and NOAEC
-        self.out_min_lms_spray = min(self.noaec_listed_seedling_emergence_monocot, self.noaec_listed_vegetative_vigor_monocot)
+        s1 = pd.Series(self.noaec_listed_seedling_emergence_monocot, name='seedling')
+        s2 = pd.Series(self.noaec_listed_vegetative_vigor_monocot, name='vegetative')
+        df = pd.concat([s1,s2], axis=1)
+        self.out_min_lms_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minlmsspray")
         logging.info(self.out_min_lms_spray)
         return self.out_min_lms_spray
@@ -1054,7 +1060,10 @@ class terrplant(object):
     def minndsspray(self):
         # determine minimum toxicity concentration used for RQ spray drift values
         # non-listed dicot EC25 and NOAEC
-        self.out_min_nds_spray = min(self.ec25_nonlisted_seedling_emergence_dicot, self.ec25_nonlisted_vegetative_vigor_dicot)
+        s1 = pd.Series(self.ec25_nonlisted_seedling_emergence_dicot, name='seedling')
+        s2 = pd.Series(self.ec25_nonlisted_vegetative_vigor_dicot, name='vegetative')
+        df = pd.concat([s1,s2], axis=1)
+        self.out_min_nds_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minndsspray")
         logging.info(self.out_min_nds_spray)
         return self.out_min_nds_spray
@@ -1062,7 +1071,10 @@ class terrplant(object):
     def minldsspray(self):
         # determine minimum toxicity concentration used for RQ spray drift values
         # listed dicot EC25 and NOAEC
-        self.out_min_lds_spray = min(self.noaec_listed_seedling_emergence_dicot, self.noaec_listed_vegetative_vigor_dicot)
+        s1 = pd.Series(self.noaec_listed_seedling_emergence_dicot, name='seedling')
+        s2 = pd.Series(self.noaec_listed_vegetative_vigor_dicot, name='vegetative')
+        df = pd.concat([s1,s2], axis=1)
+        self.out_min_lds_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minldsspray")
         logging.info(self.out_min_lds_spray)
         return self.out_min_lds_spray
