@@ -281,8 +281,9 @@ class TestTerrplant(unittest.TestCase):
         #self.out_lms_rq_spray = self.out_spray/self.ec25_nonlisted_seedling_emergence_dicot
         try:
             terrplant_empty.out_spray = pd.Series([5.], dtype='int')
-            terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.01], dtype='float')
-            terrplant_empty.noaec_listed_vegetative_vigor_dicot = pd.Series([0.05], dtype='float')
+            terrplant_empty.noaec_listed_seedling_emergence_monocot = pd.Series([0.01], dtype='float')
+            terrplant_empty.noaec_listed_vegetative_vigor_monocot = pd.Series([0.05], dtype='float')
+            terrplant_empty.out_min_lms_spray = terrplant_empty.minlmsspray()
             result = terrplant_empty.lmsRQspray()
             npt.assert_array_almost_equal(result, 500, 4, '', True)
         finally:
@@ -483,8 +484,9 @@ class TestTerrplant(unittest.TestCase):
             terrplant_empty.out_spray = pd.Series([5])
             terrplant_empty.noaec_listed_seedling_emergence_dicot = pd.Series([0.1], dtype='float')
             terrplant_empty.noaec_listed_vegetative_vigor_dicot = pd.Series([0.05], dtype='float')
+            terrplant_empty.out_min_lds_spray = terrplant_empty.minldsspray()
             result = terrplant_empty.ldsRQspray()
-            npt.assert_array_almost_equal(result, 50, 4, '', True)
+            npt.assert_array_almost_equal(result, 100, 4, '', True)
         finally:
             pass
         return
