@@ -164,9 +164,9 @@ def sam_daily_conc(jid, no_of_processes, name_temp):
     pool.submit(
         subprocess.call,
         ['source', 'sam_launch.sh', sam_callable, jid, name_temp]
-    )# .add_done_callback(  # This callback will only keep track of the job being done
-    #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
-    # )
+    ).add_done_callback(  # This callback will only keep track of the job being done
+        partial(callback_daily, jid)
+    )
 
     pool.shutdown(wait=False)
 
@@ -220,6 +220,11 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
     # Destroy the Pool object which hosts the threads when the pending Futures objects are finished,
     # but do not wait until all Futures are done to have this function return
     pool.shutdown(wait=False)
+
+
+def callback_daily(jid, future):
+    print jid
+    print future.exception()
 
 
 def callback_avg(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
