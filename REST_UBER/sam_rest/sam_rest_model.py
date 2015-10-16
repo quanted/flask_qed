@@ -83,9 +83,7 @@ def sam(inputs_json, jid, run_type):
 
                 if args['output_type'] == '1':  # Daily Concentrations
                     list_of_julian_days = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
-                    # Divide master HUC12 list CSV into subsets for current run based on 'no_of_processes'
-                    number_of_rows_list = split_csv(no_of_processes, name_temp)
-                    sam_daily_conc(jid, no_of_processes, name_temp, number_of_rows_list)
+                    sam_daily_conc(jid, no_of_processes, name_temp)
 
                 else:
                     sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)  # Does not use 'number_of_rows_list' for SuperPRZMPesticide.exe runs
@@ -144,13 +142,12 @@ def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
 
     return list_of_julian_days
 
-def sam_daily_conc(jid, no_of_processes, name_temp, number_of_rows_list):
+def sam_daily_conc(jid, no_of_processes, name_temp):
     """
     Wrapper method for firing off SAM daily runs (e.g. SuperPRZM dll).  This will eventually be used for all SAM runs.
 
     :param no_of_processes: int, number of
     :param name_temp: str,
-    :param number_of_rows_list: list,
     :return:
     """
 
@@ -160,13 +157,13 @@ def sam_daily_conc(jid, no_of_processes, name_temp, number_of_rows_list):
 
     sam_callable = os.path.join(curr_path, 'sam_multiprocessing.py')
 
-    number_of_rows_string = ""
-    for item in number_of_rows_list:
-        number_of_rows_string += str(item) + " "
+    # number_of_rows_string = ""
+    # for item in number_of_rows_list:
+    #     number_of_rows_string += str(item) + " "
 
     pool.submit(
         subprocess.call,
-        ['source', 'sam_launch.sh', sam_callable, jid, name_temp, number_of_rows_string]
+        ['source', 'sam_launch.sh', sam_callable, jid, name_temp]
     )# .add_done_callback(  # This callback will only keep track of the job being done
     #     partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
     # )

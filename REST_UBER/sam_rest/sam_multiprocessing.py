@@ -31,7 +31,7 @@ def multiprocessing_setup():
 
 
 class SamModelCaller(object):
-    def __init__(self, jid, name_temp, number_of_rows_list=None, no_of_processes=16):
+    def __init__(self, jid, name_temp, no_of_processes=16):
         """
         Constructor for SamModelCaller class.
         :param name_temp: string
@@ -42,7 +42,6 @@ class SamModelCaller(object):
         self.sam_bin_path = os.path.join(curr_path, 'bin')
         self.jid = jid
         self.name_temp = name_temp
-        self.number_of_rows_list = number_of_rows_list
         self.no_of_processes = no_of_processes
 
     def sam_multiprocessing(self):
@@ -61,20 +60,15 @@ class SamModelCaller(object):
         except NameError:
             pool = multiprocessing_setup()
 
-        if self.number_of_rows_list is None \
-                or not isinstance(self.number_of_rows_list, list) \
-                or len(self.number_of_rows_list) == 0:  # Make sure 'self.number_of_rows_list' is a list and not None
-            self.number_of_rows_list = self.split_csv()
+        # Split master HUC CSV into sections and return a list containing the number of rows in each section (sequentially)
+        self.number_of_rows_list = self.split_csv()
 
-        # testing_sections = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]  # Temporary for testing
-        for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process pool
+        for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process
             pool.submit(
-                # subprocess.Popen, "sleep 3"  # Testing
                 daily_conc_callable,
                 self.sam_bin_path,           # Absolute path to the SAM bin folder
                 self.name_temp,              # Temporary path name for this SuperPRZM run
                 self.two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
-                # testing_sections[x]
                 self.number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
                 partial(callback_daily, self.two_digit(x))
@@ -192,23 +186,13 @@ def main():
     """
 
     # Get command line arguments
-    name_temp = sys.argv[1]
-    jid = sys.argv[2]
-    try:  # 'number_of_rows_list' is an optional command line argument that is calculated if not given (split_csv() called)
-        number_of_rows_list = sys.argv[3]
-        # if isinstance(self.number_of_rows_list, str):
-        number_of_rows_list = create_number_of_rows_list(number_of_rows_list)
-        for item in number_of_rows_list:
-            int(item)
-    except ValueError:  # If the string is none int
-        number_of_rows_list = None
-    except IndexError:  # If the command-line argument is not supplied
-        number_of_rows_list = None
+    jid = sys.argv[1]
+    name_temp = sys.argv[2]
     try:  # 'no_of_processes' is an optional command line argument that defaults to 16 if not given
         no_of_processes = int(sys.argv[4])
-        sam = SamModelCaller(jid, name_temp, number_of_rows_list, no_of_processes)
+        sam = SamModelCaller(jid, name_temp, no_of_processes)
     except:
-        sam = SamModelCaller(jid, name_temp, number_of_rows_list)
+        sam = SamModelCaller(jid, name_temp)
 
     sam.sam_multiprocessing()
 
