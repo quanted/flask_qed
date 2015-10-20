@@ -83,11 +83,11 @@ class iec(object):
     def F8_f(self):
         if self.z_score_f_out == None:
             raise ValueError\
-                ('z_score_f variable equals None and therefor this function cannot be run.')
-        if self.F8_f_out == -1:
+                ('z_score_f variable equals None and therefore this function cannot be run.')
+        else:
             self.F8_f_out = 0.5 * math.erfc(-self.z_score_f_out/math.sqrt(2))
             if self.F8_f_out == 0:
-                self.F8_f_out = 10^-16
+                self.F8_f_out = 10 ^ (-16)
             else:
                 self.F8_f_out = self.F8_f_out
         return self.F8_f_out
@@ -95,8 +95,8 @@ class iec(object):
     def chance_f(self):
         if self.F8_f_out == None:
             raise ValueError\
-                ('F8_f variable equals None and therefor this function cannot be run.')
-        if self.chance_f_out == -1:
+                ('F8_f variable equals None and therefore this function cannot be run.')
+        else:
             self.chance_f_out = 1 / self.F8_f_out
         return self.chance_f_out
 

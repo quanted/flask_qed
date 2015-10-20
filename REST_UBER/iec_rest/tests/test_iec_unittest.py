@@ -39,27 +39,29 @@ class TestIEC(unittest.TestCase):
             pass
         return
 
-    def test_F8_f_out(self):
+    def test_F8_f(self):
         # '''
         # unittest for function iec.F8_f:
         # '''
-        # try:
-        #     result = iec_empty.F8_f_out()
-        #     npt.assert_array_almost_equal(result, 0.172, 4, '', True)
-        # finally:
-        #     pass
-        # return
+        try:
+            iec_empty.z_score_f_out = pd.Series([-0.87])
+            result = iec_empty.F8_f_out()
+            npt.assert_array_almost_equal(result, 0.19215, 4, '', True)
+        finally:
+            pass
+        return
 
     def test_chance_f(self):
         # '''
         # unittest for function iec.chance_f:
         # '''
-        # try:
-        #     result = iec_empty.chance_f_out()
-        #     npt.assert_array_almost_equal(result, 1000000., 4, '', True)
-        # finally:
-        #     pass
-        # return
+        try:
+            iec_empty.F8_f_out = pd.Series([0.34])
+            result = iec_empty.chance_f_out()
+            npt.assert_array_almost_equal(result, 2.941176, 4, '', True)
+        finally:
+            pass
+        return
 
 # unittest will
 # 1) call the setup method,
