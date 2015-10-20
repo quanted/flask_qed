@@ -13,3 +13,4 @@ script:
   - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.stir_rest.stir_model_rest -sv
   - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.rice_rest.rice_model_rest -sv
   - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.terrplant_rest.terrplant_model_rest -sv
+  - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.iec_rest.iec_model_rest -sv
