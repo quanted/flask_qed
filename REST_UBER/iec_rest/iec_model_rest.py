@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import math
 import pandas as pd
 
@@ -18,6 +19,7 @@ class iec(object):
         self.create_output_properties()
         self.run_methods()
         self.create_output_dataframe()
+        # Callable from Bottle that returns JSON
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
     def json(self, pd_obj, pd_obj_out, pd_obj_exp):
@@ -34,6 +36,14 @@ class iec(object):
             pd_obj_exp_json = "{}"
         # Callable from Bottle that returns JSON
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
+
+    def run_methods(self):
+        try:
+            self.z_score_f()
+            self.F8_f()
+            self.chance_f()
+        except TypeError:
+            print "Type Error: Your variables are not set correctly."
 
     def populate_input_properties(self):
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
@@ -57,15 +67,7 @@ class iec(object):
         self.F8_f_out = pd.Series(name='F8_f_out')
         self.chance_f_out = pd.Series(name='chance_f_out')
 
-    # begin model methods
-    def run_methods(self):
-        try:
-            self.z_score_f()
-            self.F8_f()
-            self.chance_f()
-        except TypeError:
-            print "Type Error: Your variables are not set correctly."
-
+        # begin model methods
     def z_score_f(self):
         if self.dose_response < 0:
             raise ValueError\

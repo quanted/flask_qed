@@ -10,7 +10,6 @@ class stir(object):
         self.run_type = run_type
         self.pd_obj = pd_obj
         self.pd_obj_exp = pd_obj_exp
-
         # Execute model methods if requested
         if self.run_type != "empty":
             self.execute_model()
