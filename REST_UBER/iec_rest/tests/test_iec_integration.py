@@ -37,6 +37,8 @@ print(tabulate(pd_obj_exp.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
 
 # create an instance of iec object with qaqc data
 iec_calc = iec_model.iec("batch", pd_obj_inputs, pd_obj_exp)
+print("####")
+print(iec_calc)
 test = {}
 
 
