@@ -27,17 +27,16 @@ print(tabulate(pd_obj_inputs.iloc[:,11:16], headers='keys', tablefmt='fancy_grid
 #csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
 #pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 #this works for both local nosetests and travis deploy
-data_exp_outputs = StringIO(pkgutil.get_data(__package__, 'iec_qaqc_exp_transpose.csv'))
-pd_obj_exp_out = pd.read_csv(data_exp_outputs, index_col=0, engine='python')
-print("iec expected outputs")
-print(pd_obj_exp_out.shape)
-print(tabulate(pd_obj_exp_out.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_exp_out.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_exp_out.iloc[:,11:13], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_exp_out.iloc[:,14:16], headers='keys', tablefmt='fancy_grid'))
+data_exp = StringIO(pkgutil.get_data(__package__, 'iec_qaqc_exp_transpose.csv'))
+pd_obj_exp = pd.read_csv(data_exp, index_col=0, engine='python')
+print("iec expected")
+print(pd_obj_exp.shape)
+print(tabulate(pd_obj_exp.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
 
-# create an instance of sip object with qaqc data
-iec_calc = iec_model.iec("batch", pd_obj_inputs, pd_obj_exp_out)
+
+# create an instance of iec object with qaqc data
+iec_calc = iec_model.iec("batch", pd_obj_inputs, pd_obj_exp)
 test = {}
 
 

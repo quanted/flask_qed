@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+import logging
 import pandas as pd
 
 class iec(object):
@@ -54,51 +55,55 @@ class iec(object):
     def create_output_dataframe(self):
     # Create DataFrame containing output value Series
         pdj_obj_out = pd.DataFrame({
-            'z_score_f_out': self.z_score_f_out,
-            'F8_f_out': self.F8_f_out,
-            'chance_f_out': self.chance_f_out
+            "z_score_f_out": self.z_score_f_out,
+            "F8_f_out": self.F8_f_out,
+            "chance_f_out": self.chance_f_out
         })
         # create pandas properties for acceptance testing
         self.pd_obj_out = pdj_obj_out
 
     def create_output_properties(self):
         # Outputs: Assign object attribute variables to Pandas Series
-        self.z_score_f_out = pd.Series(name='z_score_f_out')
-        self.F8_f_out = pd.Series(name='F8_f_out')
-        self.chance_f_out = pd.Series(name='chance_f_out')
+        self.z_score_f_out = pd.Series(name="z_score_f_out")
+        self.F8_f_out = pd.Series(name="F8_f_out")
+        self.chance_f_out = pd.Series(name="chance_f_out")
 
         # begin model methods
     def z_score_f(self):
-        if self.dose_response < 0:
-            raise ValueError\
-                ('self.dose_response=%g is a non-physical value.' % self.dose_response)
-        if self.LC50 < 0:
-            raise ValueError\
-                ('self.LC50=%g is a non-physical value.' % self.LC50)
-        if self.threshold < 0:
-            raise ValueError\
-                ('self.threshold=%g is a non-physical value.' % self.threshold)
-        else:
-            self.z_score_f_out = self.dose_response * (math.log10(self.LC50 * self.threshold) - math.log10(self.LC50))
+        # if self.dose_response < 0:
+        #     raise ValueError\
+        #         ('self.dose_response=%g is a non-physical value.' % self.dose_response)
+        # if self.LC50 < 0:
+        #     raise ValueError\
+        #         ('self.LC50=%g is a non-physical value.' % self.LC50)
+        # if self.threshold < 0:
+        #     raise ValueError\
+        #         ('self.threshold=%g is a non-physical value.' % self.threshold)
+        self.z_score_f_out = self.dose_response * (math.log10(self.LC50 * self.threshold) - math.log10(self.LC50))
+        logging.info('z_score_f')
+        logging.info(self.z_score_f_out)
         return self.z_score_f_out
         
     def F8_f(self):
-        if self.z_score_f_out == None:
-            raise ValueError\
-                ('z_score_f variable equals None and therefore this function cannot be run.')
-        else:
-            self.F8_f_out = 0.5 * math.erfc(-self.z_score_f_out/math.sqrt(2))
-            if self.F8_f_out == 0:
-                self.F8_f_out = 10 ^ (-16)
-            else:
-                self.F8_f_out = self.F8_f_out
+        # if self.z_score_f_out == None:
+        #     raise ValueError\
+        #         ('z_score_f variable equals None and therefore this function cannot be run.')
+            # if self.F8_f_out == 0:
+            #     self.F8_f_out = 10 ^ (-16)
+            # else:
+            #     self.F8_f_out = self.F8_f_out
+        self.F8_f_out = 0.5 * math.erfc(-self.z_score_f_out/math.sqrt(2))
+        logging.info('F8_f')
+        logging.info(self.F8_f_out)
         return self.F8_f_out
         
     def chance_f(self):
-        if self.F8_f_out == None:
-            raise ValueError\
-                ('F8_f variable equals None and therefore this function cannot be run.')
-        else:
-            self.chance_f_out = 1 / self.F8_f_out
+        # if self.F8_f_out == None:
+        #     raise ValueError\
+        #         ('F8_f variable equals None and therefore this function cannot be run.')
+        # else:
+        self.chance_f_out = 1 / self.F8_f_out
+        logging.info('chance_f')
+        logging.info(self.chance_f_out)
         return self.chance_f_out
 

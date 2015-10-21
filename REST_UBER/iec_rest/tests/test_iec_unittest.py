@@ -33,31 +33,31 @@ class TestIEC(unittest.TestCase):
             iec_empty.threshold = pd.Series([0.6])
             iec_empty.LC50 = pd.Series([3])
             iec_empty.dose_response = pd.Series([2.5])
-            result = iec_empty.z_score_f_out()
+            result = iec_empty.z_score_f()
             npt.assert_array_almost_equal(result, -0.554622, 4, '', True)
         finally:
             pass
         return
 
     def test_F8_f(self):
-        # '''
-        # unittest for function iec.F8_f:
-        # '''
+        '''
+        unittest for function iec.F8_f:
+        '''
         try:
             iec_empty.z_score_f_out = pd.Series([-0.87])
-            result = iec_empty.F8_f_out()
+            result = iec_empty.F8_f()
             npt.assert_array_almost_equal(result, 0.19215, 4, '', True)
         finally:
             pass
         return
 
     def test_chance_f(self):
-        # '''
-        # unittest for function iec.chance_f:
-        # '''
+        '''
+        unittest for function iec.chance_f:
+        '''
         try:
             iec_empty.F8_f_out = pd.Series([0.34])
-            result = iec_empty.chance_f_out()
+            result = iec_empty.chance_f()
             npt.assert_array_almost_equal(result, 2.941176, 4, '', True)
         finally:
             pass
