@@ -14,6 +14,7 @@ def run(jid, sam_bin_path, name_temp, section, array_size):
     # np_array_out = np.random.rand(50,3)  # Dummy NumPy data
 
     # Run SuperPRZM as DLL
+    print "sam_bin_path: ", sam_bin_path
     np_array_huc_ids, np_array_out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)
 
     huc_ids = create_huc_ids_list(np_array_huc_ids)

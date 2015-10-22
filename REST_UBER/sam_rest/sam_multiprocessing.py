@@ -14,7 +14,6 @@ except ImportError, e:
 
 curr_path = os.path.abspath(os.path.dirname(__file__))
 
-
 mp_logger = multiprocessing.log_to_stderr()
 
 def multiprocessing_setup():
@@ -24,7 +23,7 @@ def multiprocessing_setup():
     :return: ProcessPoolExecutor object reference
     """
     nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
-    if nproc < 16:  # Force 'nproc' to be 16
+    if nproc > 16:  # Force 'nproc' to be 16
         nproc = 16
     print "max_workers=%s" % nproc
     return Pool(max_workers = nproc)  # Set number of workers to equal the number of processors available on machine
@@ -40,6 +39,7 @@ class SamModelCaller(object):
         """
 
         self.sam_bin_path = os.path.join(curr_path, 'bin')
+        print self.sam_bin_path
         self.jid = jid
         self.name_temp = name_temp
         self.no_of_processes = no_of_processes
@@ -61,11 +61,13 @@ class SamModelCaller(object):
             pool = multiprocessing_setup()
 
         # Split master HUC CSV into sections and return a list containing the number of rows in each section (sequentially)
-        self.number_of_rows_list = self.split_csv()
+        #self.number_of_rows_list = self.split_csv()
+        self.number_of_rows_list = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]
 
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process
             pool.submit(
                 daily_conc_callable,
+                self.jid,                    # 'jid' of SAM run
                 self.sam_bin_path,           # Absolute path to the SAM bin folder
                 self.name_temp,              # Temporary path name for this SuperPRZM run
                 self.two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
@@ -153,10 +155,19 @@ class SamModelCaller(object):
 
 
 def daily_conc_callable(jid, sam_bin_path, name_temp, section, array_size=320):
+    """
+
+    :param jid:
+    :param sam_bin_path:
+    :param name_temp:
+    :param section:
+    :param array_size:
+    :return:
+    """
+
+    #TODO: Remove these; left to show how it was previously done while testing callable
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
     # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
-
-    #return superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)  # Run SuperPRZM as DLL
 
     try:
         sam_callable.run(jid, sam_bin_path, name_temp, section, int(array_size))
@@ -188,10 +199,10 @@ def main():
     # Get command line arguments
     jid = sys.argv[1]
     name_temp = sys.argv[2]
-    try:  # 'no_of_processes' is an optional command line argument that defaults to 16 if not given
-        no_of_processes = int(sys.argv[4])
+    if len(sys.argv) == 4:  # 'no_of_processes' is an optional command line argument that defaults to 16 if not given
+        no_of_processes = int(sys.argv[3])
         sam = SamModelCaller(jid, name_temp, no_of_processes)
-    except:
+    else:
         sam = SamModelCaller(jid, name_temp)
 
     sam.sam_multiprocessing()

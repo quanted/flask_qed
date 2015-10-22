@@ -58,6 +58,7 @@ def sam(inputs_json, jid, run_type):
 
     # Generate random name for current run
     name_temp = id_generator()
+    # name_temp = "B0SNI8"
     print name_temp
 
     # Custom or pre-canned run?
@@ -155,15 +156,13 @@ def sam_daily_conc(jid, no_of_processes, name_temp):
     # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
     pool = Pool(max_workers=1)
 
+    sam_sh_script = os.path.join(curr_path, 'sam_launch.sh')
     sam_callable = os.path.join(curr_path, 'sam_multiprocessing.py')
-
-    # number_of_rows_string = ""
-    # for item in number_of_rows_list:
-    #     number_of_rows_string += str(item) + " "
 
     pool.submit(
         subprocess.call,
-        ['source', 'sam_launch.sh', sam_callable, jid, name_temp]
+        #[sam_sh_script, sam_callable, jid, name_temp]  # Shell script version
+        ['python', sam_callable, jid, name_temp]  # Python executable versions
     ).add_done_callback(  # This callback will only keep track of the job being done
         partial(callback_daily, jid)
     )
