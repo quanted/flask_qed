@@ -20,9 +20,9 @@ class iec(object):
         logging.info("1")
         self.create_output_properties()
         logging.info("2")
-        self.run_methods()
-        logging.info("3")
         self.create_output_dataframe()
+        logging.info("3")
+        self.run_methods()
         logging.info("4")
         # Callable from Bottle that returns JSON
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
@@ -62,8 +62,9 @@ class iec(object):
             "chance_f_out": self.chance_f_out
         })
         # create pandas properties for acceptance testing
+        logging.info("here is the output object")
+        logging.info(pd_obj_out)
         self.pd_obj_out = pd_obj_out
-        print pd_obj_out
 
     def run_methods(self):
         try:
@@ -111,4 +112,3 @@ class iec(object):
         logging.info('chance_f')
         logging.info(self.chance_f_out)
         return self.chance_f_out
-
