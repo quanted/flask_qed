@@ -61,8 +61,11 @@ class SamModelCaller(object):
             pool = multiprocessing_setup()
 
         # Split master HUC CSV into sections and return a list containing the number of rows in each section (sequentially)
-        #self.number_of_rows_list = self.split_csv()
-        self.number_of_rows_list = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]
+        try:
+            self.number_of_rows_list = self.split_csv()
+        except:
+            print "Split CSV failed"
+            self.number_of_rows_list = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]
 
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process
             pool.submit(
