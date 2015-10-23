@@ -20,9 +20,9 @@ class iec(object):
         logging.info("1")
         self.create_output_properties()
         logging.info("2")
-        self.create_output_dataframe()
-        logging.info("3")
         self.run_methods()
+        logging.info("3")
+        self.create_output_dataframe()
         logging.info("4")
         # Callable from Bottle that returns JSON
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
