@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
-import math
 import logging
 import pandas as pd
+import numpy as np
+import scipy.special as sp
 
 class iec(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
@@ -29,7 +29,7 @@ class iec(object):
 
     def json(self, pd_obj, pd_obj_out, pd_obj_exp):
         """
-            Convert DataFrames to JSON, returning a tuple
+            Convert DataFrames to JSON, returning a tuplehere
             of JSON strings (inputs, outputs, exp_out)
         """
 
@@ -85,7 +85,14 @@ class iec(object):
         # if self.threshold < 0:
         #     raise ValueError\
         #         ('self.threshold=%g is a non-physical value.' % self.threshold)
-        self.z_score_f_out = self.dose_response * (math.log10(self.LC50 * self.threshold) - math.log10(self.LC50))
+        print(self.dose_response)
+        print(self.LC50)
+        print(self.threshold)
+        temp = self.LC50 * self.threshold
+        print(np.log10(temp))
+        print(np.log10(self.LC50))
+        self.z_score_f_out = self.dose_response * (np.log10(self.LC50 * self.threshold) - np.log10(self.LC50))
+        print(self.z_score_f_out)
         logging.info('z_score_f')
         logging.info(self.z_score_f_out)
         return self.z_score_f_out
@@ -98,7 +105,7 @@ class iec(object):
             #     self.F8_f_out = 10 ^ (-16)
             # else:
             #     self.F8_f_out = self.F8_f_out
-        self.F8_f_out = 0.5 * math.erfc(-self.z_score_f_out/math.sqrt(2))
+        self.F8_f_out = 0.5 * sp.erfc(-self.z_score_f_out/np.sqrt(2))
         logging.info('F8_f')
         logging.info(self.F8_f_out)
         return self.F8_f_out

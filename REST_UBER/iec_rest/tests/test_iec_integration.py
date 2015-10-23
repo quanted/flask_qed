@@ -19,8 +19,8 @@ pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
 print("iec inputs")
 print(pd_obj_inputs.shape)
 print(tabulate(pd_obj_inputs.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_inputs.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_inputs.iloc[:,11:16], headers='keys', tablefmt='fancy_grid'))
+#print(tabulate(pd_obj_inputs.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
+#print(tabulate(pd_obj_inputs.iloc[:,11:16], headers='keys', tablefmt='fancy_grid'))
 
 # load transposed qaqc data for inputs
 #works for local nosetests, but not for travis container that calls nosetests:
@@ -29,16 +29,18 @@ print(tabulate(pd_obj_inputs.iloc[:,11:16], headers='keys', tablefmt='fancy_grid
 #this works for both local nosetests and travis deploy
 data_exp = StringIO(pkgutil.get_data(__package__, 'iec_qaqc_exp_transpose.csv'))
 pd_obj_exp = pd.read_csv(data_exp, index_col=0, engine='python')
-print("iec expected")
-print(pd_obj_exp.shape)
-print(tabulate(pd_obj_exp.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_exp.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
+#print("iec expected")
+#print(pd_obj_exp.shape)
+#print(tabulate(pd_obj_exp.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
+#print(tabulate(pd_obj_exp.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
 
 
 # create an instance of iec object with qaqc data
+#print("####")
+#print("dead here")
 iec_calc = iec_model.iec("batch", pd_obj_inputs, pd_obj_exp)
-print("####")
-print(iec_calc)
+#print("####")
+#print(iec_calc)
 test = {}
 
 
