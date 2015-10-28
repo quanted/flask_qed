@@ -161,8 +161,7 @@ def sam_daily_conc(jid, no_of_processes, name_temp):
 
     pool.submit(
         subprocess.call,
-        #[sam_sh_script, sam_callable, jid, name_temp]  # Shell script version
-        ['python', sam_callable, jid, name_temp]  # Python executable versions
+        [sam_sh_script, sam_callable, jid, name_temp]  # Shell script version
     ).add_done_callback(  # This callback will only keep track of the job being done
         partial(callback_daily, jid)
     )

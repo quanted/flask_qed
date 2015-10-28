@@ -6,7 +6,7 @@ import multiprocessing, logging, sys, os, numpy as np
 import sam_callable
 
 try:
-    import superprzm  #  Import superprzm.dll / .so
+    import superprzm  # Import superprzm.dll / .so
     _dll_loaded = True
 except ImportError, e:
     logging.exception(e)
@@ -25,6 +25,12 @@ def multiprocessing_setup():
     nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
     if nproc > 16:  # Force 'nproc' to be 16
         nproc = 16
+    try:
+        host_name = os.uname()[1]
+        if host_name == 'ord-uber-vm005':  # Force Server 5 to use 16 processes to avoid the memdump error when using a process pool with less max_workers than total number of processes
+            nproc = 16
+    except:
+        pass
     print "max_workers=%s" % nproc
     return Pool(max_workers = nproc)  # Set number of workers to equal the number of processors available on machine
 

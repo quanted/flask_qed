@@ -1,8 +1,7 @@
 #!/bin/bash
 #Activate the Python virtual environment
-LD_LIBRARY_PATH=/opt/python2.7.10/lib
-#source /var/www/ubertool/env2.7.10/bin/activate
-. /var/www/ubertool/ubertool_ecorest/env/bin/activate
+export LD_LIBRARY_PATH=/opt/python2.7.10/lib
+source /var/www/ubertool/env2.7.10/bin/activate
 
 if [ $# -gt 0 ]; then
     echo '1st command line arg: ' $1

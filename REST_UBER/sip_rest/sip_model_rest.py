@@ -4,6 +4,13 @@ import pandas as pd
 import logging
 class sip(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
+        """
+
+        :param run_type:
+        :param pd_obj:
+        :param pd_obj_exp:
+        :return:
+        """
 
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
         self.run_type = run_type
