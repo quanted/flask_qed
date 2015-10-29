@@ -100,12 +100,14 @@ class TestSip(unittest.TestCase):
         :param output: String; Pandas Series name (e.g. column name) without '_out'
         :return:
         """
+        pd.set_option('display.float_format','{:.4E}'.format) # display model output in scientific notation
         result = iec_calc.pd_obj_out[output + "_out"]
         expected = iec_calc.pd_obj_exp[output + "_exp"]
         tab = pd.concat([result, expected], axis=1)
         print(" ")
         print(tabulate(tab, headers='keys', tablefmt='fancy_grid'))
-        npt.assert_array_almost_equal(result, expected, 4, '', True)
+        #npt.assert_array_almost_equal(result, expected, 4, '', True)
+        npt.assert_allclose(result,expected,1e-4,0,'',True)
 
 
 # unittest will

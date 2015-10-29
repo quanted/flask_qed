@@ -85,14 +85,7 @@ class iec(object):
         # if self.threshold < 0:
         #     raise ValueError\
         #         ('self.threshold=%g is a non-physical value.' % self.threshold)
-        print(self.dose_response)
-        print(self.LC50)
-        print(self.threshold)
-        temp = self.LC50 * self.threshold
-        print(np.log10(temp))
-        print(np.log10(self.LC50))
         self.z_score_f_out = self.dose_response * (np.log10(self.LC50 * self.threshold) - np.log10(self.LC50))
-        print(self.z_score_f_out)
         logging.info('z_score_f')
         logging.info(self.z_score_f_out)
         return self.z_score_f_out
