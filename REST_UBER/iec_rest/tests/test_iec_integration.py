@@ -107,7 +107,8 @@ class TestSip(unittest.TestCase):
         print(" ")
         print(tabulate(tab, headers='keys', tablefmt='fancy_grid'))
         #npt.assert_array_almost_equal(result, expected, 4, '', True)
-        npt.assert_allclose(result,expected,1e-4,0,'',True)
+        rtol = 1e-5
+        npt.assert_allclose(result,expected,rtol,0,'',True)
 
 
 # unittest will
