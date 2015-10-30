@@ -10,6 +10,7 @@ df_empty = pd.DataFrame()
 # create an empty sip object
 iec_empty = iec_model.iec("empty", df_empty, df_empty)
 
+rtol = 1e-5 # set relative tolerance level for npt.assert_allclose assertion tests
 test = {}
 
 class TestIEC(unittest.TestCase):
@@ -34,7 +35,8 @@ class TestIEC(unittest.TestCase):
             iec_empty.LC50 = pd.Series([3])
             iec_empty.dose_response = pd.Series([2.5])
             result = iec_empty.z_score_f()
-            npt.assert_array_almost_equal(result, -0.554622, 4, '', True)
+            #npt.assert_array_almost_equal(result, -0.554622, 4, '', True)
+            npt.assert_allclose(result,-0.554622,rtol,0,'',True)
         finally:
             pass
         return
@@ -46,7 +48,8 @@ class TestIEC(unittest.TestCase):
         try:
             iec_empty.z_score_f_out = pd.Series([-0.87])
             result = iec_empty.F8_f()
-            npt.assert_array_almost_equal(result, 0.19215, 4, '', True)
+            #npt.assert_array_almost_equal(result, 0.19215, 4, '', True)
+            npt.assert_allclose(result,0.19215,rtol,0,'',True)
         finally:
             pass
         return
@@ -58,7 +61,8 @@ class TestIEC(unittest.TestCase):
         try:
             iec_empty.F8_f_out = pd.Series([0.34])
             result = iec_empty.chance_f()
-            npt.assert_array_almost_equal(result, 2.941176, 4, '', True)
+            #npt.assert_array_almost_equal(result, 2.941176, 4, '', True)
+            npt.assert_allclose(result,2.941176,rtol,0,'',True)
         finally:
             pass
         return
