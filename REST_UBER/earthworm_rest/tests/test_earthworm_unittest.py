@@ -1,5 +1,6 @@
 from .. import earthworm_model_rest as earthworm_model
 import pandas as pd
+import unittest
 import numpy.testing as npt
 
 df_empty = pd.DataFrame()
@@ -21,9 +22,6 @@ class TestEarthworm(unittest.TestCase):
             earthworm_empty.c_s = pd.Series([0.038692165])
             earthworm_empty.k_d = pd.Series([0.0035])
             earthworm_empty.p_s = pd.Series([1.5])
-            earthworm_empty.c_w = pd.Series([11.05490438])
-            earthworm_empty.m_w = pd.Series([406.9])
-            earthworm_empty.p_e = pd.Series([1])
             result = earthworm_empty.earthworm_fugacity()
             npt.assert_array_almost_equal(result,0.073699363, 4, '', True)
         finally:
