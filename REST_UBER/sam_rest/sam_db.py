@@ -2,22 +2,15 @@ import logging
 import os
 import keys_Picloud_S3
 import requests
+import json
 
 
-def create_mongo_document(jid, run_type, args):
+def create_mongo_document(jid, run_type, args, list_of_julian_days):
     """
     Create MongoDB document skeleton for SAM run output
     :param jid, run_type:
     :return: None
     """
-
-    # Connect to MongoDB server
-    try:
-        import pymongo
-        client = pymongo.MongoClient('localhost', 27017)
-        db = client.ubertool
-    except:
-        return None
 
     if args['output_type'] == '1': # Daily Concentrations
 
@@ -30,15 +23,29 @@ def create_mongo_document(jid, run_type, args):
             "run_type": run_type,
             "model_object_dict": {
                 'filename': filename,
-                'input': args
+                'input': args,
+                'sim_days': list_of_julian_days
             }
         }
         try:
-            db['sam'].insert(document)
+            # db['sam'].insert(document)  # PyMongo driver version (DEPRECATED)
+
+            # Send SAM run Meatadata document to Mongo server (Motor/Tornado driver version)
+            url = 'http://localhost:8787/sam/metadata/' + jid
+            http_headers = {'Content-Type': 'application/json'}
+            requests.post(url, data=json.dumps(document), headers=http_headers, timeout=30)
         except:
             logging.exception(Exception)
 
     else: # Time-Averaged Results
+
+        # Connect to MongoDB server
+        try:
+            import pymongo
+            client = pymongo.MongoClient('localhost', 27017)
+            db = client.ubertool
+        except:
+            return None
 
         if args['output_time_avg_option'] == '1': # Time-Averaged Concentrations
 

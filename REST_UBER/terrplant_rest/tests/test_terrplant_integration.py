@@ -316,6 +316,44 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+    def test_min_nms_spray(self):
+        """
+        Integration test for terrplant.minnmsspray
+        """
+        try:
+            self.blackbox_method_int('min_nms_spray')
+        finally:
+            pass
+        return
+    def test_min_lms_spray(self):
+        """
+        Integration test for terrplant.minlmsspray
+        """
+        try:
+            self.blackbox_method_int('min_lms_spray')
+        finally:
+            pass
+        return
+    def test_min_nds_spray(self):
+        """
+        Integration test for terrplant.minndsspray
+        """
+        try:
+            self.blackbox_method_int('min_nds_spray')
+        finally:
+            pass
+        return
+    def test_min_lds_spray(self):
+        """
+        Integration test for terrplant.minldsspray
+        """
+        try:
+            self.blackbox_method_int('min_lds_spray')
+        finally:
+            pass
+        return
+
+
     def blackbox_method_int(self, output):
         """
         Helper method to reuse code for testing numpy array outputs from TerrPlant model

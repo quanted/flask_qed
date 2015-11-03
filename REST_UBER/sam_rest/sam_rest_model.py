@@ -2,18 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-import zipfile
 import shutil
-import numpy
-from boto.s3.connection import S3Connection
-from boto.s3.key import Key
-from boto.s3.bucket import Bucket
 import string
 import random
 import keys_Picloud_S3
 import json
 import logging
-import sam_db
+import sam_db, sam_input_generator
 # ProcessPoolExecutor: http://stackoverflow.com/questions/24896193/whats-the-difference-between-pythons-multiprocessing-and-concurrent-futures
 import concurrent.futures
 from functools import partial
@@ -22,11 +17,9 @@ try:
 except ImportError:
     import subprocess
 
-try:
-    import superprzm  #  Import superprzm.dll / .so
-except ImportError, e:
-    logging.exception(e)
 
+curr_path = os.path.abspath(os.path.dirname(__file__))
+sam_bin_path = os.path.join(curr_path, 'bin')
 done_list = []
 huc_output = {} # Dictionary to hold output data
 
@@ -56,14 +49,16 @@ def sam(inputs_json, jid, run_type):
 
     Actual run launches SuperPRZMPesticide after determining which OS is being used
     in a separate process.  A Futures object is created and when the process is finished
-    executing (SAM completes or is killed) a callback function is fired (sam_callback()).
+    executing (SAM completes or is killed) a callback function is fired (callback_avg()).
     The callback function stores the output and input file into MongoDB for later
     retrieval.
     """
     args = json.loads(inputs_json)
+    list_of_julian_days = None
 
     # Generate random name for current run
     name_temp = id_generator()
+    # name_temp = "B0SNI8"
     print name_temp
 
     # Custom or pre-canned run?
@@ -83,91 +78,18 @@ def sam(inputs_json, jid, run_type):
 
         try:
             # Create temporary dir based on "name_temp" to store SAM run input file and outputs
-            curr_path = os.path.abspath(os.path.dirname(__file__))
-            temp_sam_run_path = os.path.join(curr_path, 'bin', name_temp)
+            temp_sam_run_path = os.path.join(sam_bin_path, name_temp)
 
             try:
 
                 if args['output_type'] == '1':  # Daily Concentrations
-
-                    # from concurrent.futures import ThreadPoolExecutor as Pool
-                    from concurrent.futures import ProcessPoolExecutor as Pool
-                    import multiprocessing
-                    nproc = multiprocessing.cpu_count()
-                    print "max_workers=%s" % nproc
-                    pool = Pool(max_workers=nproc)
-
-                    for x in range(no_of_processes):
-                        future = pool.submit(
-                            callable,
-                            two_digit(x)  #  'number_of_rows' needs to be added this
-                            # superprzm.runmain.run,
-                            # "/cygdrive/d/Workspace/GitHub/qed/ubertool_ecorest/REST_UBER/sam_rest/bin", "B0SNI8", two_digit(x), 320
-                        ).add_done_callback(
-                            partial(sam_callback_dll)
-                        )
-
-                    # Destroy the Pool object which hosts the threads when the pending Futures objects are finished,
-                    # but do not wait until all Futures are done to have this function return
-                    pool.shutdown(wait=False)
+                    list_of_julian_days = sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)
+                    sam_daily_conc(jid, no_of_processes, name_temp)
 
                 else:
-
-                    if not os.path.exists(temp_sam_run_path):
-                        print "Creating SAM run temporary directory: ",\
-                            str(temp_sam_run_path)
-                        os.makedirs(temp_sam_run_path)
-                        print "Creating SAM run temporary sub-directory: ",\
-                            str(os.path.join(temp_sam_run_path, 'output'))
-                        os.makedirs(os.path.join(temp_sam_run_path, 'output'))
-                        #     str(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
-                        # os.makedirs(os.path.join(temp_sam_run_path, 'EcoPestOut_all', 'EcoPestOut_UpdatedGUI', 'Test1'))
-
-                    sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
-
-                    # Generate "SAM.inp" file
-                    import sam_input_generator
-                    sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
-
-                    for x in range(no_of_workers):
-                        shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
-
-                    # Set "SuperPRZMpesticide.exe" based on OS
-                    if os.name == 'posix':
-                        print "Linux OS"
-                        # Linux / UNIX based OS
-                        exe = "SuperPRZMpesticide.exe"
-                    else:
-                        print "Windows (really NOT Linux/POSIX) OS"
-                        # Assuming Windows here, could be other tho and this will break
-                        exe = "SuperPRZMpesticide_win.exe"
-
-                    from concurrent.futures import ThreadPoolExecutor as Pool
-                    # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
-                    pool = Pool(max_workers=no_of_workers)
-
-                    sam_path = os.path.join(curr_path, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
-                    print sam_path
-                    # Define SuperPRZMpesticide.exe command line arguments
-                    sam_arg1 = os.path.join(curr_path, 'bin')     # Absolute path to "root" of SAM model
-                    sam_arg2 = name_temp                          # Temp directory name for SAM run
-
-                    # Divide master HUC CSV into subsets for current run
-                    number_of_rows = split_csv(no_of_processes, curr_path, name_temp)
-
-                    for x in range(no_of_processes):
-                        print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
-                        pool.submit(
-                            # callable,
-                            subprocess.call,
-                            [sam_path, sam_arg1, sam_arg2, two_digit(x), number_of_rows[x]]
-                        ).add_done_callback(
-                            partial(sam_callback, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
-                        )
-
-                    # Destroy the Pool object which hosts the threads when the pending Futures objects are finished,
-                    # but do not wait until all Futures are done to have this function return
-                    pool.shutdown(wait=False)
+                    sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args)  # Does not use 'number_of_rows_list' for SuperPRZMPesticide.exe runs
+                    split_csv(no_of_processes, name_temp)
+                    sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type)
 
             except ImportError, e:
                 logging.exception(e)
@@ -175,10 +97,12 @@ def sam(inputs_json, jid, run_type):
                 """
                 Don't actually run SAM, just delay a few seconds...
                 """
+                from concurrent.futures import ThreadPoolExecutor as Pool
+                pool = Pool(max_workers=no_of_workers)
                 pool.submit(subprocess.Popen, "timeout 3")
 
             # Create MongoDB document skeleton for SAM run output
-            sam_db.create_mongo_document(jid, run_type, args)
+            sam_db.create_mongo_document(jid, run_type, args, list_of_julian_days)
 
             return jid
 
@@ -192,88 +116,152 @@ def sam(inputs_json, jid, run_type):
         return  {'user_id': 'admin', 'result': ["https://s3.amazonaws.com/super_przm/SAM_IB2QZS.zip"], '_id': jid }
 
 
-def callable(section):
-    # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
-    # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()
-
-    return superprzm.runmain.run("/cygdrive/d/Workspace/GitHub/qed/ubertool_ecorest/REST_UBER/sam_rest/bin", "B0SNI8", section, 320)
-
-
-def sam_callback_dll(future):
-    print type(future.result())
-
-
-def sam_callback(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
+def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
     """
+    Helper function to create temporary directory and generate the SAM.inp file(s) for SAM run.
+
+    :param no_of_processes: int, number of sections the list of HUCs for the SAM run will be divided into
+    :param temp_sam_run_path: str, absolute path of the temporary directory to place the SAM input file(s) and, if necessary, the output files
+    :param args: dict, the input values POSTed by the user
+    :return: list, list containing the number of 'rows'/HUC12s for each worker/process, which is passed to SuperPRZM
+    """
+    if not os.path.exists(temp_sam_run_path):
+        print "Creating SAM run temporary directory: ",\
+            str(temp_sam_run_path)
+        os.makedirs(temp_sam_run_path)
+        print "Creating SAM run temporary sub-directory: ",\
+            str(os.path.join(temp_sam_run_path, 'output'))
+        os.makedirs(os.path.join(temp_sam_run_path, 'output'))
+
+    sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
+
+    # Generate "SAM.inp" file and return list of 'Julian' days for the simulation
+    list_of_julian_days = sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
+
+    for x in range(no_of_processes):
+        shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
+
+    return list_of_julian_days
+
+def sam_daily_conc(jid, no_of_processes, name_temp):
+    """
+    Wrapper method for firing off SAM daily runs (e.g. SuperPRZM dll).  This will eventually be used for all SAM runs.
+
+    :param no_of_processes: int, number of
+    :param name_temp: str,
+    :return:
+    """
+
+    from concurrent.futures import ThreadPoolExecutor as Pool
+    # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
+    pool = Pool(max_workers=1)
+
+    sam_sh_script = os.path.join(curr_path, 'sam_launch.sh')
+    sam_callable = os.path.join(curr_path, 'sam_multiprocessing.py')
+
+    pool.submit(
+        subprocess.call,
+        [sam_sh_script, sam_callable, jid, name_temp]  # Shell script version
+    ).add_done_callback(  # This callback will only keep track of the job being done
+        partial(callback_daily, jid)
+    )
+
+    pool.shutdown(wait=False)
+
+    # import sam_multiprocessing as mp
+    # sam = mp.SamModelCaller(name_temp, number_of_rows_list)
+    # sam.sam_multiprocessing()
+
+
+def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type):
+    """
+
+    :param no_of_processes:
+    :param no_of_workers:
+    :param name_temp:
+    :param temp_sam_run_path:
+    :param args:
+    :param jid:
+    :param run_type:
+    :return:
+    """
+
+    # Set "SuperPRZMpesticide.exe" based on OS
+    if os.name == 'posix':
+        print "Linux OS"
+        # Linux / UNIX based OS
+        exe = "SuperPRZMpesticide.exe"
+    else:
+        print "Windows (really NOT Linux/POSIX) OS"
+        # Assuming Windows here, could be other tho and this will break
+        exe = "SuperPRZMpesticide_win.exe"
+
+    from concurrent.futures import ThreadPoolExecutor as Pool
+    # Create ThreadPoolExecutor (as 'Pool') instance to store threads which execute Fortran exe as subprocesses
+    pool = Pool(max_workers=no_of_workers)
+
+    sam_path = os.path.join(sam_bin_path, 'ubertool_superprzm_src', 'Debug', exe)
+    print sam_path
+    # Define SuperPRZMpesticide.exe command line arguments
+    sam_arg1 = sam_bin_path     # Absolute path to "root" of SAM model
+    sam_arg2 = name_temp        # Temp directory name for SAM run
+
+    for x in range(no_of_processes):
+        print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
+        pool.submit(
+            subprocess.call,
+            [sam_path, sam_arg1, sam_arg2, two_digit(x)]
+        ).add_done_callback(
+            partial(callback_avg, temp_sam_run_path, jid, run_type, no_of_processes, args, two_digit(x))
+        )
+
+    # Destroy the Pool object which hosts the threads when the pending Futures objects are finished,
+    # but do not wait until all Futures are done to have this function return
+    pool.shutdown(wait=False)
+
+
+def callback_daily(jid, future):
+    print jid
+    print future.exception()
+
+
+def callback_avg(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
+    """
+    Time-Averaged Concentrations callback function for when each Future object completes, fails, or is cancelled.
+
     temp_sam_run_path: String; Absolute path to SAM output temporary directory
     jid: String; SAM run jid
     run_type: String; SAM run type ('single', 'qaqc', or 'batch')
     future: concurrent.Future object; automatically passed in from concurrent.Future.add_done_callback()
 
-    Callback function for when SuperPRZMPestide.exe has completed.
+    Callback function for when SuperPRZMPesticide.exe has completed.
     Calls update_mongo() to insert output file into MongoDB.
     Deletes SAM output temporary directory.
     """
 
-    # if future.done():
-    # logging.info("Future is done")
     if future.cancelled():
         logging.info("but was cancelled")
     else:
-        global huc_output  # Use global (module) variable 'huc_output'
+        global huc_output  # Use global (module-level) variable 'huc_output'
 
         done_list.append("Done")
         logging.info("Appended 'Done' to list with len = %s", len(done_list))
 
-        if args['output_type'] == '1': # Daily Concentrations
-            print "Future %s done" % section
-            # if len(done_list) == no_of_processes:
-            #     # Read output files
-            #     update_global_output_holder(temp_sam_run_path, args, section)
-            #     sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
-            #
-            #     logging.info("jid = %s" %jid)
-            #     logging.info("run_type = %s" %run_type)
-            #     logging.info("Last SuperPRZMpesticide process completed")
-            #
-            #     # Remove temporary SAM run directory upon completion
-            #     shutil.rmtree(temp_sam_run_path)
-            #     empty_global_output_holders()
-            # else:
-            #     pass
-            #     if future.result is not None:
-            #         try:
-            #             sam_daily_results_parser(future.result()[0])  # Result is tuple (0 = STDOUT, 1 = STDERR)
-            #         except:
-            #             logging.exception(future.exception())
-            # sam_daily_results_parser(temp_sam_run_path, jid, run_type, args, huc_output)
+        if len(done_list) == no_of_processes:
+            # Last SAM run has completed or was cancelled
+            update_global_output_holder(temp_sam_run_path, args, section)
 
-        else: # Time-Averaged Concentrations
-            if len(done_list) == no_of_processes:
-                # Last SAM run has completed or was cancelled
-                update_global_output_holder(temp_sam_run_path, args, section)
+            sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
 
-                # import sam_figures
-                # sam_figures.sam_figures_callable(
-                #     jid,
-                #     args['output_type'] == '1',
-                #     args['output_type'] == '1',
-                #     args['output_type'] == '1',
-                #     huc_output
-                # )
+            logging.info("jid = %s" %jid)
+            logging.info("run_type = %s" %run_type)
+            logging.info("Last SuperPRZMpesticide process completed")
 
-
-                sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
-
-                logging.info("jid = %s" %jid)
-                logging.info("run_type = %s" %run_type)
-                logging.info("Last SuperPRZMpesticide process completed")
-
-                # Remove temporary SAM run directory upon completion
-                shutil.rmtree(temp_sam_run_path)
-                empty_global_output_holders()
-            else:
-                update_global_output_holder(temp_sam_run_path, args, section)
+            # Remove temporary SAM run directory upon completion
+            shutil.rmtree(temp_sam_run_path)
+            empty_global_output_holders()
+        else:
+            update_global_output_holder(temp_sam_run_path, args, section)
 
 
 def sam_daily_results_parser(temp_sam_run_path, jid, run_type, args, section, huc_output):
@@ -333,7 +321,7 @@ def convert_text_to_html(sam_input_file_path):
 
     return html
 
-def split_csv(number, curr_path, name_temp):
+def split_csv(number, name_temp):
     """
     Load master CSV for SuperPRZM run as Pandas DataFrame and slice it
     based on the number of Futures objects created to execute it.
@@ -347,8 +335,9 @@ def split_csv(number, curr_path, name_temp):
     print "number = ", number
     import pandas as pd
     df = pd.read_csv(os.path.join(
-        curr_path, 'bin', 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'
-    ))
+        sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'),
+        dtype={'HUC_12': object, 'COMID': object}  # Set columns 'HUC_12' & 'COMID' to 'object' (~eq. to string)
+    )
 
     if number > 99:
         number = 99
@@ -363,9 +352,9 @@ def split_csv(number, curr_path, name_temp):
         number = 1
         rows_per_sect = df.shape[0] / number
 
-    os.makedirs(os.path.join(curr_path, 'bin', name_temp, 'EcoRecipes_huc12', 'recipe_combos2012'))
+    os.makedirs(os.path.join(sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012'))
 
-    number_of_rows = []
+    number_of_rows_list = []
     i = 1
     while i <= number:
         if i == 1:
@@ -381,14 +370,14 @@ def split_csv(number, curr_path, name_temp):
             # Middle slices (not first or last)
             df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
-        number_of_rows.append(len(df_slice.count()))  #  Save the number of rows for each CSV to be passed to SuperPRZM
+        number_of_rows_list.append(len(df_slice))  # Save the number of rows for each CSV to be passed to SuperPRZM
         df_slice.to_csv(os.path.join(
-            curr_path, 'bin', name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + two_digit(i - 1) + '.csv'
+            sam_bin_path, name_temp, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric_' + two_digit(i - 1) + '.csv'
         ), index=False)
 
         i += 1
 
-    return number_of_rows
+    return number_of_rows_list
 
 def empty_global_output_holders():
     # Empty output dictionary if needed

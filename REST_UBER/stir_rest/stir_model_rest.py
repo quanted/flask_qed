@@ -222,7 +222,7 @@ class stir(object):
         #    self.direct_spray_duration = float(self.direct_spray_duration)
         #    self.spray_drift_fraction = float(self.spray_drift_fraction)
         #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
-        self.sid_avian = (self.air_conc * self.inh_rate_avian * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_bird)
+        self.sid_avian = (self.air_conc * self.inh_rate_avian * (self.direct_spray_duration/60.0) * self.spray_drift_fraction)/(self.body_weight_assessed_bird)
         #logging.info("self.air_conc = " + self.air_conc)
         #logging.info("self.inh_rate_avian = " + self.inh_rate_avian)
         #logging.info("self.direct_spray_duration = " + self.direct_spray_duration)
@@ -239,7 +239,7 @@ class stir(object):
         #    self.direct_spray_duration = float(self.direct_spray_duration)
         #    self.spray_drift_fraction = float(self.spray_drift_fraction)
         #    self.body_weight_assessed_mammal = float(self.body_weight_assessed_mammal)
-        self.sid_mammal = (self.air_conc * self.inh_rate_mammal * self.direct_spray_duration * self.spray_drift_fraction)/(60.0 * self.body_weight_assessed_mammal)
+        self.sid_mammal = (self.air_conc * self.inh_rate_mammal * (self.direct_spray_duration/60.0) * self.spray_drift_fraction)/(self.body_weight_assessed_mammal)
         logging.info(self.sid_mammal)
         return self.sid_mammal
 
@@ -384,7 +384,7 @@ class stir(object):
         return self.loc_sid_mammal
 
 def main():
-    test_stir = stir(True,True,1,1,1,1,1,1,1,1)
+    test_stir = stir(True, True,1,1,1,1,1,1,1,1)
     print vars(test_stir)
     stir_json = toJSON(test_stir)
     new_stir = fromJSON(stir_json)
