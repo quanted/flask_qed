@@ -36,9 +36,9 @@ class earthworm(object):
         self.c_s = self.pd_obj['c_s']
         self.k_d = self.pd_obj['k_d']
         self.p_s = self.pd_obj['p_s']
-        self.c_w = self.pd_obj['c_w']
-        self.m_w = self.pd_obj['m_w']
-        self.p_e = self.pd_obj['p_e']
+        # self.c_w = self.pd_obj['c_w']
+        # self.m_w = self.pd_obj['m_w']
+        # self.p_e = self.pd_obj['p_e']
 
     def execute_model(self):
         logging.info("1")
