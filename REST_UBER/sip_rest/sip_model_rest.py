@@ -6,6 +6,7 @@ import logging
 from functools import wraps
 import time
 
+
 # def timefn(fn):
 #     @wraps(fn)
 #     def measure_time(*args, **kwargs):
@@ -21,10 +22,20 @@ import time
 
 
 class sip(object):
-# #    @timefn
+    # #    @timefn
     def __init__(self, run_type, pd_obj, pd_obj_exp):
+        """
+
+        :param run_type:
+        :param pd_obj:
+        :param pd_obj_exp:
+        :return:
+        """
+
+        # Inputs: Assign object attribute variables from the input Pandas DataFrame
         # run_type can be single, batch or qaqc
         # 0 to run calculation, else it wont
+
         self.run_type = run_type
         self.pd_obj = pd_obj
         self.pd_obj_exp = pd_obj_exp
@@ -47,14 +58,14 @@ class sip(object):
             Convert DataFrames to JSON, returning a tuple 
             of JSON strings (inputs, outputs, exp_out)
         """
-        
+
         pd_obj_json = pd_obj.to_json()
         pd_obj_out_json = pd_obj_out.to_json()
         try:
             pd_obj_exp_json = pd_obj_exp.to_json()
         except:
             pd_obj_exp_json = "{}"
-        
+
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
     # @timefn
@@ -79,23 +90,23 @@ class sip(object):
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
-            'fw_bird_out' : self.fw_bird_out,
-            'fw_mamm_out' : self.fw_mamm_out,
-            'dose_bird_out' : self.dose_bird_out,
-            'dose_mamm_out' : self.dose_mamm_out,
-            'at_bird_out' : self.at_bird_out,
-            'at_mamm_out' : self.at_mamm_out,
-            'fi_bird_out' : self.fi_bird_out,
-            'det_out' : self.det_out,
-            'act_out' : self.act_out,
-            'acute_bird_out' : self.acute_bird_out,
-            'acuconb_out' : self.acuconb_out,
-            'acute_mamm_out' : self.acute_mamm_out,
-            'acuconm_out' : self.acuconm_out,
-            'chron_bird_out' : self.chron_bird_out,
-            'chronconb_out' : self.chronconb_out,
-            'chron_mamm_out' : self.chron_mamm_out,
-            'chronconm_out' : self.chronconm_out
+            'fw_bird_out': self.fw_bird_out,
+            'fw_mamm_out': self.fw_mamm_out,
+            'dose_bird_out': self.dose_bird_out,
+            'dose_mamm_out': self.dose_mamm_out,
+            'at_bird_out': self.at_bird_out,
+            'at_mamm_out': self.at_mamm_out,
+            'fi_bird_out': self.fi_bird_out,
+            'det_out': self.det_out,
+            'act_out': self.act_out,
+            'acute_bird_out': self.acute_bird_out,
+            'acuconb_out': self.acuconb_out,
+            'acute_mamm_out': self.acute_mamm_out,
+            'acuconm_out': self.acuconm_out,
+            'chron_bird_out': self.chron_bird_out,
+            'chronconb_out': self.chronconb_out,
+            'chron_mamm_out': self.chron_mamm_out,
+            'chronconm_out': self.chronconm_out
         })
 
         # create pandas properties for acceptance testing
@@ -103,23 +114,23 @@ class sip(object):
 
     def create_output_properties(self):
         # Outputs: Assign object attribute variables to Pandas Series
-        self.fw_bird_out = pd.Series(name = "fw_bird_out")
-        self.fw_mamm_out = pd.Series(name = "fw_mamm_out")
-        self.dose_bird_out = pd.Series(name = "dose_bird_out")
-        self.dose_mamm_out = pd.Series(name = "dose_mamm_out")
-        self.at_bird_out = pd.Series(name = "at_bird_out")
-        self.at_mamm_out = pd.Series(name = "at_mamm_out")
-        self.fi_bird_out = pd.Series(name = "fi_bird_out")
-        self.det_out = pd.Series(name = "det_out")
-        self.act_out = pd.Series(name = "act_out")
-        self.acute_bird_out = pd.Series(name = "acute_bird_out")
-        self.acuconb_out = pd.Series(name = "acuconb_out")
-        self.acute_mamm_out = pd.Series(name = "acute_mamm_out")
-        self.acuconm_out = pd.Series(name = "acuconm_out")
-        self.chron_bird_out = pd.Series(name = "chron_bird_out")
-        self.chronconb_out = pd.Series(name = "chronconb_out")
-        self.chron_mamm_out = pd.Series(name = "chron_mamm_out")
-        self.chronconm_out = pd.Series(name = "chronconm_out")
+        self.fw_bird_out = pd.Series(name="fw_bird_out")
+        self.fw_mamm_out = pd.Series(name="fw_mamm_out")
+        self.dose_bird_out = pd.Series(name="dose_bird_out")
+        self.dose_mamm_out = pd.Series(name="dose_mamm_out")
+        self.at_bird_out = pd.Series(name="at_bird_out")
+        self.at_mamm_out = pd.Series(name="at_mamm_out")
+        self.fi_bird_out = pd.Series(name="fi_bird_out")
+        self.det_out = pd.Series(name="det_out")
+        self.act_out = pd.Series(name="act_out")
+        self.acute_bird_out = pd.Series(name="acute_bird_out")
+        self.acuconb_out = pd.Series(name="acuconb_out")
+        self.acute_mamm_out = pd.Series(name="acute_mamm_out")
+        self.acuconm_out = pd.Series(name="acuconm_out")
+        self.chron_bird_out = pd.Series(name="chron_bird_out")
+        self.chronconb_out = pd.Series(name="chronconb_out")
+        self.chron_mamm_out = pd.Series(name="chron_mamm_out")
+        self.chronconm_out = pd.Series(name="chronconm_out")
 
     def populate_input_properties(self):
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
@@ -171,7 +182,7 @@ class sip(object):
         #     if self.bodyweight_assessed_bird < 0:
         #         raise ValueError\
         #         ('self.bodyweight_assessed_bird=%g is a non-physical value.' % self.bodyweight_assessed_bird)
-        
+
         # self.fw_bird_out = (1.180 * (self.bodyweight_assessed_bird**0.874))/1000.0
         """
         Using fixed value to correctly handle floating point decimals as compared to spreadsheet implementation
@@ -207,7 +218,7 @@ class sip(object):
         #     if self.bodyweight_assessed_mammal < 0:
         #         raise ValueError\
         #         ('self.bodyweight_assessed_mammal=%g is a non-physical value.' % self.bodyweight_assessed_mammal)
-        
+
         # self.fw_mamm_out = (0.708 * (self.bodyweight_assessed_mammal**0.795))/1000.0
         """
         Using fixed value to correctly handle floating point decimals as compared to spreadsheet implementation
@@ -261,9 +272,8 @@ class sip(object):
         #     if self.bodyweight_assessed_bird < 0:
         #         raise ValueError\
         #         ('self.bodyweight_assessed_bird=%g is a non-physical value.' % self.bodyweight_assessed_bird)
-        self.dose_bird_out = (self.fw_bird_out * self.solubility)/(self.bodyweight_assessed_bird / 1000.)
+        self.dose_bird_out = (self.fw_bird_out * self.solubility) / (self.bodyweight_assessed_bird / 1000.)
         return self.dose_bird_out
-
 
     # Upper bound estimate of exposure for mammals
     # @timefn
@@ -311,7 +321,7 @@ class sip(object):
         #     if self.bodyweight_assessed_mammal < 0:
         #         raise ValueError\
         #         ('self.bodyweight_assessed_mammal=%g is a non-physical value.' % self.bodyweight_assessed_mammal)
-        self.dose_mamm_out = (self.fw_mamm_out * self.solubility)/(self.bodyweight_assessed_mammal / 1000.)
+        self.dose_mamm_out = (self.fw_mamm_out * self.solubility) / (self.bodyweight_assessed_mammal / 1000.)
         return self.dose_mamm_out
 
     # Acute adjusted toxicity value for birds
@@ -368,7 +378,8 @@ class sip(object):
         #         raise ValueError\
         #         ('bodyweight_tested_bird=%g is a non-physical value.' % self.bodyweight_tested_bird)
         logging.info(self.bodyweight_tested_bird)
-        self.at_bird_out = (self.ld50_avian_water) * ((self.bodyweight_assessed_bird / self.bodyweight_tested_bird)**(self.mineau_scaling_factor - 1.))
+        self.at_bird_out = (self.ld50_avian_water) * (
+        (self.bodyweight_assessed_bird / self.bodyweight_tested_bird) ** (self.mineau_scaling_factor - 1.))
         return self.at_bird_out
 
     # Acute adjusted toxicity value for mammals
@@ -422,9 +433,9 @@ class sip(object):
         #     if self.bodyweight_tested_mammal < 0:
         #         raise ValueError\
         #         ('bodyweight_tested_mammal=%g is a non-physical value.' % self.bodyweight_tested_mammal)
-        self.at_mamm_out = (self.ld50_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
+        self.at_mamm_out = (self.ld50_mammal_water) * (
+        (self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal) ** 0.25)
         return self.at_mamm_out
-
 
     # Adjusted chronic toxicity values for birds
 
@@ -460,7 +471,7 @@ class sip(object):
         #     if self.bodyweight_tested_bird < 0:
         #         raise ValueError\
         #         ('self.bodyweight_tested_bird=%g is a non-physical value.' % self.bodyweight_tested_bird)
-        self.fi_bird_out = 0.0582 * ((bw_grams / 1000.)**0.651)
+        self.fi_bird_out = 0.0582 * ((bw_grams / 1000.) ** 0.651)
         return self.fi_bird_out
 
     # Dose-equivalent chronic toxicity value for birds
@@ -521,32 +532,34 @@ class sip(object):
 
         try:
             # Body weight of bobtail quail is 178 g
-            det_quail = (self.noaec_quail * self.fi_bird(178.)) / (178. / 1000.)    
+            det_quail = (self.noaec_quail * self.fi_bird(178.)) / (178. / 1000.)
         except:
             det_quail = None
 
         try:
             # Body weight of mallard duck is 1580 g
-            det_duck = (self.noaec_duck * self.fi_bird(1580.)) / (1580. / 1000.)           
+            det_duck = (self.noaec_duck * self.fi_bird(1580.)) / (1580. / 1000.)
         except:
             det_duck = None
 
         try:
-            det_other_1 = (self.noaec_bird_other_1 * self.fi_bird(self.bodyweight_bird_other_1)) / (self.bodyweight_bird_other_1 / 1000.)           
+            det_other_1 = (self.noaec_bird_other_1 * self.fi_bird(self.bodyweight_bird_other_1)) / (
+            self.bodyweight_bird_other_1 / 1000.)
         except:
             det_other_1 = None
 
         try:
-            det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_2)) / (self.bodyweight_bird_other_2 / 1000.)
+            det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_2)) / (
+            self.bodyweight_bird_other_2 / 1000.)
         except:
             det_other_2 = None
 
         # Create DataFrame containing method Series created above
         df_noaec = pd.DataFrame({
-            'det_quail' : det_quail,
-            'det_duck' : det_duck,
-            'det_other_1' : det_other_1,
-            'det_other_2' : det_other_2
+            'det_quail': det_quail,
+            'det_duck': det_duck,
+            'det_other_1': det_other_1,
+            'det_other_2': det_other_2
         })
 
         # Create a Series of the minimum values for each row/model run of the above DataFrame
@@ -602,9 +615,11 @@ class sip(object):
         #     if self.bodyweight_assessed_mammal < 0:
         #         raise ValueError\
         #         ('bodyweight_assessed_mammal=%g is a non-physical value.' % self.bodyweight_assessed_mammal)
-        self.act_out = (self.noael_mammal_water) * ((self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal)**0.25)
+        self.act_out = (self.noael_mammal_water) * (
+        (self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal) ** 0.25)
         return self.act_out
         #   MAMMILIAN:  If only a NOAEC value (in mg/kg-diet) is available, the model user should divide the NOAEC by 20 to determine the equivalent chronic daily dose (NOAEL)
+
     # ---- Is drinking water a concern?
 
     # Acute exposures for birds
@@ -655,15 +670,15 @@ class sip(object):
         #     if self.acute_bird_out == None:
         #         raise ValueError\
         #         ('acute_bird variable equals None and therefor this function cannot be run.')
-            # if self.acute_bird_out < 0.1:
-            #     self.acuconb_out = ('Drinking water exposure alone is NOT a potential concern for birds')
-            # else:
-            #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
+        # if self.acute_bird_out < 0.1:
+        #     self.acuconb_out = ('Drinking water exposure alone is NOT a potential concern for birds')
+        # else:
+        #     self.acuconb_out = ('Exposure through drinking water alone is a potential concern for birds')
         boolean = self.acute_bird_out < 0.1
-        self.acuconb_out = boolean.map(lambda x: 
-            'Drinking water exposure alone is NOT a potential concern for birds' if x == True 
-            else 'Exposure through drinking water alone is a potential concern for birds')
-             
+        self.acuconb_out = boolean.map(lambda x:
+                                       'Drinking water exposure alone is NOT a potential concern for birds' if x == True
+                                       else 'Exposure through drinking water alone is a potential concern for birds')
+
         return self.acuconb_out
 
     # Acute exposures for mammals
@@ -719,9 +734,9 @@ class sip(object):
         #         self.acuconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
         #     return self.acuconm_out
         boolean = self.acute_mamm_out < 0.1
-        self.acuconm_out = boolean.map(lambda x: 
-            'Drinking water exposure alone is NOT a potential concern for mammals' if x == True 
-            else 'Exposure through drinking water alone is a potential concern for mammals')
+        self.acuconm_out = boolean.map(lambda x:
+                                       'Drinking water exposure alone is NOT a potential concern for mammals' if x == True
+                                       else 'Exposure through drinking water alone is a potential concern for mammals')
         return self.acuconm_out
 
     # Chronic Exposures for birds
@@ -781,9 +796,9 @@ class sip(object):
         #     else:
         #         self.chronconb_out = ('Exposure through drinking water alone is a potential concern for birds')
         boolean = self.chron_bird_out < 1
-        self.chronconb_out = boolean.map(lambda x: 
-            'Drinking water exposure alone is NOT a potential concern for birds' if x == True 
-            else 'Exposure through drinking water alone is a potential concern for birds')
+        self.chronconb_out = boolean.map(lambda x:
+                                         'Drinking water exposure alone is NOT a potential concern for birds' if x == True
+                                         else 'Exposure through drinking water alone is a potential concern for birds')
         return self.chronconb_out
 
     # Chronic exposures for mammals
@@ -825,6 +840,7 @@ class sip(object):
         #         ('act=%g is a non-physical value.' % self.act_out)
         self.chron_mamm_out = self.dose_mamm_out / self.act_out
         return self.chron_mamm_out
+
     # @timefn
     def chronconm(self):
         """
@@ -839,7 +855,7 @@ class sip(object):
         #     else:
         #         self.chronconm_out = ('Exposure through drinking water alone is a potential concern for mammals')
         boolean = self.chron_mamm_out < 1
-        self.chronconm_out = boolean.map(lambda x: 
-            'Drinking water exposure alone is NOT a potential concern for mammals' if x == True 
-            else 'Exposure through drinking water alone is a potential concern for mammals')
+        self.chronconm_out = boolean.map(lambda x:
+                                         'Drinking water exposure alone is NOT a potential concern for mammals' if x == True
+                                         else 'Exposure through drinking water alone is a potential concern for mammals')
         return self.chronconm_out
