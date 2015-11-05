@@ -26,7 +26,8 @@ def run(jid, sam_bin_path, name_temp, section, array_size):
 
 def mongo_motor_insert(jid, huc_ids, np_array, name_temp, section):
 
-    jid = name_temp + "_" +section
+    #TODO: Remove the next line (was previously used for testing, production 'jid' is the 'jid' param)
+    # jid = name_temp + "_" +section
     url = 'http://localhost:8787/sam/daily/' + jid
     # http_headers = {'Content-Type': 'application/json'}
     http_headers = {'Content-Type': 'application/octet-stream'}
@@ -57,7 +58,7 @@ def serialize(jid, huc_ids, np_array, name_temp, section):
     :param section:
     :return:
     """
-    return  cPickle.dumps({
+    return cPickle.dumps({
         "jid": jid,
         'output': np_array,
         'huc_ids': huc_ids
