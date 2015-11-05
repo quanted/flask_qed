@@ -68,7 +68,6 @@ def oreWorkerActivities(query):
     """
     Get
     """
-    # print query
     category = query['crop_category']
     _query_root = 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE '
 
@@ -97,7 +96,7 @@ def oreWorkerActivities(query):
     apptype = []
     activity = []
 
-    print query
+    # print query
 
     for result in query:
 
@@ -110,10 +109,10 @@ def oreWorkerActivities(query):
         if result[3] not in formulation:
             formulation.append(result[3])
 
-    print activity
-    print apptype
-    print appequip
-    print formulation
+    # print activity
+    # print apptype
+    # print appequip
+    # print formulation
 
     return { 'Activity': activity,
              'AppType': apptype,
