@@ -10,6 +10,7 @@
 *.py~
 *.pptx
 .elasticbeanstalk/config
+*.ipynb
 GA2.tif
 .VolumeIcon.icns
 .fseventsd
@@ -30,3 +31,4 @@ REST_UBER/sam_rest/temp.zip
 REST_UBER/sam_rest/bin/bin_mother_lode/*
 REST_UBER/sam_rest/bin/ubertool_superprzm_src/*
 static/*
+.xml
