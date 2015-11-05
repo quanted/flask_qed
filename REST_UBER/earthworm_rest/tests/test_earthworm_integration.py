@@ -65,6 +65,7 @@ class TestEarthworm(unittest.TestCase):
         :param output: String; Pandas Series name (e.g. column name) without '_out'
         :return:
         """
+        pd.set_option('display.float_format','{:.4E}'.format) # display model output in scientific notation
         result = earthworm_calc.pd_obj_out[output + "_out"]
         expected = earthworm_calc.pd_obj_exp[output + "_exp"]
         tab = pd.concat([result,expected], axis=1)
