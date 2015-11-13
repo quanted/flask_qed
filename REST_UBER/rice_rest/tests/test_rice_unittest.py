@@ -6,7 +6,7 @@ import pandas as pd
 import pandas.util.testing as pdt
 
 #importing as a package (specified in ../../setup.py)
-from .. import rice_model_rest as rice_model
+from REST_UBER.rice_rest import rice_model_rest as rice_model
 
 # create empty pandas dataframes to create empty sip object for testing
 df_empty = pd.DataFrame()

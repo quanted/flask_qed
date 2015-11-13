@@ -11,13 +11,7 @@ class rice(object):
         self.pd_obj = pd_obj
         self.pd_obj_exp = pd_obj_exp
 
-        # Outputs: Assign object attribute variables to Pandas Series
-        self.out_msed = pd.Series(name="out_msed")
-        self.out_vw = pd.Series(name="out_vw")
-        self.out_mass_area = pd.Series(name="out_mass_area")
-        self.out_cw = pd.Series(name="out_cw")
-
-        #run meth
+        # run methods
         # Execute model methods if requested
         if self.run_type != "empty":
             self.execute_model()
@@ -29,6 +23,21 @@ class rice(object):
         self.create_output_dataframe()
         # Callable from Bottle that returns JSON
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
+
+    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
+        """
+            Convert DataFrames to JSON, returning a tuple
+            of JSON strings (inputs, outputs, exp_out)
+        """
+
+        pd_obj_json = pd_obj.to_json()
+        pd_obj_out_json = pd_obj_out.to_json()
+        try:
+            pd_obj_exp_json = pd_obj_exp.to_json()
+        except:
+            pd_obj_exp_json = "{}"
+
+        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
     def populate_input_properties(self):
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
@@ -64,23 +73,8 @@ class rice(object):
             'out_cw' : self.out_cw
         })
 
-        # Callable from Bottle that returns JSON
-        self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
-
-    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
-        """
-            Convert DataFrames to JSON, returning a tuple 
-            of JSON strings (inputs, outputs, exp_out)
-        """
-        
-        pd_obj_json = pd_obj.to_json()
-        pd_obj_out_json = pd_obj_out.to_json()
-        try:
-            pd_obj_exp_json = pd_obj_exp.to_json()
-        except:
-            pd_obj_exp_json = "{}"
-        
-        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
+        # create pandas properties for acceptance testing
+        self.pd_obj_out = pd_obj_out
 
     # The mass of the sediment at equilibrium with the water column
     # Sediment depth (dsed) * Area of rice paddy (area) * Bulk density of sediment(mass/volume) pb
