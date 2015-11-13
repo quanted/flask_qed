@@ -9,7 +9,6 @@ c = conn.cursor()
 
 
 def loadChoices(query):
-
     choices = []
 
     if query == 'crop':
@@ -24,16 +23,19 @@ def loadChoices(query):
     # print choices['Crop']
     return choices
 
+
 def cropQuery():
     c.execute('SELECT DISTINCT Crop FROM CCA')
 
     return c.fetchall()
+
 
 # , GrpName, SubGrpNo, SubGrpName
 def oreDbQuery():
     c.execute('SELECT DISTINCT Crop, GrpNo, GrpName, SubGrpNo, SubGrpName, Category FROM CCA')
 
     return c.fetchall()
+
 
 def generateSQLFilter(filter, es_type, category):
     """
@@ -80,15 +82,15 @@ def oreWorkerActivities(query):
         print _query_root + query_string[0] + ', ' + str(query_string[1])
 
         crop_category = tuple(query_string[1])
-        c.execute( _query_root + query_string[0],
-                   crop_category )
+        c.execute(_query_root + query_string[0],
+                  crop_category)
 
     except KeyError, e:  # Crop-Target query (Crop-Target Category Lookup Tab)
         logging.exception(e)
-        crop_category = (category, )  # Must be a tuple
+        crop_category = (category,)  # Must be a tuple
         print _query_root + 'Category=?'
-        c.execute( _query_root + 'Category=?',
-                   crop_category )
+        c.execute(_query_root + 'Category=?',
+                  crop_category)
 
     query = c.fetchall()
 
@@ -115,10 +117,10 @@ def oreWorkerActivities(query):
     print appequip
     print formulation
 
-    return { 'Activity': activity,
-             'AppType': apptype,
-             'AppEquip': appequip,
-             'Formulation': formulation }
+    return {'Activity': activity,
+            'AppType': apptype,
+            'AppEquip': appequip,
+            'Formulation': formulation}
 
 
 def oreOutputQuery(query):
@@ -143,29 +145,31 @@ def oreOutputQuery(query):
 
     def query_generator(exp_scenario, exp_scenario_list):
 
-        query = exp_scenario + " = ?" #  E.g. "Activity = ?"
+        query = exp_scenario + " = ?"  # E.g. "Activity = ?"
         i = 0
         while i < len(exp_scenario_list):
             params.append(exp_scenario_list[i])  # append item to params[] to pass to SQL statement
             if i > 0:  # skip 1st list item bc it is handle by default in the 'query' string definition
-                query += " OR " + exp_scenario + " = ?" #  E.g. "Activity = ? OR Activity = ? OR Activity = ?"
+                query += " OR " + exp_scenario + " = ?"  # E.g. "Activity = ? OR Activity = ? OR Activity = ?"
             i += 1
         return query
 
     sql_query = 'SELECT * FROM CCA WHERE Crop = ? ' \
                 'AND (' + query_generator('Activity', activities) + ') ' \
-                'AND (' + query_generator('AppEquip', app_eqips) + ') ' \
-                'AND (' + query_generator('AppType', app_types) + ') ' \
-                'AND (' + query_generator('Formulation', formulations) + ')'
+                                                                    'AND (' + query_generator('AppEquip',
+                                                                                              app_eqips) + ') ' \
+                                                                                                           'AND (' + query_generator(
+        'AppType', app_types) + ') ' \
+                                'AND (' + query_generator('Formulation', formulations) + ')'
 
-    #TreatedVal, TreatedUnit, DUESLNoG, DUESLG, DUEDLG, DUESLGCRH, DUEDLGCRH, IUENoR, IUEPF5R, IUEPF10R, IUEEC
+    # TreatedVal, TreatedUnit, DUESLNoG, DUESLG, DUEDLG, DUESLGCRH, DUEDLGCRH, IUENoR, IUEPF5R, IUEPF10R, IUEEC
     print sql_query
     # print len(params)
     # print params
 
-    c.execute( sql_query, tuple(params) )
+    c.execute(sql_query, tuple(params))
 
     query = c.fetchall()
-    conn.close()  #  Close 'row_factory' connection
+    conn.close()  # Close 'row_factory' connection
 
     return query

@@ -2,12 +2,12 @@
 #
 import cloud
 
-api_key='3355'
-api_secretkey='212ed160e3f416fdac8a3b71c90f3016722856b9'
-cloud.setkey(api_key, api_secretkey) 
+api_key = '3355'
+api_secretkey = '212ed160e3f416fdac8a3b71c90f3016722856b9'
+cloud.setkey(api_key, api_secretkey)
 
-def PRZM_EXAMS(input_list): 
 
+def PRZM_EXAMS(input_list):
     import os, sys
     lib_path = os.path.abspath('/home/picloud/PRZM_EXAMS_Picloud')
     sys.path.append(lib_path)
@@ -42,11 +42,12 @@ def PRZM_EXAMS(input_list):
     hl_out = input_list[27]
 
     import PRZM_EXAMS_pi
-    ff=PRZM_EXAMS_pi.PRZM_EXAMS_pi(chem_name, noa, scenarios, unit, met, inp, run, exam, MM, DD, YY, CAM_f, DEPI, Ar, EFF, Drft, 
-                  farm, mw, sol, koc, vp, aem, anm, aqp, tmper, n_ph, ph_out, hl_out)
+    ff = PRZM_EXAMS_pi.PRZM_EXAMS_pi(chem_name, noa, scenarios, unit, met, inp, run, exam, MM, DD, YY, CAM_f, DEPI, Ar,
+                                     EFF, Drft,
+                                     farm, mw, sol, koc, vp, aem, anm, aqp, tmper, n_ph, ph_out, hl_out)
     return ff
 
-cloud.rest.publish(func=PRZM_EXAMS, label='przm_exams_s1', _env='t-fortran77-test', _type='s1', _profile=True )
+
+cloud.rest.publish(func=PRZM_EXAMS, label='przm_exams_s1', _env='t-fortran77-test', _type='s1', _profile=True)
 
 print 'Done'
-
