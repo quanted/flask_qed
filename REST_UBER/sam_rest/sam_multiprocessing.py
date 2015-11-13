@@ -7,6 +7,7 @@ import sam_callable
 
 try:
     import superprzm  # Import superprzm.dll / .so
+
     _dll_loaded = True
 except ImportError, e:
     logging.exception(e)
@@ -15,6 +16,7 @@ except ImportError, e:
 curr_path = os.path.abspath(os.path.dirname(__file__))
 
 mp_logger = multiprocessing.log_to_stderr()
+
 
 def multiprocessing_setup():
     """
@@ -32,7 +34,7 @@ def multiprocessing_setup():
     except:
         pass
     print "max_workers=%s" % nproc
-    return Pool(max_workers = nproc)  # Set number of workers to equal the number of processors available on machine
+    return Pool(max_workers=nproc)  # Set number of workers to equal the number of processors available on machine
 
 
 class SamModelCaller(object):
@@ -56,7 +58,7 @@ class SamModelCaller(object):
         """
 
         try:
-            import subprocess32 as subprocess    # Use subprocess32 for Linux (Python 3.2 backport)
+            import subprocess32 as subprocess  # Use subprocess32 for Linux (Python 3.2 backport)
         except ImportError:
             import subprocess
 
@@ -76,10 +78,10 @@ class SamModelCaller(object):
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process
             pool.submit(
                 daily_conc_callable,
-                self.jid,                    # 'jid' of SAM run
-                self.sam_bin_path,           # Absolute path to the SAM bin folder
-                self.name_temp,              # Temporary path name for this SuperPRZM run
-                self.two_digit(x),           # Section number, as two digits, of this set of HUCs for the SuperPRZM run
+                self.jid,  # 'jid' of SAM run
+                self.sam_bin_path,  # Absolute path to the SAM bin folder
+                self.name_temp,  # Temporary path name for this SuperPRZM run
+                self.two_digit(x),  # Section number, as two digits, of this set of HUCs for the SuperPRZM run
                 self.number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
                 partial(callback_daily, self.two_digit(x))
@@ -106,7 +108,7 @@ class SamModelCaller(object):
         df = pd.read_csv(os.path.join(
             self.sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'),
             dtype={'HUC_12': object, 'COMID': object}  # Set columns 'HUC_12' & 'COMID' to 'object' (~eq. to string)
-        )                                              # This preserves any leading zeros present in the HUC12_IDs
+        )  # This preserves any leading zeros present in the HUC12_IDs
 
         if self.no_of_processes > 99:
             self.no_of_processes = 99
@@ -174,7 +176,7 @@ def daily_conc_callable(jid, sam_bin_path, name_temp, section, array_size=320):
     :return:
     """
 
-    #TODO: Remove these; left to show how it was previously done while testing callable
+    # TODO: Remove these; left to show how it was previously done while testing callable
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
     # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
@@ -188,8 +190,10 @@ def callback_daily(section, future):
     print "Section: ", section
     # print future.result()
 
+
 def create_number_of_rows_list(list_string):
     return list_string.split()
+
 
 def main():
     """
@@ -215,6 +219,7 @@ def main():
         sam = SamModelCaller(jid, name_temp)
 
     sam.sam_multiprocessing()
+
 
 if __name__ == "__main__":
     # Create Process Pool

@@ -20,27 +20,27 @@ def generatehtml_pi(input_str):
     def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
 
-    name_temp=id_generator()
+    name_temp = id_generator()
 
-##########################################################################################
-#####AMAZON KEY, store output files. You might have to write your own import approach#####
-##########################################################################################
+    ##########################################################################################
+    #####AMAZON KEY, store output files. You might have to write your own import approach#####
+    ##########################################################################################
     key = keys_Picloud_S3.amazon_s3_key
     secretkey = keys_Picloud_S3.amazon_s3_secretkey
 
-##################################################################################
-######Create a folder if it does not existed, where holds calculations' output.#####
-##################################################################################
-    #cwd='/home/ubuntu/Rest_EC2/generate_doc'
+    ##################################################################################
+    ######Create a folder if it does not existed, where holds calculations' output.#####
+    ##################################################################################
+    # cwd='/home/ubuntu/Rest_EC2/generate_doc'
     cwd = os.path.dirname(os.path.realpath(__file__))
-    src=cwd
-    src1=cwd+'/'+name_temp
+    src = cwd
+    src1 = cwd + '/' + name_temp
     if not os.path.exists(src1):
         os.makedirs(src1)
     else:
         shutil.rmtree(src1)
         os.makedirs(src1)
-    os.chdir(src1) 
+    os.chdir(src1)
 
     filename = "model.html"
     text_file = open(filename, "w")
@@ -49,14 +49,13 @@ def generatehtml_pi(input_str):
 
     conn = S3Connection(key, secretkey)
     bucket = Bucket(conn, 'ubertool_htmls')
-    k=Key(bucket)
-    name1=name_temp+".html"
-    k.key=name1
+    k = Key(bucket)
+    name1 = name_temp + ".html"
+    k.key = name1
     k.set_contents_from_filename(filename)
-    link='https://s3.amazonaws.com/ubertool_htmls/'+name1
+    link = 'https://s3.amazonaws.com/ubertool_htmls/' + name1
     k.set_acl('public-read-write')
     os.chdir(src)
     shutil.rmtree(src1)
 
     return link
-

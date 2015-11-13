@@ -3,6 +3,7 @@
 import pandas as pd
 import logging
 
+
 class terrplant(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
 
@@ -122,7 +123,7 @@ class terrplant(object):
             "out_lds_loc_spray": self.out_lds_loc_spray
         })
 
-        #create pandas properties for acceptance testing
+        # create pandas properties for acceptance testing
         logging.info("here is the output object")
         logging.info(pd_obj_out)
         self.pd_obj_out = pd_obj_out
@@ -185,7 +186,6 @@ class terrplant(object):
         self.noaec_listed_vegetative_vigor_monocot = self.pd_obj["noaec_listed_vegetative_vigor_monocot"]
         self.noaec_listed_vegetative_vigor_dicot = self.pd_obj["noaec_listed_vegetative_vigor_dicot"]
 
-
     # EEC for runoff for dry areas
     def rundry(self):
         # try:
@@ -217,7 +217,7 @@ class terrplant(object):
         #     raise ValueError\
         #     ('runoff_fraction must be positive.')
         # if self.out_rundry == -1:
-        self.out_rundry = (self.application_rate/self.incorporation_depth) * self.runoff_fraction
+        self.out_rundry = (self.application_rate / self.incorporation_depth) * self.runoff_fraction
         logging.info(self.out_rundry)
         return self.out_rundry
 
@@ -249,7 +249,7 @@ class terrplant(object):
         #     raise ValueError\
         #     ('runoff_fraction must be positive.')
         # if self.out_runsemi == -1:
-        self.out_runsemi = (self.application_rate/self.incorporation_depth) * self.runoff_fraction * 10
+        self.out_runsemi = (self.application_rate / self.incorporation_depth) * self.runoff_fraction * 10
         logging.info("runsemi")
         logging.info(self.out_runsemi)
         return self.out_runsemi
@@ -292,16 +292,15 @@ class terrplant(object):
         #             raise ValueError\
         #             ('Either the rundry or spray variables equals None and therefor this function cannot be run.')
         self.out_totaldry = self.out_rundry + self.out_spray
-            # except ZeroDivisionError:
-            #     raise ZeroDivisionError\
-            #     ('The incorporation_depth must be non-zero.')
+        # except ZeroDivisionError:
+        #     raise ZeroDivisionError\
+        #     ('The incorporation_depth must be non-zero.')
         logging.info("totaldry")
         logging.info(self.out_totaldry)
         return self.out_totaldry
 
-
     # EEC total for semi-aquatic areas
-    def totalsemi (self):
+    def totalsemi(self):
         # if self.out_totalsemi == -1:
         #     try:
         #         if self.out_runsemi == -1:
@@ -312,13 +311,12 @@ class terrplant(object):
         #             raise ValueError\
         #             ('Either the runsemi or spray variables equals None and therefor this function cannot be run.')
         self.out_totalsemi = self.out_runsemi + self.out_spray
-            # except ZeroDivisionError:
-            #     raise ZeroDivisionError\
-            #     ('The incorporation_depth must be non-zero.')
+        # except ZeroDivisionError:
+        #     raise ZeroDivisionError\
+        #     ('The incorporation_depth must be non-zero.')
         logging.info("totalsemi")
         logging.info(self.out_totalsemi)
         return self.out_totalsemi
-
 
     # ec25 --> non-listed species
     # noaec --> listed species
@@ -362,27 +360,26 @@ class terrplant(object):
         #     if self.out_totaldry == None:
         #         raise ValueError\
         #         ('Either the out_totaldry variable equals None and therefor this function cannot be run.')
-        self.out_nms_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_monocot
+        self.out_nms_rq_dry = self.out_totaldry / self.ec25_nonlisted_seedling_emergence_monocot
         logging.info("nmsRQdry")
         logging.info(self.out_nms_rq_dry)
         return self.out_nms_rq_dry
-
 
     # Level of concern for non-listed monocot seedlings exposed to pesticide X in a dry area
 
     def LOCnmsdry(self):
         # if self.out_nms_loc_dry == '':
-            # try:
-            #     if self.out_nms_rq_dry == -1:
-            #         try:
-            #             self.nmsRQdry()
-            #         except TypeError:
-            #             raise TypeError\
-            #             ('totaldry equals None and therefor this function cannot be run.')
-                # if self.out_nms_rq_dry == None:
-                #     raise ValueError\
-                #     ('nmsRQdry variable equals None and therefor this function cannot be run.')
-                # elif self.out_nms_rq_dry >= 1.0:
+        # try:
+        #     if self.out_nms_rq_dry == -1:
+        #         try:
+        #             self.nmsRQdry()
+        #         except TypeError:
+        #             raise TypeError\
+        #             ('totaldry equals None and therefor this function cannot be run.')
+        # if self.out_nms_rq_dry == None:
+        #     raise ValueError\
+        #     ('nmsRQdry variable equals None and therefor this function cannot be run.')
+        # elif self.out_nms_rq_dry >= 1.0:
         # if self.out_nms_rq_dry >= 1.0:
         #     self.out_nms_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.')
         # else:
@@ -391,9 +388,9 @@ class terrplant(object):
         self.out_nms_loc_dry = exceed_boolean.map(lambda x:
                                                   'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.' if x == True
                                                   else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.')
-            # except ZeroDivisionError:
-            #     raise ZeroDivisionError\
-            #     ('The incorporation_depth must be non-zero.')
+        # except ZeroDivisionError:
+        #     raise ZeroDivisionError\
+        #     ('The incorporation_depth must be non-zero.')
         logging.info("LOCnmsdry")
         logging.info(self.out_nms_loc_dry)
         return self.out_nms_loc_dry
@@ -425,7 +422,7 @@ class terrplant(object):
         #     if self.out_totalsemi == None:
         #         raise ValueError\
         #         ('Either the out_totaldry variable equals None and therefor this function cannot be run.')
-        self.out_nms_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_monocot
+        self.out_nms_rq_semi = self.out_totalsemi / self.ec25_nonlisted_seedling_emergence_monocot
         logging.info("nmsRQsemi")
         logging.info(self.out_nms_rq_semi)
         return self.out_nms_rq_semi
@@ -450,12 +447,11 @@ class terrplant(object):
         #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         exceed_boolean = self.out_nms_rq_semi >= 1.0
         self.out_nms_loc_semi = exceed_boolean.map(lambda x:
-                                                  'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+                                                   'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
+                                                   else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         logging.info("LOCnmssemi")
         logging.info(self.out_nms_loc_semi)
         return self.out_nms_loc_semi
-
 
     # Risk Quotient for NON-LISTED MONOCOT seedlings exposed to Pesticide X via SPRAY drift
     def nmsRQspray(self):
@@ -481,7 +477,7 @@ class terrplant(object):
         #         raise ValueError\
         #         ('Either the out_spray variable equals None and therefor this function cannot be run.')
         # li = [self.ec25_nonlisted_vegetative_vigor_monocot, self.ec25_nonlisted_seedling_emergence_monocot]
-        
+
         # m = pd.Series([min(li, key=lambda x:float(x))])
         self.out_nms_rq_spray = self.out_spray / self.out_min_nms_spray
         logging.info("nmsRQspray")
@@ -508,12 +504,11 @@ class terrplant(object):
         # ' pesticide via spray drift indicates that potential risk is minimal.')
         exceed_boolean = self.out_nms_rq_spray >= 1.0
         self.out_nms_loc_spray = exceed_boolean.map(lambda x:
-                                                  'The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
+                                                    'The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
+                                                    else 'The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
         logging.info("LOCnmsspray")
         logging.info(self.out_nms_loc_spray)
         return self.out_nms_loc_spray
-
 
     # Risk Quotient for LISTED MONOCOT seedlings exposed to Pesticide X in a DRY areas
     def lmsRQdry(self):
@@ -574,7 +569,6 @@ class terrplant(object):
         logging.info(self.out_lms_loc_dry)
         return self.out_lms_loc_dry
 
-
     # Risk Quotient for LISTED MONOCOT seedlings exposed to Pesticide X in a SEMI-AQUATIC area
     def lmsRQsemi(self):
         # if self.out_lms_rq_semi == -1:
@@ -627,12 +621,11 @@ class terrplant(object):
         #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         exceed_boolean = self.out_lms_rq_semi >= 1.0
         self.out_lms_loc_semi = exceed_boolean.map(lambda x:
-                                                  'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+                                                   'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
+                                                   else 'The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         logging.info("LOClmssemi")
         logging.info(self.out_lms_loc_semi)
         return self.out_lms_loc_semi
-
 
     # Risk Quotient for LISTED MONOCOT seedlings exposed to Pesticide X via SPRAY drift
     def lmsRQspray(self):
@@ -685,12 +678,11 @@ class terrplant(object):
         #     ' pesticide via spray drift indicates that potential risk is minimal.')
         exceed_boolean = self.out_lms_rq_spray >= 1.0
         self.out_lms_loc_spray = exceed_boolean.map(lambda x:
-                                                  'The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
+                                                    'The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
+                                                    else 'The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
         logging.info("LOClmsspray")
         logging.info(self.out_lms_loc_spray)
         return self.out_lms_loc_spray
-
 
     # Risk Quotient for NON-LISTED DICOT seedlings exposed to Pesticide X in DRY areas
     def ndsRQdry(self):
@@ -718,7 +710,7 @@ class terrplant(object):
         #     if self.out_totaldry == None:
         #         raise ValueError\
         #         ('The out_totaldry variable equals None and therefor this function cannot be run.')
-        self.out_nds_rq_dry = self.out_totaldry/self.ec25_nonlisted_seedling_emergence_dicot
+        self.out_nds_rq_dry = self.out_totaldry / self.ec25_nonlisted_seedling_emergence_dicot
         logging.info("ndsRQdry")
         logging.info(self.out_nds_rq_dry)
         return self.out_nds_rq_dry
@@ -741,14 +733,13 @@ class terrplant(object):
         # else:
         #     self.out_nds_loc_dry = ('The risk quotient for non-listed monocot seedlings exposed to the'\
         #     ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
-        exceed_boolean = self.out_nds_rq_dry>= 1.0
+        exceed_boolean = self.out_nds_rq_dry >= 1.0
         self.out_nds_loc_dry = exceed_boolean.map(lambda x:
                                                   'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.' if x == True
                                                   else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.')
         logging.info("LOCndsdry")
         logging.info(self.out_nds_loc_dry)
         return self.out_nds_loc_dry
-
 
     # Risk Quotient for NON-LISTED DICOT seedlings exposed to Pesticide X in SEMI-AQUATIC areas
     def ndsRQsemi(self):
@@ -776,7 +767,7 @@ class terrplant(object):
         #     if self.out_totaldry == None:
         #         raise ValueError\
         #         ('The out_totalsemi variable equals None and therefor this function cannot be run.')
-        self.out_nds_rq_semi = self.out_totalsemi/self.ec25_nonlisted_seedling_emergence_dicot
+        self.out_nds_rq_semi = self.out_totalsemi / self.ec25_nonlisted_seedling_emergence_dicot
         logging.info("ndsRQsemi")
         logging.info(self.out_nds_rq_semi)
         return self.out_nds_rq_semi
@@ -799,10 +790,10 @@ class terrplant(object):
         # else:
         #     self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
         #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
-        exceed_boolean = self.out_nds_rq_semi>= 1.0
-        self.out_nds_loc_semi= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+        exceed_boolean = self.out_nds_rq_semi >= 1.0
+        self.out_nds_loc_semi = exceed_boolean.map(lambda x:
+                                                   'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
+                                                   else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         logging.info("LOCndssemi")
         logging.info(self.out_nds_loc_semi)
         return self.out_nds_loc_semi
@@ -856,10 +847,10 @@ class terrplant(object):
         # else:
         #     self.out_nds_loc_semi = ('The risk quotient for non-listed monocot seedlings exposed to the'\
         #     ' pesticide via spray drift indicates that potential risk is minimal.')
-        exceed_boolean = self.out_nds_rq_spray>= 1.0
-        self.out_nds_loc_spray= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
+        exceed_boolean = self.out_nds_rq_spray >= 1.0
+        self.out_nds_loc_spray = exceed_boolean.map(lambda x:
+                                                    'The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
+                                                    else 'The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
         logging.info("LOCndsspray")
         logging.info(self.out_nds_loc_spray)
         return self.out_nds_loc_spray
@@ -890,7 +881,7 @@ class terrplant(object):
         #     if self.out_totaldry == None:
         #         raise ValueError\
         #         ('The out_totaldry variable equals None and therefor this function cannot be run.')
-        self.out_lds_rq_dry = self.out_totaldry/self.noaec_listed_seedling_emergence_dicot
+        self.out_lds_rq_dry = self.out_totaldry / self.noaec_listed_seedling_emergence_dicot
         logging.info("ldsRQdry")
         logging.info(self.out_lds_rq_dry)
         return self.out_lds_rq_dry
@@ -913,8 +904,8 @@ class terrplant(object):
         # else:
         #     self.out_lds_loc_dry = ('The risk quotient for listed monocot seedlings exposed to the'\
         #     ' pesticide via runoff to dry areas indicates that potential risk is minimal.')
-        exceed_boolean = self.out_lds_rq_dry>= 1.0
-        self.out_lds_loc_dry= exceed_boolean.map(lambda x:
+        exceed_boolean = self.out_lds_rq_dry >= 1.0
+        self.out_lds_loc_dry = exceed_boolean.map(lambda x:
                                                   'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.' if x == True
                                                   else 'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.')
         logging.info("LOCldsdry")
@@ -947,7 +938,7 @@ class terrplant(object):
         #     if self.out_totalsemi == None:
         #         raise ValueError\
         #         ('The out_totalsemi variable equals None and therefor this function cannot be run.')
-        self.out_lds_rq_semi = self.out_totalsemi/self.noaec_listed_seedling_emergence_dicot
+        self.out_lds_rq_semi = self.out_totalsemi / self.noaec_listed_seedling_emergence_dicot
         logging.info("ldsRQsemi")
         logging.info(self.out_lds_rq_semi)
         return self.out_lds_rq_semi
@@ -970,10 +961,10 @@ class terrplant(object):
         # else:
         #     self.out_lds_loc_semi = ('The risk quotient for listed monocot seedlings exposed to the'\
         #     ' pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
-        exceed_boolean = self.out_lds_rq_semi>= 1.0
-        self.out_lds_loc_semi= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
+        exceed_boolean = self.out_lds_rq_semi >= 1.0
+        self.out_lds_loc_semi = exceed_boolean.map(lambda x:
+                                                   'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.' if x == True
+                                                   else 'The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.')
         logging.info("LOCldssemi")
         logging.info(self.out_lds_loc_semi)
         return self.out_lds_loc_semi
@@ -1027,10 +1018,10 @@ class terrplant(object):
         # else:
         #     self.out_lds_loc_spray = ('The risk quotient for listed monocot seedlings exposed to the'\
         #     ' pesticide via spray drift indicates that potential risk is minimal.')
-        exceed_boolean = self.out_lds_rq_spray>= 1.0
-        self.out_lds_loc_spray= exceed_boolean.map(lambda x:
-                                                  'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
-                                                  else 'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
+        exceed_boolean = self.out_lds_rq_spray >= 1.0
+        self.out_lds_loc_spray = exceed_boolean.map(lambda x:
+                                                    'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
+                                                    else 'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
         logging.info("LOCldsspray")
         logging.info(self.out_lds_loc_spray)
         return self.out_lds_loc_spray
@@ -1040,7 +1031,7 @@ class terrplant(object):
         # non-listed monocot EC25 and NOAEC
         s1 = pd.Series(self.ec25_nonlisted_seedling_emergence_monocot, name='seedling')
         s2 = pd.Series(self.ec25_nonlisted_vegetative_vigor_monocot, name='vegetative')
-        df = pd.concat([s1,s2], axis=1)
+        df = pd.concat([s1, s2], axis=1)
         self.out_min_nms_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minnmsspray")
         logging.info(self.out_min_nms_spray)
@@ -1051,7 +1042,7 @@ class terrplant(object):
         # listed monocot EC25 and NOAEC
         s1 = pd.Series(self.noaec_listed_seedling_emergence_monocot, name='seedling')
         s2 = pd.Series(self.noaec_listed_vegetative_vigor_monocot, name='vegetative')
-        df = pd.concat([s1,s2], axis=1)
+        df = pd.concat([s1, s2], axis=1)
         self.out_min_lms_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minlmsspray")
         logging.info(self.out_min_lms_spray)
@@ -1062,7 +1053,7 @@ class terrplant(object):
         # non-listed dicot EC25 and NOAEC
         s1 = pd.Series(self.ec25_nonlisted_seedling_emergence_dicot, name='seedling')
         s2 = pd.Series(self.ec25_nonlisted_vegetative_vigor_dicot, name='vegetative')
-        df = pd.concat([s1,s2], axis=1)
+        df = pd.concat([s1, s2], axis=1)
         self.out_min_nds_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minndsspray")
         logging.info(self.out_min_nds_spray)
@@ -1073,7 +1064,7 @@ class terrplant(object):
         # listed dicot EC25 and NOAEC
         s1 = pd.Series(self.noaec_listed_seedling_emergence_dicot, name='seedling')
         s2 = pd.Series(self.noaec_listed_vegetative_vigor_dicot, name='vegetative')
-        df = pd.concat([s1,s2], axis=1)
+        df = pd.concat([s1, s2], axis=1)
         self.out_min_lds_spray = pd.DataFrame.min(df, axis=1)
         logging.info("minldsspray")
         logging.info(self.out_min_lds_spray)

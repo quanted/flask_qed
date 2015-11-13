@@ -379,7 +379,7 @@ class sip(object):
         #         ('bodyweight_tested_bird=%g is a non-physical value.' % self.bodyweight_tested_bird)
         logging.info(self.bodyweight_tested_bird)
         self.at_bird_out = (self.ld50_avian_water) * (
-        (self.bodyweight_assessed_bird / self.bodyweight_tested_bird) ** (self.mineau_scaling_factor - 1.))
+            (self.bodyweight_assessed_bird / self.bodyweight_tested_bird) ** (self.mineau_scaling_factor - 1.))
         return self.at_bird_out
 
     # Acute adjusted toxicity value for mammals
@@ -434,7 +434,7 @@ class sip(object):
         #         raise ValueError\
         #         ('bodyweight_tested_mammal=%g is a non-physical value.' % self.bodyweight_tested_mammal)
         self.at_mamm_out = (self.ld50_mammal_water) * (
-        (self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal) ** 0.25)
+            (self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal) ** 0.25)
         return self.at_mamm_out
 
     # Adjusted chronic toxicity values for birds
@@ -544,13 +544,13 @@ class sip(object):
 
         try:
             det_other_1 = (self.noaec_bird_other_1 * self.fi_bird(self.bodyweight_bird_other_1)) / (
-            self.bodyweight_bird_other_1 / 1000.)
+                self.bodyweight_bird_other_1 / 1000.)
         except:
             det_other_1 = None
 
         try:
             det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_2)) / (
-            self.bodyweight_bird_other_2 / 1000.)
+                self.bodyweight_bird_other_2 / 1000.)
         except:
             det_other_2 = None
 
@@ -616,7 +616,7 @@ class sip(object):
         #         raise ValueError\
         #         ('bodyweight_assessed_mammal=%g is a non-physical value.' % self.bodyweight_assessed_mammal)
         self.act_out = (self.noael_mammal_water) * (
-        (self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal) ** 0.25)
+            (self.bodyweight_tested_mammal / self.bodyweight_assessed_mammal) ** 0.25)
         return self.act_out
         #   MAMMILIAN:  If only a NOAEC value (in mg/kg-diet) is available, the model user should divide the NOAEC by 20 to determine the equivalent chronic daily dose (NOAEL)
 

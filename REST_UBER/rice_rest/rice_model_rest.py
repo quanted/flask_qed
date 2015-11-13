@@ -3,10 +3,11 @@
 import pandas as pd
 import logging
 
+
 class rice(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
 
-        logging.info ("====== Rice constructor")
+        logging.info("====== Rice constructor")
         self.run_type = run_type
         self.pd_obj = pd_obj
         self.pd_obj_exp = pd_obj_exp
@@ -17,7 +18,7 @@ class rice(object):
         self.out_mass_area = pd.Series(name="out_mass_area")
         self.out_cw = pd.Series(name="out_cw")
 
-        #run meth
+        # run meth
         # Execute model methods if requested
         if self.run_type != "empty":
             self.execute_model()
@@ -44,10 +45,10 @@ class rice(object):
 
     def create_output_properties(self):
         # Outputs: Assign object attribute variables to Pandas Series
-        self.out_msed = pd.Series(name = "out_msed")
-        self.out_vw = pd.Series(name = "out_vw")
-        self.out_mass_area = pd.Series(name = "out_mass_area")
-        self.out_cw = pd.Series(name = "out_cw")
+        self.out_msed = pd.Series(name="out_msed")
+        self.out_vw = pd.Series(name="out_vw")
+        self.out_mass_area = pd.Series(name="out_mass_area")
+        self.out_cw = pd.Series(name="out_cw")
 
     def run_methods(self):
         self.Calcmsed()
@@ -58,10 +59,10 @@ class rice(object):
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
-            'out_msed' : self.out_msed,
-            'out_vw' : self.out_vw,
-            'out_mass_area' : self.out_mass_area,
-            'out_cw' : self.out_cw
+            'out_msed': self.out_msed,
+            'out_vw': self.out_vw,
+            'out_mass_area': self.out_mass_area,
+            'out_cw': self.out_cw
         })
 
         # Callable from Bottle that returns JSON
@@ -72,14 +73,14 @@ class rice(object):
             Convert DataFrames to JSON, returning a tuple 
             of JSON strings (inputs, outputs, exp_out)
         """
-        
+
         pd_obj_json = pd_obj.to_json()
         pd_obj_out_json = pd_obj_out.to_json()
         try:
             pd_obj_exp_json = pd_obj_exp.to_json()
         except:
             pd_obj_exp_json = "{}"
-        
+
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
     # The mass of the sediment at equilibrium with the water column
@@ -154,8 +155,6 @@ class rice(object):
         self.out_vw = (self.dw * self.area) + (self.dsed * self.osed * self.area)
         return self.out_vw
 
-
-
     # The pesticide mass per unit area
     def Calcmass_area(self):
         # if self.mai1 == -1:
@@ -177,7 +176,7 @@ class rice(object):
         #     if self.mai < 0:
         #         raise ValueError\
         #         ('mai=%g is a non-physical value.' % self.mai)
-        self.out_mass_area = (self.mai/self.area)*10000
+        self.out_mass_area = (self.mai / self.area) * 10000
         return self.out_mass_area
 
     #    if a <= 0:
@@ -238,6 +237,5 @@ class rice(object):
         #     if self.kd < 0:
         #         raise ValueError\
         #         ('kd=g% is a non-physical value.' % self.kd)
-        self.out_cw = (self.out_mass_area / (self.dw + (self.dsed * (self.osed + (self.pb * self.Kd*1e-5)))))*100
+        self.out_cw = (self.out_mass_area / (self.dw + (self.dsed * (self.osed + (self.pb * self.Kd * 1e-5))))) * 100
         return self.out_cw
-
