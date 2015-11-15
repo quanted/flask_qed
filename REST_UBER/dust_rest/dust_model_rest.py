@@ -1,3 +1,5 @@
+from __future__ import division
+
 class dust(object):
     def __init__(self, chemical_name, label_epa_reg_no, ar_lb, frac_pest_surface, dislodge_fol_res,
                  bird_acute_oral_study, bird_study_add_comm,

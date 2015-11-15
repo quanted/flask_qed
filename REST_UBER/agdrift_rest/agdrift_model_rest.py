@@ -1,5 +1,5 @@
 import numpy as np
-
+from __future__ import division
 
 class agdrift(object):
     def __init__(self, drop_size, ecosystem_type, application_method, boom_height, orchard_type,

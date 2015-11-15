@@ -2,7 +2,7 @@
 
 import pandas as pd
 import logging
-
+from __future__ import division
 
 class stir(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):

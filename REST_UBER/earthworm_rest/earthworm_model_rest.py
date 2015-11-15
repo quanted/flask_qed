@@ -1,3 +1,5 @@
+from __future__ import division
+
 class earthworm(object):
     def __init__(self, k_ow, l_f_e, c_s, k_d, p_s, c_w, m_w, p_e):
         self.k_ow = k_ow

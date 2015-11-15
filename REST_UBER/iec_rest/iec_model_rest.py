@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 import numpy as np
 import scipy.special as sp
-
+from __future__ import division
 
 class iec(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):

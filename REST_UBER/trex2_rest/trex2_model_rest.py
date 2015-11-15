@@ -1,5 +1,5 @@
 import numpy as np
-
+from __future__ import division
 
 class trex2(object):
     def __init__(self, chem_name, use, formu_name, a_i, Application_type, seed_treatment_formulation_name, seed_crop,

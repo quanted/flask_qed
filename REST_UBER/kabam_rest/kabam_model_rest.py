@@ -1,6 +1,6 @@
 import math
 import numpy as np
-
+from __future__ import division
 
 class kabam(object):
     def __init__(self, chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto, mineau_scaling_factor, x_poc, x_doc,
