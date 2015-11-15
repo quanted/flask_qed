@@ -1,6 +1,7 @@
+from __future__ import division
 from collections import OrderedDict
 import logging
-from __future__ import division
+
 
 class OreCalculator(object):
     def __init__(self, app_rate, area_treated, unit_exp, abs_frac, bw_adult, nc_POD):

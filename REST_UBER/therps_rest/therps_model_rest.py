@@ -1,5 +1,5 @@
-import numpy as np
 from __future__ import division
+import numpy as np
 
 
 class therps(object):

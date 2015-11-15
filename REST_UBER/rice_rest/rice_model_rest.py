@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import division
 import pandas as pd
 import logging
-from __future__ import division
+
 
 class rice(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):

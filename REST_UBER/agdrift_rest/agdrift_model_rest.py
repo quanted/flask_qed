@@ -1,5 +1,6 @@
-import numpy as np
 from __future__ import division
+import numpy as np
+
 
 class agdrift(object):
     def __init__(self, drop_size, ecosystem_type, application_method, boom_height, orchard_type,
@@ -570,7 +571,7 @@ class agdrift(object):
                       290, 291, 292, 293, 294, 295, 296, 297, 298, 299]
 
         elif (
-                    self.ecosystem_type == 'EPA Pond' and self.application_method == 'Aerial' and self.drop_size == 'Very Coarse'):
+                            self.ecosystem_type == 'EPA Pond' and self.application_method == 'Aerial' and self.drop_size == 'Very Coarse'):
             self.y = self.pond_aerial_c2vc
             # self.x = [0,1,5,10,25,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,997]
             self.nasae = 3
@@ -649,7 +650,7 @@ class agdrift(object):
                       290, 291, 292, 293, 294, 295, 296, 297, 298, 299]
 
         elif (
-                        self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Fine' and self.boom_height == 'Low'):
+                                self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Fine' and self.boom_height == 'Low'):
             self.y = self.pond_ground_low_vf2f
             # self.x = [0,1,5,10,25,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,997]
             self.nasae = 4
@@ -731,7 +732,7 @@ class agdrift(object):
                       290, 291, 292, 293, 294, 295, 296, 297, 298, 299]
 
         elif (
-                        self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Medium' and self.boom_height == 'Low'):
+                                self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Medium' and self.boom_height == 'Low'):
             self.y = self.pond_ground_low_f2m
             # self.x = [0,1,5,10,25,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,997]
             self.nasae = 6
@@ -816,7 +817,7 @@ class agdrift(object):
                       290, 291, 292, 293, 294, 295, 296, 297, 298, 299]
 
         elif (
-                        self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Fine' and self.boom_height == 'High'):
+                                self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Fine' and self.boom_height == 'High'):
             self.y = self.pond_ground_high_vf2f
             # self.x = [0,1,5,10,25,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,997]
             self.nasae = 5
@@ -898,7 +899,7 @@ class agdrift(object):
                       271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289,
                       290, 291, 292, 293, 294, 295, 296, 297, 298, 299]
         elif (
-                        self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Medium' and self.boom_height == 'High'):
+                                self.ecosystem_type == 'EPA Pond' and self.application_method == 'Ground' and self.drop_size == 'Medium' and self.boom_height == 'High'):
             self.y = self.pond_ground_high_f2m
             # self.x = [0,1,5,10,25,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,997]
             self.nasae = 7
@@ -981,7 +982,7 @@ class agdrift(object):
                       290, 291, 292, 293, 294, 295, 296, 297, 298, 299]
 
         elif (
-                    self.ecosystem_type == 'EPA Pond' and self.application_method == 'Orchard/Airblast' and self.orchard_type == 'Orchard'):
+                            self.ecosystem_type == 'EPA Pond' and self.application_method == 'Orchard/Airblast' and self.orchard_type == 'Orchard'):
             self.y = self.pond_airblast_orchard
             # self.x = [0,1,5,10,25,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,997]
             self.nasae = 9
@@ -1067,7 +1068,7 @@ class agdrift(object):
                       290, 291, 292, 293, 294, 295, 296, 297, 298, 299]
 
         elif (
-                    self.ecosystem_type == 'EPA Pond' and self.application_method == 'Orchard/Airblast' and self.orchard_type == 'Vineyard'):
+                            self.ecosystem_type == 'EPA Pond' and self.application_method == 'Orchard/Airblast' and self.orchard_type == 'Vineyard'):
             self.y = self.pond_airblast_vineyard
             self.express_y = [0.002433, 0.0020455, 0.001658, 0.001466, 0.0012740000000000002, 0.0011565, 0.001039,
                               0.00096125, 0.0008835, 0.00082735, 0.0007712, 0.0007285999999999999, 0.000686,
@@ -1211,7 +1212,7 @@ class agdrift(object):
         I = I_f - 1  # to account for python being zero based
 
         self.init_avg_dep_foa = (0.5 * (
-        self.y[I] * (YP - int(self.distance)) + self.y[I + 1] * (int(self.distance) - YM))) / 100
+            self.y[I] * (YP - int(self.distance)) + self.y[I + 1] * (int(self.distance) - YM))) / 100
         return self.init_avg_dep_foa
 
     def extrapolate_from_fig(self, ecosystem_type, distance, bisect_left, x, y):

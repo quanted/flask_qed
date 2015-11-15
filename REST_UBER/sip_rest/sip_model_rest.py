@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import division
 import numpy as np
 import pandas as pd
 import logging
-from __future__ import division
 from functools import wraps
 import time
 

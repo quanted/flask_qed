@@ -1,7 +1,8 @@
+from __future__ import division
 from collections import OrderedDict
 import json
 import OreCalculator
-from __future__ import division
+
 
 def ore(inputs, query_result_list):
     ore_class_list = []

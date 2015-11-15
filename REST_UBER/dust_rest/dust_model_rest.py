@@ -1,5 +1,6 @@
 from __future__ import division
 
+
 class dust(object):
     def __init__(self, chemical_name, label_epa_reg_no, ar_lb, frac_pest_surface, dislodge_fol_res,
                  bird_acute_oral_study, bird_study_add_comm,
@@ -116,7 +117,8 @@ class dust(object):
         self.mam_acute_derm_ld50 = float(self.mam_acute_derm_ld50)
         if self.bird_reptile_dermal_ld50 == -1:
             # if self.aviandermaltype == 'With DTI':
-            #    self.bird_reptile_dermal_ld50 = 10**(1.7822+0.8199 *(math.log(self.low_bird_acute_ld50))-0.4874 * (math.log(self.mam_acute_oral_ld50/self.mam_acute_derm_ld50*1000)))
+            #    self.bird_reptile_dermal_ld50 = 10**(1.7822+0.8199 *(math.log(self.low_bird_acute_ld50))-0.4874 *
+            # (math.log(self.mam_acute_oral_ld50/self.mam_acute_derm_ld50*1000)))
             # elif self.aviandermaltype == 'With DTI 90% CI':
             # rmse1<-0.5361976
             # var_b1<-0.1038**2
@@ -124,10 +126,13 @@ class dust(object):
             # b1_mean<-0.6379028
             # b2_mean<-2.432222
             # no.samples<-72
-            # self.bird_reptile_dermal_ld50 = 10**(1.7822+0.8199 *(math.log(self.low_bird_acute_ld50))-0.4874 * (math.log(self.mam_acute_oral_ld50/self.mam_acute_derm_ld50*1000)))
-            #          -((math.sqrt(2)/2)*2.38*math.sqrt((rmse1**2/(no.samples)) + ((self.low_bird_acute_ld50-b1_mean)**2*var_b1)+(((math.log(self.mam_acute_oral_ld50/self.mam_acute_derm_ld50*1000)-b2_mean)**2*var_b2)+rmse1**2 ))
+            # self.bird_reptile_dermal_ld50 = 10**(1.7822+0.8199 *(math.log(self.low_bird_acute_ld50))-0.4874 *
+            # (math.log(self.mam_acute_oral_ld50/self.mam_acute_derm_ld50*1000)))
+            #          -((math.sqrt(2)/2)*2.38*math.sqrt((rmse1**2/(no.samples)) + ((self.low_bird_acute_ld50-b1_mean)
+            # **2*var_b1)+(((math.log(self.mam_acute_oral_ld50/self.mam_acute_derm_ld50*1000)-b2_mean)**2*var_b2)+
+            # rmse1**2 ))
             self.bird_reptile_dermal_ld50 = 10 ** (1.7822 + 0.8199 * (math.log(self.low_bird_acute_ld50)) - 0.4874 * (
-            math.log(self.mam_acute_oral_ld50 / self.mam_acute_derm_ld50 * 1000)))
+                math.log(self.mam_acute_oral_ld50 / self.mam_acute_derm_ld50 * 1000)))
             -((math.sqrt(2) / 2) * 2.38 * math.sqrt(
                 (0.5361976 ** 2 / (72)) + ((self.low_bird_acute_ld50 - 0.6379028) ** 2 * 0.1038 ** 2) + (((math.log(
                     self.mam_acute_oral_ld50 / self.mam_acute_derm_ld50 * 1000) - 2.432222) ** 2 * 0.1210 ** 2) + 0.5361976 ** 2)))
@@ -146,7 +151,7 @@ class dust(object):
                 ('')
         if self.gran_bird_ex_derm_dose == -1:
             self.gran_bird_ex_derm_dose = (((self.ar_mg * self.frac_pest_surface) / 1300) * 0.958 * (
-            10 * (20 ** 0.667))) / (20.0 / 1000.0)
+                10 * (20 ** 0.667))) / (20.0 / 1000.0)
         return self.gran_bird_ex_derm_dose
 
     # Reptile/Amphibian External Dermal Dose
@@ -159,7 +164,7 @@ class dust(object):
                 ('')
         if self.gran_repamp_ex_derm_dose == -1:
             self.gran_repamp_ex_derm_dose = ((self.ar_mg * self.frac_pest_surface / 1300) * 0.958 * (
-            8.42 * (20 ** 0.694))) / (20.0 / 1000.0)
+                8.42 * (20 ** 0.694))) / (20.0 / 1000.0)
         return self.gran_repamp_ex_derm_dose
 
     # Mammal External Dermal Dose
@@ -172,7 +177,7 @@ class dust(object):
                 ('')
         if self.gran_mam_ex_derm_dose == -1:
             self.gran_mam_ex_derm_dose = ((self.ar_mg * self.frac_pest_surface / 1300) * 0.958 * (
-            12.3 * (15 ** 0.65))) / (15.0 / 1000.0)
+                12.3 * (15 ** 0.65))) / (15.0 / 1000.0)
         return self.gran_mam_ex_derm_dose
 
     # ------Foliar Spray Application-------
@@ -187,7 +192,7 @@ class dust(object):
                 ('')
         if self.fol_bird_ex_derm_dose == -1:
             self.fol_bird_ex_derm_dose = ((self.ar_mg * 6.01 * 6 * 0.158 * 0.2 * (10 * (20 ** 0.667))) + (
-            self.ar_mg * ((10 * (20 ** 0.667) * 0.1)))) / (20.0 / 1000.0)
+                self.ar_mg * ((10 * (20 ** 0.667) * 0.1)))) / (20.0 / 1000.0)
         return self.fol_bird_ex_derm_dose
 
     # Reptile/Amphibian External Dermal Dose
@@ -200,7 +205,7 @@ class dust(object):
                 ('')
         if self.fol_repamp_ex_derm_dose == -1:
             self.fol_repamp_ex_derm_dose = ((self.ar_mg * 6.01 * 6 * 0.158 * 0.2 * (8.42 * (20 ** 0.694))) + (
-            self.ar_mg * ((8.42 * (20 ** 0.694)) * 0.1))) / (20.0 / 1000.0)
+                self.ar_mg * ((8.42 * (20 ** 0.694)) * 0.1))) / (20.0 / 1000.0)
         return self.fol_repamp_ex_derm_dose
 
     # Mammal External Dermal Dose
@@ -213,8 +218,9 @@ class dust(object):
                 ('')
         if self.fol_mam_ex_derm_dose == -1:
             self.fol_mam_ex_derm_dose = (
-            (self.ar_mg * 6.01 * 0.158 * 0.2 * (12.3 * (15 ** 0.65))) + (self.ar_mg * ((12.3 * (15 ** 0.65)) * 0.1)) / (
-            15.0 / 1000.0))
+                (self.ar_mg * 6.01 * 0.158 * 0.2 * (12.3 * (15 ** 0.65))) + (
+                    self.ar_mg * ((12.3 * (15 ** 0.65)) * 0.1)) / (
+                    15.0 / 1000.0))
         return self.fol_mam_ex_derm_dose
 
     # ------Bare Ground Spray Application-------
@@ -229,7 +235,7 @@ class dust(object):
                 ('')
         if self.bgs_bird_ex_derm_dose == -1:
             self.bgs_bird_ex_derm_dose = (((self.ar_mg * self.frac_pest_surface / 1300.0) * 0.958 * (
-            10 * (20 ** 0.667))) + (self.ar_mg * ((10 * (20 ** 0.667)) / 2.0))) / (20.0 / 1000.0)
+                10 * (20 ** 0.667))) + (self.ar_mg * ((10 * (20 ** 0.667)) / 2.0))) / (20.0 / 1000.0)
         return self.bgs_bird_ex_derm_dose
 
     # Reptile/Amphibian External Dermal Dose
@@ -242,7 +248,7 @@ class dust(object):
                 ('')
         if self.bgs_repamp_ex_derm_dose == -1:
             self.bgs_repamp_ex_derm_dose = (((self.ar_mg * self.frac_pest_surface / 1300.0) * 0.958 * (
-            8.42 * (20 ** 0.694))) + (self.ar_mg * ((8.42 * (20 ** 0.694)) / 2.0))) / (20.0 / 1000.0)
+                8.42 * (20 ** 0.694))) + (self.ar_mg * ((8.42 * (20 ** 0.694)) / 2.0))) / (20.0 / 1000.0)
         return self.bgs_repamp_ex_derm_dose
 
     # Mammal External Dermal Dose
@@ -255,7 +261,7 @@ class dust(object):
                 ('')
         if self.bgs_mam_ex_derm_dose == -1:
             self.bgs_mam_ex_derm_dose = (((self.ar_mg * self.frac_pest_surface / 1300.0) * 0.958 * (
-            12.3 * (20 ** 0.65))) + (self.ar_mg * ((12.3 * (20 ** 0.65)) / 2.0))) / (15.0 / 1000.0)
+                12.3 * (20 ** 0.65))) + (self.ar_mg * ((12.3 * (20 ** 0.65)) / 2.0))) / (15.0 / 1000.0)
         return self.bgs_mam_ex_derm_dose
 
     # ------Dermal Toxicity Calculation (ADJ LD50)------
@@ -271,7 +277,7 @@ class dust(object):
                 ('')
         if self.amp_derm_ld50 == -1:
             self.amp_derm_ld50 = self.low_bird_acute_ld50 * (
-            (20.0 / self.test_bird_bw) ** (self.mineau_scaling_factor - 1.0))
+                (20.0 / self.test_bird_bw) ** (self.mineau_scaling_factor - 1.0))
         return self.amp_derm_ld50
 
     # Estimate 20g Bird/Reptile Dermal LD50 (mg a.i./kg-bw)
@@ -285,7 +291,7 @@ class dust(object):
                 ('')
         if self.birdrep_derm_ld50 == -1:
             self.birdrep_derm_ld50 = self.bird_reptile_dermal_ld50 * (
-            (20 / self.test_bird_bw) ** (self.mineau_scaling_factor - 1))
+                (20 / self.test_bird_bw) ** (self.mineau_scaling_factor - 1))
         return self.birdrep_derm_ld50
 
     # Estimate 15g Mammal Dermal LD50 (mg a.i./kg-bw)

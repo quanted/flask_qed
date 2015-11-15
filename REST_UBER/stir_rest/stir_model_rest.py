@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import division
 import pandas as pd
 import logging
-from __future__ import division
+
 
 class stir(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
@@ -171,7 +171,7 @@ class stir(object):
         conversion_factor = 1000000.  # cm3/m3
         # 1 (hr) is duration of exposure
         self.vid_avian = (self.sat_air_conc * self.inh_rate_avian * duration_hours) / (
-        conversion_factor * self.body_weight_assessed_bird)
+            conversion_factor * self.body_weight_assessed_bird)
         logging.info(self.vid_avian)
         return self.vid_avian
 
@@ -184,7 +184,7 @@ class stir(object):
         minutes_conversion = 60.
         activity_factor = 3.
         self.inh_rate_mammal = magic1 * (
-        self.body_weight_assessed_mammal ** magic2) * minutes_conversion * activity_factor
+            self.body_weight_assessed_mammal ** magic2) * minutes_conversion * activity_factor
         logging.info(self.inh_rate_mammal)
         return self.inh_rate_mammal
 
@@ -198,7 +198,7 @@ class stir(object):
         conversion_factor = 1000000.
         # 1 hr = duration of exposure
         self.vid_mammal = (self.sat_air_conc * self.inh_rate_mammal * duration_hours) / (
-        conversion_factor * self.body_weight_assessed_mammal)
+            conversion_factor * self.body_weight_assessed_mammal)
         logging.info(self.vid_mammal)
         return self.vid_mammal
 
@@ -227,7 +227,7 @@ class stir(object):
         #    self.spray_drift_fraction = float(self.spray_drift_fraction)
         #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
         self.sid_avian = (self.air_conc * self.inh_rate_avian * (
-        self.direct_spray_duration / 60.0) * self.spray_drift_fraction) / (self.body_weight_assessed_bird)
+            self.direct_spray_duration / 60.0) * self.spray_drift_fraction) / (self.body_weight_assessed_bird)
         # logging.info("self.air_conc = " + self.air_conc)
         # logging.info("self.inh_rate_avian = " + self.inh_rate_avian)
         # logging.info("self.direct_spray_duration = " + self.direct_spray_duration)
@@ -245,7 +245,7 @@ class stir(object):
         #    self.spray_drift_fraction = float(self.spray_drift_fraction)
         #    self.body_weight_assessed_mammal = float(self.body_weight_assessed_mammal)
         self.sid_mammal = (self.air_conc * self.inh_rate_mammal * (
-        self.direct_spray_duration / 60.0) * self.spray_drift_fraction) / (self.body_weight_assessed_mammal)
+            self.direct_spray_duration / 60.0) * self.spray_drift_fraction) / (self.body_weight_assessed_mammal)
         logging.info(self.sid_mammal)
         return self.sid_mammal
 
@@ -273,7 +273,7 @@ class stir(object):
         #    self.body_weight_tested_mammal = float(self.body_weight_tested_mammal)
         magicpower = 0.25
         self.adjusted_mammal_inhalation_ld50 = self.mammal_inhalation_ld50 * (
-                                                                             self.body_weight_tested_mammal / self.body_weight_assessed_mammal) ** magicpower
+                                                                                 self.body_weight_tested_mammal / self.body_weight_assessed_mammal) ** magicpower
         logging.info(self.adjusted_mammal_inhalation_ld50)
         return self.adjusted_mammal_inhalation_ld50
 
@@ -285,7 +285,7 @@ class stir(object):
         #    self.mammal_oral_ld50 = float(self.mammal_oral_ld50)
         three_five = 3.5
         self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50) / (
-        three_five * self.mammal_oral_ld50)
+            three_five * self.mammal_oral_ld50)
         logging.info(self.estimated_avian_inhalation_ld50)
         return self.estimated_avian_inhalation_ld50
 
@@ -297,8 +297,8 @@ class stir(object):
         #    self.body_weight_tested_bird = float(self.body_weight_tested_bird)
         #    self.mineau_scaling_factor = float(self.mineau_scaling_factor)
         self.adjusted_avian_inhalation_ld50 = self.estimated_avian_inhalation_ld50 * (
-                                                                                     self.body_weight_assessed_bird / self.body_weight_tested_bird) ** (
-                                                                                     self.mineau_scaling_factor - 1)
+                                                                                         self.body_weight_assessed_bird / self.body_weight_tested_bird) ** (
+                                                                                         self.mineau_scaling_factor - 1)
         logging.info(self.adjusted_avian_inhalation_ld50)
         return self.adjusted_avian_inhalation_ld50
 
