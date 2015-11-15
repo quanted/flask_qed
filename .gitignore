@@ -32,3 +32,4 @@ REST_UBER/sam_rest/bin/bin_mother_lode/*
 REST_UBER/sam_rest/bin/ubertool_superprzm_src/*
 static/*
 .xml
+secret.py
