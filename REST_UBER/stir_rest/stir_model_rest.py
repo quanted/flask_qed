@@ -38,6 +38,11 @@ class stir(object):
 
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
+#    def json_swagger(self, pd_obj, pd_obj_out, pd_obj_exp):
+#       replace data with types
+#       pd_objects.to_json()
+#       return pd_obj_json_swagger, pd_obj_out_json_swagger, pd_obj_exp_json_swagger
+
     def run_methods(self):
         try:
             self.CalcSatAirConc()  # eq. 1
@@ -65,30 +70,29 @@ class stir(object):
 
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
-        pd_obj_out = pd.DataFrame({
-            "sat_air_conc": self.sat_air_conc,
-            "inh_rate_avian": self.inh_rate_avian,
-            "vid_avian": self.vid_avian,
-            "inh_rate_mammal": self.inh_rate_mammal,
-            "vid_mammal": self.vid_mammal,
-            "ar2": self.ar2,
-            "air_conc": self.air_conc,
-            "sid_avian": self.sid_avian,
-            "sid_mammal": self.sid_mammal,
-            "cf": self.cf,
-            "mammal_inhalation_ld50": self.mammal_inhalation_ld50,
-            "adjusted_mammal_inhalation_ld50": self.adjusted_mammal_inhalation_ld50,
-            "estimated_avian_inhalation_ld50": self.estimated_avian_inhalation_ld50,
-            "adjusted_avian_inhalation_ld50": self.adjusted_avian_inhalation_ld50,
-            "ratio_vid_avian": self.ratio_vid_avian,
-            "ratio_sid_avian": self.ratio_sid_avian,
-            "ratio_vid_mammal": self.ratio_vid_mammal,
-            "ratio_sid_mammal": self.ratio_sid_mammal,
-            "loc_vid_avian": self.loc_vid_avian,
-            "loc_sid_avian": self.loc_sid_avian,
-            "loc_vid_mammal": self.loc_vid_mammal,
-            "loc_sid_mammal": self.loc_sid_mammal
-        })
+        pd_obj_out = pd.DataFrame(
+            dict(sat_air_conc=self.sat_air_conc,
+                 inh_rate_avian=self.inh_rate_avian,
+                 vid_avian=self.vid_avian,
+                 inh_rate_mammal=self.inh_rate_mammal,
+                 vid_mammal=self.vid_mammal,
+                 ar2=self.ar2,
+                 air_conc=self.air_conc,
+                 sid_avian=self.sid_avian,
+                 sid_mammal=self.sid_mammal,
+                 cf=self.cf,
+                 mammal_inhalation_ld50=self.mammal_inhalation_ld50,
+                 adjusted_mammal_inhalation_ld50=self.adjusted_mammal_inhalation_ld50,
+                 estimated_avian_inhalation_ld50=self.estimated_avian_inhalation_ld50,
+                 adjusted_avian_inhalation_ld50=self.adjusted_avian_inhalation_ld50,
+                 ratio_vid_avian=self.ratio_vid_avian,
+                 ratio_sid_avian=self.ratio_sid_avian,
+                 ratio_vid_mammal=self.ratio_vid_mammal,
+                 ratio_sid_mammal=self.ratio_sid_mammal,
+                 loc_vid_avian=self.loc_vid_avian,
+                 loc_sid_avian=self.loc_sid_avian,
+                 loc_vid_mammal=self.loc_vid_mammal,
+                 loc_sid_mammal=self.loc_sid_mammal))
 
         # create pandas properties for acceptance testing
         self.pd_obj_out = pd_obj_out
