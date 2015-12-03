@@ -21,6 +21,7 @@ def convert_date_to_days_since_date2(date, date2):
 
     return no_of_days.days
 
+
 def sim_date_index_list(start_date_since_1900, end_date_since_1900, start_datetime_object):
     """
         start_date_since_1900: int; Number of days from Jan 1, 1900 to simulation start date
@@ -49,6 +50,7 @@ def sim_date_index_list(start_date_since_1900, end_date_since_1900, start_dateti
 
     return day_list, date_list
 
+
 def app_num_record(args):
     """
         Produces 4 Python lists, corresponding to 4 lines of the SAM.inp file. The lists are, if order:
@@ -62,11 +64,14 @@ def app_num_record(args):
     """
 
     firstapp_datetime_object = datetime.strptime(args['sim_date_1stapp'], "%m/%d/%Y")
-    firstapp_date_since1900 = convert_date_to_days_since_date2(firstapp_datetime_object.date(), date(1900, 1, 1))    # Equivalent to 'appcount' in VB code (SAMBeta.vb)
+    firstapp_date_since1900 = convert_date_to_days_since_date2(firstapp_datetime_object.date(), date(1900, 1,
+                                                                                                     1))  # Equivalent to 'appcount' in VB code (SAMBeta.vb)
 
-    no_of_apps = int(args['apps_per_year']) * int(args['sim_no_of_years'])  # Number of applications each year X number of years in simulation
+    no_of_apps = int(args['apps_per_year']) * int(
+        args['sim_no_of_years'])  # Number of applications each year X number of years in simulation
 
-    tspan = (args['sim_date_end_since1900'] - args['sim_date_start_since1900']) + 1   # Time span, number of simulation days
+    tspan = (args['sim_date_end_since1900'] - args[
+        'sim_date_start_since1900']) + 1  # Time span, number of simulation days
     appfreq = tspan / no_of_apps  # 'appfreq' is an 'int' type
 
     application_method = args['application_method']
@@ -117,7 +122,6 @@ def app_num_record(args):
 
 
 def app_refine_uniform(appcount, no_of_apps, application_rate, application_method, appfreq, time_window_1):
-
     """
         Application Refinement: Uniform over Window
 
@@ -161,7 +165,6 @@ def app_refine_uniform(appcount, no_of_apps, application_rate, application_metho
         # Counter for time_window_1 loop
         j = 1
         while (j < int(time_window_1)):
-
             # List 1: Application record number
             app_record_no = appcount - jdate_i + j
             app_num_record_list.append(app_record_no)
@@ -180,7 +183,7 @@ def app_refine_uniform(appcount, no_of_apps, application_rate, application_metho
 
             j += 1
 
-        appcount = appcount + appfreq   # This should be an 'int'
+        appcount = appcount + appfreq  # This should be an 'int'
 
         i += 1
 
@@ -188,9 +191,9 @@ def app_refine_uniform(appcount, no_of_apps, application_rate, application_metho
 
     return app_num_record_list, app_record_day_since_1900_list, app_rate_list, app_method_list, total_no_of_apps
 
-def app_refine_uniform_with_step(appcount, no_of_apps, application_rate, application_method, appfreq,
-    time_window_1, percent_applied_1, time_window_2, percent_applied_2):
 
+def app_refine_uniform_with_step(appcount, no_of_apps, application_rate, application_method, appfreq,
+                                 time_window_1, percent_applied_1, time_window_2, percent_applied_2):
     """
         Application Refinement: Uniform Step over Window
 
@@ -237,7 +240,6 @@ def app_refine_uniform_with_step(appcount, no_of_apps, application_rate, applica
         # Application number tracker for inner loop
         appcount2 = 0
         while (j < int(time_window_1)):
-
             appcount2 += 1
 
             # List 1: Application record number
@@ -261,7 +263,6 @@ def app_refine_uniform_with_step(appcount, no_of_apps, application_rate, applica
         # Counter for time_window_2 loop
         k = 1
         while (k < int(time_window_2)):
-
             # List 1: Application record number
             app_record_no = appcount - jdate_i + appcount2 + k
             app_num_record_list.append(app_record_no)
@@ -280,7 +281,7 @@ def app_refine_uniform_with_step(appcount, no_of_apps, application_rate, applica
 
             k += 1
 
-        appcount = appcount + appfreq   # This should be an 'int'
+        appcount = appcount + appfreq  # This should be an 'int'
 
         i += 1
 
@@ -288,8 +289,8 @@ def app_refine_uniform_with_step(appcount, no_of_apps, application_rate, applica
 
     return app_num_record_list, app_record_day_since_1900_list, app_rate_list, app_method_list, total_no_of_apps
 
-def app_refine_triangular(appcount, no_of_apps, application_rate, application_method, appfreq, time_window_1):
 
+def app_refine_triangular(appcount, no_of_apps, application_rate, application_method, appfreq, time_window_1):
     """
         Application Refinement: Triangular over Window
 
@@ -336,7 +337,6 @@ def app_refine_triangular(appcount, no_of_apps, application_rate, application_me
         # Application number tracker for inner loop
         appcount2 = 0
         while (j < int(thalf)):
-
             appcount2 += 1
 
             # List 1: Application record number
@@ -360,7 +360,6 @@ def app_refine_triangular(appcount, no_of_apps, application_rate, application_me
         # Counter 'k' loop
         k = 1
         while (k < int(thalf)):
-
             # List 1: Application record number
             app_record_no = appcount - jdate_i + appcount2 + k
             app_num_record_list.append(app_record_no)
@@ -370,7 +369,8 @@ def app_refine_triangular(appcount, no_of_apps, application_rate, application_me
             app_record_day_since_1900_list.append(app_record_day_since_1900)
 
             # List 3: Application rate
-            app_rate = (appm / float(time_window_1) / float(thalf)) * (((float(thalf) - k) ** 2) - ((float(thalf) - k - 1) ** 2))
+            app_rate = (appm / float(time_window_1) / float(thalf)) * (
+            ((float(thalf) - k) ** 2) - ((float(thalf) - k - 1) ** 2))
             app_rate_list.append(app_rate)
 
             # List 4: Application method
@@ -379,7 +379,7 @@ def app_refine_triangular(appcount, no_of_apps, application_rate, application_me
 
             k += 1
 
-        appcount = appcount + appfreq   # This should be an 'int'
+        appcount = appcount + appfreq  # This should be an 'int'
 
         i += 1
 
@@ -387,8 +387,8 @@ def app_refine_triangular(appcount, no_of_apps, application_rate, application_me
 
     return app_num_record_list, app_record_day_since_1900_list, app_rate_list, app_method_list, total_no_of_apps
 
-def output_time_avg_options(output_time_avg_option):
 
+def output_time_avg_options(output_time_avg_option):
     if output_time_avg_option == '1':
         """
             FIX THIS PART
@@ -399,13 +399,14 @@ def output_time_avg_options(output_time_avg_option):
 
     return options
 
+
 def inputs_preprocessing(inputs):
- 
     start_datetime_object = datetime.strptime(inputs['sim_date_start'], "%m/%d/%Y")
     end_datetime_object = datetime.strptime(inputs['sim_date_end'], "%m/%d/%Y")
 
     inputs['sim_date_start_index'] = convert_date_to_days_since_date2(start_datetime_object.date(), date(1984, 1, 1))
-    inputs['sim_date_start_since1900'] = convert_date_to_days_since_date2(start_datetime_object.date(), date(1900, 1, 1))
+    inputs['sim_date_start_since1900'] = convert_date_to_days_since_date2(start_datetime_object.date(),
+                                                                          date(1900, 1, 1))
     inputs['sim_date_end_since1900'] = convert_date_to_days_since_date2(end_datetime_object.date(), date(1900, 1, 1))
     inputs['sim_date_1st_year'] = start_datetime_object.year
     inputs['sim_date_1st_month'] = start_datetime_object.month
@@ -414,14 +415,15 @@ def inputs_preprocessing(inputs):
     inputs['sim_no_of_years'] = inputs['sim_date_last_year'] - inputs['sim_date_1st_year'] + 1
     inputs['sim_no_of_days'] = inputs['sim_date_end_since1900'] - inputs['sim_date_start_since1900'] + 1
     inputs['sim_day_index_list'], inputs['sim_day_date_list'] = sim_date_index_list(
-            inputs['sim_date_start_since1900'], inputs['sim_date_end_since1900'],
-            start_datetime_object)
+        inputs['sim_date_start_since1900'], inputs['sim_date_end_since1900'],
+        start_datetime_object)
     inputs['crop_list_no'] = inputs['crop_list_no'].split(',')
     inputs['app_num_record'], inputs['app_record_day_since_1900'], \
-            inputs['app_rate'], inputs['app_method'], inputs['total_no_of_apps'] = app_num_record(inputs)
+    inputs['app_rate'], inputs['app_method'], inputs['total_no_of_apps'] = app_num_record(inputs)
     inputs['output_time_avg_conc'] = output_time_avg_options(inputs['output_time_avg_option'])
 
     return inputs
+
 
 def generate_sam_input_file(args, sam_input_file_path):
     """
@@ -432,11 +434,12 @@ def generate_sam_input_file(args, sam_input_file_path):
         returns: nothing
     """
 
-    inputs = inputs_preprocessing(copy.deepcopy(args))  # Create a new copy of args dict to not mess with the original POSTed 'args'
+    inputs = inputs_preprocessing(
+        copy.deepcopy(args))  # Create a new copy of args dict to not mess with the original POSTed 'args'
 
     ####################Start writing input file###################
 
-    myfile = open(sam_input_file_path,'w')
+    myfile = open(sam_input_file_path, 'w')
 
     try:
         myfile.write(inputs['sim_type'] + "\n")
@@ -489,12 +492,14 @@ def generate_sam_input_file(args, sam_input_file_path):
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s \n" % ' '.join(map(str, inputs['sim_day_index_list'])))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
+        myfile.write("%s \n" % ' '.join(map(str, inputs[
+            'sim_day_index_list'])))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s \n" % ' '.join(map(str, inputs['sim_day_date_list'])))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
+        myfile.write("%s \n" % ' '.join(map(str, inputs[
+            'sim_day_date_list'])))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
@@ -534,7 +539,6 @@ def generate_sam_input_file(args, sam_input_file_path):
         print str(e)
         myfile.write(' ---ERROR--- \n')
 
-
     try:
         myfile.write("%s !Application num_record \n" % ' '.join(map(str, inputs['app_num_record'])))
     except Exception, e:
@@ -555,7 +559,6 @@ def generate_sam_input_file(args, sam_input_file_path):
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
-
 
     try:
         myfile.write("%s !Output type (1=Daily,2=TimeAvg) \n" % inputs['output_type'])
@@ -588,11 +591,13 @@ def generate_sam_input_file(args, sam_input_file_path):
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("1 !Output format (1=table,2=map,3=plot/histogram) \n")   #inputs['output_format'] This needs to be fixed to handle all combinations
+        myfile.write(
+            "1 !Output format (1=table,2=map,3=plot/histogram) \n")  # inputs['output_format'] This needs to be fixed to handle all combinations
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
 
     myfile.close()
 
-    return inputs['sim_day_index_list']  #, sam_input_file_path  NOT NEEDED; COULD BE USED TO REMOVE HARD CODED STRINGS FROM FORTRAN AND BE PASSED IN AS COMMAND LINE ARH INSTEAD
+    return inputs[
+        'sim_day_index_list']  # , sam_input_file_path  NOT NEEDED; COULD BE USED TO REMOVE HARD CODED STRINGS FROM FORTRAN AND BE PASSED IN AS COMMAND LINE ARH INSTEAD

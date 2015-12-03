@@ -3,14 +3,15 @@ __author__ = 'jflaisha'
 import logging, numpy as np, requests, json, cPickle
 
 try:
-    import superprzm  #  Import superprzm.dll / .so
+    import superprzm  # Import superprzm.dll / .so
+
     _dll_loaded = True
 except ImportError, e:
     logging.exception(e)
     _dll_loaded = False
 
-def run(jid, sam_bin_path, name_temp, section, array_size):
 
+def run(jid, sam_bin_path, name_temp, section, array_size):
     # np_array_out = np.random.rand(50,3)  # Dummy NumPy data
 
     # Run SuperPRZM as DLL
@@ -24,17 +25,19 @@ def run(jid, sam_bin_path, name_temp, section, array_size):
 
     return True
 
-def mongo_motor_insert(jid, huc_ids, np_array, name_temp, section):
 
-    jid = name_temp + "_" +section
+def mongo_motor_insert(jid, huc_ids, np_array, name_temp, section):
+    # TODO: Remove the next line (was previously used for testing, production 'jid' is the 'jid' param)
+    # jid = name_temp + "_" +section
     url = 'http://localhost:8787/sam/daily/' + jid
     # http_headers = {'Content-Type': 'application/json'}
     http_headers = {'Content-Type': 'application/octet-stream'}
-    #data = json.dumps(create_mongo_document(np_array, name_temp, section))
+    # data = json.dumps(create_mongo_document(np_array, name_temp, section))
     data = serialize(jid, huc_ids, np_array, name_temp, section)
 
     # Send data to Mongo server
     requests.post(url, data=data, headers=http_headers, timeout=30)
+
 
 def create_huc_ids_list(np_array_huc_ids):
     """
@@ -57,7 +60,7 @@ def serialize(jid, huc_ids, np_array, name_temp, section):
     :param section:
     :return:
     """
-    return  cPickle.dumps({
+    return cPickle.dumps({
         "jid": jid,
         'output': np_array,
         'huc_ids': huc_ids

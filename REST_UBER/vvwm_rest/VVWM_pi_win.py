@@ -5,7 +5,8 @@ def VVWM_pi(working_dir,
             wc_hl, w_temp, bm_hl, ben_temp, ap_hl, p_ref, h_hl, mwt, vp, sol, Q10Box,
             convertSoil, convert_Foliar, convertWC, convertBen, convertAP, convertH,
             deg_check, totalApp,
-            SpecifyYears, ApplicationTypes, PestAppyDay, PestAppyMon, appNumber_year, app_date_type, DepthIncorp, PestAppyRate, localEff, localSpray,
+            SpecifyYears, ApplicationTypes, PestAppyDay, PestAppyMon, appNumber_year, app_date_type, DepthIncorp,
+            PestAppyRate, localEff, localSpray,
             scenID,
             buried, D_over_dx, PRBEN, benthic_depth, porosity, bulk_density, FROC2, DOC2, BNMAS,
             DFAC, SUSED, CHL, FROC1, DOC1, PLMAS,
@@ -32,21 +33,21 @@ def VVWM_pi(working_dir,
     def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
 
-    name_temp=id_generator()
+    name_temp = id_generator()
 
-##########################################################################################
-#####AMAZON KEY, store output files. You might have to write your own import approach#####
-##########################################################################################
+    ##########################################################################################
+    #####AMAZON KEY, store output files. You might have to write your own import approach#####
+    ##########################################################################################
     key = keys_Picloud_S3.amazon_s3_key
     secretkey = keys_Picloud_S3.amazon_s3_secretkey
-##################################################################################
-######Create a folder if it does not existed, where holds calculations' output.#####
-##################################################################################
+    ##################################################################################
+    ######Create a folder if it does not existed, where holds calculations' output.#####
+    ##################################################################################
     cwd = os.path.dirname(os.path.realpath(__file__))
-    print("cwd="+cwd)
+    print("cwd=" + cwd)
 
-    src=cwd
-    src1=os.path.join(cwd, name_temp)
+    src = cwd
+    src1 = os.path.join(cwd, name_temp)
     if not os.path.exists(src1):
         os.makedirs(src1)
     else:
@@ -57,24 +58,24 @@ def VVWM_pi(working_dir,
     # Set working_dir for vvwmTransfer file:
     working_dir = src1
 
-################################################################################
-#####Write the vvwmTransfer file################
+    ################################################################################
+    #####Write the vvwmTransfer file################
     vvwm_input_generator.makevvwmTransfer(working_dir,
-                                    koc_check, Koc, soilHalfLifeBox, soilTempBox1, foliarHalfLifeBox,
-                                    wc_hl, w_temp, bm_hl, ben_temp, ap_hl, p_ref, h_hl, mwt, vp, sol, Q10Box,
-                                    convertSoil, convert_Foliar, convertWC, convertBen, convertAP, convertH,
-                                    deg_check, totalApp,
-                                    SpecifyYears, ApplicationTypes, PestAppyDay, PestAppyMon, appNumber_year, app_date_type, DepthIncorp, PestAppyRate, localEff, localSpray,
-                                    scenID,
-                                    buried, D_over_dx, PRBEN, benthic_depth, porosity, bulk_density, FROC2, DOC2, BNMAS,
-                                    DFAC, SUSED, CHL, FROC1, DOC1, PLMAS,
-                                    firstYear, lastyear, vvwmSimType,
-                                    afield, area, depth_0, depth_max,
-                                    ReservoirFlowAvgDays)
-    
+                                          koc_check, Koc, soilHalfLifeBox, soilTempBox1, foliarHalfLifeBox,
+                                          wc_hl, w_temp, bm_hl, ben_temp, ap_hl, p_ref, h_hl, mwt, vp, sol, Q10Box,
+                                          convertSoil, convert_Foliar, convertWC, convertBen, convertAP, convertH,
+                                          deg_check, totalApp,
+                                          SpecifyYears, ApplicationTypes, PestAppyDay, PestAppyMon, appNumber_year,
+                                          app_date_type, DepthIncorp, PestAppyRate, localEff, localSpray,
+                                          scenID,
+                                          buried, D_over_dx, PRBEN, benthic_depth, porosity, bulk_density, FROC2, DOC2,
+                                          BNMAS,
+                                          DFAC, SUSED, CHL, FROC1, DOC1, PLMAS,
+                                          firstYear, lastyear, vvwmSimType,
+                                          afield, area, depth_0, depth_max,
+                                          ReservoirFlowAvgDays)
 
-
-# ########Copy files to the tempt folder#############
+    # ########Copy files to the tempt folder#############
     print "++++++++++++++++++++++++++"
     met = "test.dvf"
     if (deg_check == 1):
@@ -89,7 +90,7 @@ def VVWM_pi(working_dir,
     shutil.copy(os.path.join(src, met), src1)
     shutil.copy(os.path.join(src, przm5_output), src1)
     print(os.getcwd())
-    print(os.listdir(src1))   #check what files are copied
+    print(os.listdir(src1))  # check what files are copied
 
     ##call vvwm_win.exe w/ transfer file
     os.chdir(src1)
@@ -97,72 +98,72 @@ def VVWM_pi(working_dir,
     print 'Before running VVWM', fname_before
     # If EPA Pond & Reservoir is checked, loop through model twice with the two Transfer files:
     if (vvwmSimType == '0'):
-        src2="vvwm_win.exe vvwmTransfer.txt"
-        a=subprocess.Popen(src2, shell=True)
+        src2 = "vvwm_win.exe vvwmTransfer.txt"
+        a = subprocess.Popen(src2, shell=True)
         print('done 1')
         a.wait()
         os.rename(os.path.join(working_dir, 'vvwmTransfer.txt'), os.path.join((working_dir, 'vvwmTransferPond.txt'))
         os.rename(os.path.join(working_dir, 'vvwmTransferRes.txt'), os.path.join(working_dir, 'vvwmTransfer.txt'))
-        b=subprocess.Popen(src2, shell=True)
+        b = subprocess.Popen(src2, shell=True)
         print('done 2')
         b.wait()
         os.rename(os.path.join(working_dir, 'vvwmTransfer.txt'), os.path.join(working_dir, 'vvwmTransferRes.txt'))
-    else:
-        src2="vvwm_win.exe vvwmTransfer.txt"
-        a=subprocess.Popen(src2, shell=True)
+        else:
+        src2 = "vvwm_win.exe vvwmTransfer.txt"
+        a = subprocess.Popen(src2, shell=True)
         print('done')
         a.wait()
 
-    fname=os.listdir(src1)
-    print 'After running VVWM', fname
-    print "++++++++++++++++++++++++++"
-    # Generate Output Variables
-    WC_peak = []
-    WC_chronic = []
-    WC_simavg = []
-    WC_4dayavg = []
-    WC_21dayavg = []
-    WC_60dayavg = []
-    WC_90dayavg = []
-    Ben_peak = []
-    Ben_21dayavg = []
-    Ben_convfact = []
-    Ben_massfract = []
-    EWCH_washout = []
-    EWCH_metabolism = []
-    EWCH_hydrolysis = []
-    EWCH_photolysis = []
-    EWCH_volatilization = []
-    EWCH_total = []
-    EBH_burial = []
-    EBH_metabolism = []
-    EBH_hydrolysis = []
-    EBH_total = []
-    RT_runoff = []
-    RT_erosion = []
-    RT_drift = []
-    # Lists to contain graph data
-    peak_li1 = []
-    ben_peak_li1 = []
-    peak_li2 = []
-    ben_peak_li2 = []
-    # name of output file generated by vvwm
-    vvwm_outputFilePond = przm5_outputChk + '_' + scenID + '_Pond_Parent.txt'
-    vvwm_outputFileReservoir = przm5_outputChk + '_' + scenID + '_Reservoir_Parent.txt'
-    vvwm_outputFileCustom = przm5_outputChk + '_' + scenID + '_Custom_Parent.txt'
-    
-    # Read output file(s):
-    NumOfOutputFiles = 1
-    if vvwmSimType == '5':
-        vvwm_outputTxt = vvwm_outputFilePond
-    elif vvwmSimType == "4":
-        vvwm_outputTxt = vvwm_outputFileReservoir
-    elif vvwmSimType == "1" or vvwmSimType == "2" or vvwmSimType == "3":
-        vvwm_outputTxt = vvwm_outputFileCustom
-    elif vvwmSimType == "0":
-        vvwm_outputTxt = vvwm_outputFilePond
+        fname = os.listdir(src1)
+        print 'After running VVWM', fname
+        print "++++++++++++++++++++++++++"
+        # Generate Output Variables
+        WC_peak = []
+        WC_chronic = []
+        WC_simavg = []
+        WC_4dayavg = []
+        WC_21dayavg = []
+        WC_60dayavg = []
+        WC_90dayavg = []
+        Ben_peak = []
+        Ben_21dayavg = []
+        Ben_convfact = []
+        Ben_massfract = []
+        EWCH_washout = []
+        EWCH_metabolism = []
+        EWCH_hydrolysis = []
+        EWCH_photolysis = []
+        EWCH_volatilization = []
+        EWCH_total = []
+        EBH_burial = []
+        EBH_metabolism = []
+        EBH_hydrolysis = []
+        EBH_total = []
+        RT_runoff = []
+        RT_erosion = []
+        RT_drift = []
+        # Lists to contain graph data
+        peak_li1 = []
+        ben_peak_li1 = []
+        peak_li2 = []
+        ben_peak_li2 = []
+        # name of output file generated by vvwm
+        vvwm_outputFilePond = przm5_outputChk + '_' + scenID + '_Pond_Parent.txt'
+        vvwm_outputFileReservoir = przm5_outputChk + '_' + scenID + '_Reservoir_Parent.txt'
+        vvwm_outputFileCustom = przm5_outputChk + '_' + scenID + '_Custom_Parent.txt'
+
+        # Read output file(s):
+        NumOfOutputFiles = 1
+        if vvwmSimType == '5':
+            vvwm_outputTxt = vvwm_outputFilePond
+        elif vvwmSimType == "4":
+            vvwm_outputTxt = vvwm_outputFileReservoir
+        elif vvwmSimType == "1" or vvwmSimType == "2" or vvwmSimType == "3":
+            vvwm_outputTxt = vvwm_outputFileCustom
+        elif vvwmSimType == "0":
+            vvwm_outputTxt = vvwm_outputFilePond
         NumOfOutputFiles = 2
-    x = 0
+        x = 0
     while (x < NumOfOutputFiles):
         years = 0
         if x == 1:
@@ -177,7 +178,7 @@ def VVWM_pi(working_dir,
                         if "=" in line:
                             # Make desired value be index=1 for each line:
                             equalsSignIndex = line.index("=")
-                            del line[equalsSignIndex+2:len(line)]
+                            del line[equalsSignIndex + 2:len(line)]
                             s = " ".join(line)
                             li = s.split(" = ", 1)
                             # Assign desired value to variable:
@@ -264,15 +265,15 @@ def VVWM_pi(working_dir,
                                 years = 1
         x = x + 1
 
-    #zip all the file
-    zout=zipfile.ZipFile("test.zip","w", zipfile.ZIP_DEFLATED)
+    # zip all the file
+    zout = zipfile.ZipFile("test.zip", "w", zipfile.ZIP_DEFLATED)
     for name in fname:
-        if name !='vvwm_win.exe' and name !='test.dvf' and name != przm5_output:
+        if name != 'vvwm_win.exe' and name != 'test.dvf' and name != przm5_output:
             zout.write(name)
     zout.close()
 
-    name1='VVWM_'+name_temp+'.zip'
-    link='https://s3.amazonaws.com/vvwm/'+name1
+    name1 = 'VVWM_' + name_temp + '.zip'
+    link = 'https://s3.amazonaws.com/vvwm/' + name1
     # print link
     shutil.rmtree(src1)
 

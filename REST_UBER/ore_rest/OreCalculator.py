@@ -1,5 +1,7 @@
+from __future__ import division
 from collections import OrderedDict
 import logging
+
 
 class OreCalculator(object):
     def __init__(self, app_rate, area_treated, unit_exp, abs_frac, bw_adult, nc_POD):
@@ -118,7 +120,6 @@ class DermalNonCancer(NonCancerInputs):
         """
         self.calc_not_combined()
 
-
     def calc_sl_no_G(self):
         self.sl_no_G = self.calc_ppe(self.unit_exp_sl_no_G)
 
@@ -192,7 +193,6 @@ class InhalNonCancer(NonCancerInputs):
         """
         self.calc_not_combined()
 
-
     def calc_no_r(self):
         self.no_r = self.calc_ppe(self.unit_exp_no_r)
 
@@ -261,19 +261,18 @@ class CombinedDose(object):
         self.dermal = dermal
         self.inhal = inhal
 
-        self.ppe_in_use = map(None, self.dermal.get_ppe_in_use(), self.inhal.get_ppe_in_use())  #  merge dermal & inhal lists
+        self.ppe_in_use = map(None, self.dermal.get_ppe_in_use(),
+                              self.inhal.get_ppe_in_use())  # merge dermal & inhal lists
         print self.ppe_in_use
-
 
     def moe_calc_additive_dose(self, nc_POD, dose_conc_combined):
         return float(nc_POD) / dose_conc_combined
 
     def moe_calc_one_over_moe(self, moe_dermal, moe_inhal):
-        return 1 / ( ( 1 / moe_dermal ) + ( 1 / moe_inhal ) )
+        return 1 / ((1 / moe_dermal) + (1 / moe_inhal))
 
     def ari_calc(self, loc_dermal, loc_inhal, moe_dermal, moe_inhal):
-        return 1 / ( ( loc_dermal / moe_dermal ) + ( loc_inhal / moe_inhal ) )
-
+        return 1 / ((loc_dermal / moe_dermal) + (loc_inhal / moe_inhal))
 
     def additive_dose(self):
         self.combined = 'MOE'
@@ -287,27 +286,26 @@ class CombinedDose(object):
             lists are different lengths.  The try..except blocks here will replace None values with
             last valid dose conc. value for use in the Combined MOE calculation
             """
-            try:  #  Try to set dermal dose conc. to current ppe
+            try:  # Try to set dermal dose conc. to current ppe
                 conc_d = getattr(self.dermal, ppe_dermal).dose_conc
                 last_dermal_conc = conc_d
-            except TypeError, e:  #  if try fails, use previous valid dermal dose conc.
+            except TypeError, e:  # if try fails, use previous valid dermal dose conc.
                 logging.exception(e)
                 conc_d = last_dermal_conc
-            try:  #  Try to set inhal dose conc. to current ppe
+            try:  # Try to set inhal dose conc. to current ppe
                 conc_i = getattr(self.inhal, ppe_inhal).dose_conc
                 last_inhal_conc = conc_i
-            except TypeError, e:  #  if try fails, use previous valid inhal dose conc.
+            except TypeError, e:  # if try fails, use previous valid inhal dose conc.
                 logging.exception(e)
                 conc_i = last_inhal_conc
 
-            combo_moe = self.moe_calc_additive_dose(self.dermal.nc_POD, conc_d + conc_i)  #  run Combined MOE calculation
+            combo_moe = self.moe_calc_additive_dose(self.dermal.nc_POD, conc_d + conc_i)  # run Combined MOE calculation
             self.combined_moe.append(combo_moe)
 
             i += 1
 
         print self.combined_moe
-        return { 'combined': self.combined, 'combined_list': self.combined_moe, 'combined_approach': self.approach }
-
+        return {'combined': self.combined, 'combined_list': self.combined_moe, 'combined_approach': self.approach}
 
     def one_over_moe(self):
         self.combined = 'MOE'
@@ -321,27 +319,26 @@ class CombinedDose(object):
             lists are different lengths.  The try..except blocks here will replace None values with
             last valid dose conc. value for use in the Combined MOE calculation
             """
-            try:  #  Try to set dermal dose conc. to current ppe
+            try:  # Try to set dermal dose conc. to current ppe
                 moe_d = getattr(self.dermal, ppe_dermal).moe
                 last_dermal_moe = moe_d
-            except TypeError, e:  #  if try fails, use previous valid dermal dose conc.
+            except TypeError, e:  # if try fails, use previous valid dermal dose conc.
                 logging.exception(e)
                 moe_d = last_dermal_moe
-            try:  #  Try to set inhal dose conc. to current ppe
+            try:  # Try to set inhal dose conc. to current ppe
                 moe_i = getattr(self.inhal, ppe_inhal).moe
                 last_inhal_moe = moe_i
-            except TypeError, e:  #  if try fails, use previous valid inhal dose conc.
+            except TypeError, e:  # if try fails, use previous valid inhal dose conc.
                 logging.exception(e)
                 moe_i = last_inhal_moe
 
-            combo_moe = self.moe_calc_one_over_moe(moe_d, moe_i)  #  run Combined MOE calculation
+            combo_moe = self.moe_calc_one_over_moe(moe_d, moe_i)  # run Combined MOE calculation
             self.combined_moe.append(combo_moe)
 
             i += 1
 
         print self.combined_moe
-        return { 'combined': self.combined, 'combined_list': self.combined_moe, 'combined_approach': self.approach }
-
+        return {'combined': self.combined, 'combined_list': self.combined_moe, 'combined_approach': self.approach}
 
     def ari(self):
         self.combined = 'ARI'
@@ -358,25 +355,23 @@ class CombinedDose(object):
             lists are different lengths.  The try..except blocks here will replace None values with
             last valid dose conc. value for use in the Combined MOE calculation
             """
-            try:  #  Try to set dermal dose conc. to current ppe
+            try:  # Try to set dermal dose conc. to current ppe
                 moe_d = getattr(self.dermal, ppe_dermal).moe
                 last_dermal_moe = moe_d
-            except TypeError, e:  #  if try fails, use previous valid dermal dose conc.
+            except TypeError, e:  # if try fails, use previous valid dermal dose conc.
                 logging.exception(e)
                 moe_d = last_dermal_moe
-            try:  #  Try to set inhal dose conc. to current ppe
+            try:  # Try to set inhal dose conc. to current ppe
                 moe_i = getattr(self.inhal, ppe_inhal).moe
                 last_inhal_moe = moe_i
-            except TypeError, e:  #  if try fails, use previous valid inhal dose conc.
+            except TypeError, e:  # if try fails, use previous valid inhal dose conc.
                 logging.exception(e)
                 moe_i = last_inhal_moe
 
-            combo_moe = self.ari_calc(loc_d, loc_i, moe_d, moe_i)  #  run Combined MOE calculation
+            combo_moe = self.ari_calc(loc_d, loc_i, moe_d, moe_i)  # run Combined MOE calculation
             self.combined_moe.append(combo_moe)
 
             i += 1
 
         print self.combined_moe
-        return { 'combined': self.combined, 'combined_list': self.combined_moe, 'combined_approach': self.approach }
-
-
+        return {'combined': self.combined, 'combined_list': self.combined_moe, 'combined_approach': self.approach}

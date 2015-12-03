@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import logging
 import pandas as pd
 import numpy as np
 import scipy.special as sp
+
 
 class iec(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
@@ -55,7 +57,7 @@ class iec(object):
         self.chance_f_out = pd.Series(name="chance_f_out")
 
     def create_output_dataframe(self):
-    # Create DataFrame containing output value Series
+        # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
             "z_score_f_out": self.z_score_f_out,
             "F8_f_out": self.F8_f_out,
@@ -74,7 +76,8 @@ class iec(object):
         except TypeError:
             print "Type Error: Your variables are not set correctly."
 
-        # begin model methods
+            # begin model methods
+
     def z_score_f(self):
         # if self.dose_response < 0:
         #     raise ValueError\
@@ -89,20 +92,20 @@ class iec(object):
         logging.info('z_score_f')
         logging.info(self.z_score_f_out)
         return self.z_score_f_out
-        
+
     def F8_f(self):
         # if self.z_score_f_out == None:
         #     raise ValueError\
         #         ('z_score_f variable equals None and therefore this function cannot be run.')
-            # if self.F8_f_out == 0:
-            #     self.F8_f_out = 10 ^ (-16)
-            # else:
-            #     self.F8_f_out = self.F8_f_out
-        self.F8_f_out = 0.5 * sp.erfc(-self.z_score_f_out/np.sqrt(2))
+        # if self.F8_f_out == 0:
+        #     self.F8_f_out = 10 ^ (-16)
+        # else:
+        #     self.F8_f_out = self.F8_f_out
+        self.F8_f_out = 0.5 * sp.erfc(-self.z_score_f_out / np.sqrt(2))
         logging.info('F8_f')
         logging.info(self.F8_f_out)
         return self.F8_f_out
-        
+
     def chance_f(self):
         # if self.F8_f_out == None:
         #     raise ValueError\

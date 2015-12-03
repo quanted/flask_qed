@@ -1,7 +1,7 @@
 from distutils.core import setup
 
-#create package with specific modules accessible
-#https://packaging.python.org/en/latest/distributing/
+# create package with specific modules accessible
+# https://packaging.python.org/en/latest/distributing/
 
 setup(name='ubertool',
       version='1.0',
