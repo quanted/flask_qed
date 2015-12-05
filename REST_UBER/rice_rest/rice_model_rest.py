@@ -7,7 +7,6 @@ import logging
 class rice(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):
 
-        logging.info("====== Rice constructor")
         self.run_type = run_type
         self.pd_obj = pd_obj
         self.pd_obj_exp = pd_obj_exp

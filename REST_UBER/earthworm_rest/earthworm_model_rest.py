@@ -1,6 +1,6 @@
+from __future__ import division
 import logging
 import pandas as pd
-from __future__ import division
 
 class earthworm(object):
     def __init__(self, run_type, pd_obj, pd_obj_exp):

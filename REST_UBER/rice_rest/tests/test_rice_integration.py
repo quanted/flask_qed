@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import numpy.testing as npt
-from REST_UBER.rice_rest import rice_model_rest as rice_model
+from .. import rice_model_rest as rice_model
 import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs
