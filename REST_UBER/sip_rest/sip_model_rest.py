@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import division
-import numpy as np
 import pandas as pd
 import logging
+import numpy as np
 from functools import wraps
 import time
 

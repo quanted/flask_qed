@@ -23,79 +23,24 @@ class stir(object):
         # Callable from Bottle that returns JSON
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
-    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
-        """
-            Convert DataFrames to JSON, returning a tuple
-            of JSON strings (inputs, outputs, exp_out)
-        """
-
-        pd_obj_json = pd_obj.to_json()
-        pd_obj_out_json = pd_obj_out.to_json()
-        try:
-            pd_obj_exp_json = pd_obj_exp.to_json()
-        except:
-            pd_obj_exp_json = "{}"
-
-        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
-
-#    def json_swagger(self, pd_obj, pd_obj_out, pd_obj_exp):
-#       replace data with types
-#       pd_objects.to_json()
-#       return pd_obj_json_swagger, pd_obj_out_json_swagger, pd_obj_exp_json_swagger
-
-    def run_methods(self):
-        try:
-            self.CalcSatAirConc()  # eq. 1
-            self.CalcInhRateAvian()  # eq. 2
-            self.CalcVidAvian()  # eq. 3
-            self.CalcInhRateMammal()  # eq. 4
-            self.CalcVidMammal()  # eq. 5
-            self.CalcConcAir()  # eq. 6
-            self.CalcSidAvian()  # eq. 7
-            self.CalcSidMammal()  # eq. 8
-            self.CalcConvertMammalInhalationLC50toLD50()  # eq. 9
-            self.CalcAdjustedMammalInhalationLD50()  # eq. 10
-            self.CalcEstimatedAvianInhalationLD50()  # eq. 11
-            self.CalcAdjustedAvianInhalationLD50()  # eq. 12
-            self.ReturnRatioVidAvian()  # results #1
-            self.ReturnLocVidAvian()  # results #2
-            self.ReturnRatioSidAvian()  # results #3
-            self.ReturnLocSidAvian()  # results #4
-            self.ReturnRatioVidMammal()  # results #5
-            self.ReturnLocVidMammal()  # results #6
-            self.ReturnRatioSidMammal()  # results #7
-            self.ReturnLocSidMammal()  # results #8
-        except TypeError:
-            print "Type Error: Your variables are not set correctly."
-
-    def create_output_dataframe(self):
-        # Create DataFrame containing output value Series
-        pd_obj_out = pd.DataFrame(
-            dict(sat_air_conc=self.sat_air_conc,
-                 inh_rate_avian=self.inh_rate_avian,
-                 vid_avian=self.vid_avian,
-                 inh_rate_mammal=self.inh_rate_mammal,
-                 vid_mammal=self.vid_mammal,
-                 ar2=self.ar2,
-                 air_conc=self.air_conc,
-                 sid_avian=self.sid_avian,
-                 sid_mammal=self.sid_mammal,
-                 cf=self.cf,
-                 mammal_inhalation_ld50=self.mammal_inhalation_ld50,
-                 adjusted_mammal_inhalation_ld50=self.adjusted_mammal_inhalation_ld50,
-                 estimated_avian_inhalation_ld50=self.estimated_avian_inhalation_ld50,
-                 adjusted_avian_inhalation_ld50=self.adjusted_avian_inhalation_ld50,
-                 ratio_vid_avian=self.ratio_vid_avian,
-                 ratio_sid_avian=self.ratio_sid_avian,
-                 ratio_vid_mammal=self.ratio_vid_mammal,
-                 ratio_sid_mammal=self.ratio_sid_mammal,
-                 loc_vid_avian=self.loc_vid_avian,
-                 loc_sid_avian=self.loc_sid_avian,
-                 loc_vid_mammal=self.loc_vid_mammal,
-                 loc_sid_mammal=self.loc_sid_mammal))
-
-        # create pandas properties for acceptance testing
-        self.pd_obj_out = pd_obj_out
+    def populate_input_properties(self):
+        # Inputs: Assign object attribute variables from the input Pandas DataFrame
+        self.chemical_name = self.pd_obj["chemical_name"]
+        self.application_rate = self.pd_obj["application_rate"]
+        self.column_height = self.pd_obj["column_height"]
+        self.spray_drift_fraction = self.pd_obj["spray_drift_fraction"]
+        self.direct_spray_duration = self.pd_obj["direct_spray_duration"]
+        self.molecular_weight = self.pd_obj["molecular_weight"]
+        self.vapor_pressure = self.pd_obj["vapor_pressure"]
+        self.avian_oral_ld50 = self.pd_obj["avian_oral_ld50"]
+        self.body_weight_assessed_bird = self.pd_obj["body_weight_assessed_bird"]
+        self.body_weight_tested_bird = self.pd_obj["body_weight_tested_bird"]
+        self.mineau_scaling_factor = self.pd_obj["mineau_scaling_factor"]
+        self.mammal_inhalation_lc50 = self.pd_obj["mammal_inhalation_lc50"]
+        self.duration_mammal_inhalation_study = self.pd_obj["duration_mammal_inhalation_study"]
+        self.body_weight_assessed_mammal = self.pd_obj["body_weight_assessed_mammal"]
+        self.body_weight_tested_mammal = self.pd_obj["body_weight_tested_mammal"]
+        self.mammal_oral_ld50 = self.pd_obj["mammal_oral_ld50"]
 
     def create_output_properties(self):
         # Outputs: Assign object attribute variables to Pandas Series
@@ -122,24 +67,71 @@ class stir(object):
         self.loc_vid_mammal = pd.Series(name="loc_vid_mammal")
         self.loc_sid_mammal = pd.Series(name="loc_sid_mammal")
 
-    def populate_input_properties(self):
-        # Inputs: Assign object attribute variables from the input Pandas DataFrame
-        self.chemical_name = self.pd_obj["chemical_name"]
-        self.application_rate = self.pd_obj["application_rate"]
-        self.column_height = self.pd_obj["column_height"]
-        self.spray_drift_fraction = self.pd_obj["spray_drift_fraction"]
-        self.direct_spray_duration = self.pd_obj["direct_spray_duration"]
-        self.molecular_weight = self.pd_obj["molecular_weight"]
-        self.vapor_pressure = self.pd_obj["vapor_pressure"]
-        self.avian_oral_ld50 = self.pd_obj["avian_oral_ld50"]
-        self.body_weight_assessed_bird = self.pd_obj["body_weight_assessed_bird"]
-        self.body_weight_tested_bird = self.pd_obj["body_weight_tested_bird"]
-        self.mineau_scaling_factor = self.pd_obj["mineau_scaling_factor"]
-        self.mammal_inhalation_lc50 = self.pd_obj["mammal_inhalation_lc50"]
-        self.duration_mammal_inhalation_study = self.pd_obj["duration_mammal_inhalation_study"]
-        self.body_weight_assessed_mammal = self.pd_obj["body_weight_assessed_mammal"]
-        self.body_weight_tested_mammal = self.pd_obj["body_weight_tested_mammal"]
-        self.mammal_oral_ld50 = self.pd_obj["mammal_oral_ld50"]
+    def run_methods(self):
+        try:
+            self.CalcSatAirConc()  # eq. 1
+            self.CalcInhRateAvian()  # eq. 2
+            self.CalcVidAvian()  # eq. 3
+            self.CalcInhRateMammal()  # eq. 4
+            self.CalcVidMammal()  # eq. 5
+            self.CalcConcAir()  # eq. 6
+            self.CalcSidAvian()  # eq. 7
+            self.CalcSidMammal()  # eq. 8
+            self.CalcConvertMammalInhalationLC50toLD50()  # eq. 9
+            self.CalcAdjustedMammalInhalationLD50()  # eq. 10
+            self.CalcEstimatedAvianInhalationLD50()  # eq. 11
+            self.CalcAdjustedAvianInhalationLD50()  # eq. 12
+            self.ReturnRatioVidAvian()  # results #1
+            self.ReturnLocVidAvian()  # results #2
+            self.ReturnRatioSidAvian()  # results #3
+            self.ReturnLocSidAvian()  # results #4
+            self.ReturnRatioVidMammal()  # results #5
+            self.ReturnLocVidMammal()  # results #6
+            self.ReturnRatioSidMammal()  # results #7
+            self.ReturnLocSidMammal()  # results #8
+
+    def create_output_dataframe(self):
+        # Create DataFrame containing output value Series
+        pd_obj_out = pd.DataFrame(
+            dict(sat_air_conc=self.sat_air_conc,
+                 inh_rate_avian=self.inh_rate_avian,
+                 vid_avian=self.vid_avian,
+                 inh_rate_mammal=self.inh_rate_mammal,
+                 vid_mammal=self.vid_mammal,
+                 ar2=self.ar2,
+                 air_conc=self.air_conc,
+                 sid_avian=self.sid_avian,
+                 sid_mammal=self.sid_mammal,
+                 cf=self.cf,
+                 mammal_inhalation_ld50=self.mammal_inhalation_ld50,
+                 adjusted_mammal_inhalation_ld50=self.adjusted_mammal_inhalation_ld50,
+                 estimated_avian_inhalation_ld50=self.estimated_avian_inhalation_ld50,
+                 adjusted_avian_inhalation_ld50=self.adjusted_avian_inhalation_ld50,
+                 ratio_vid_avian=self.ratio_vid_avian,
+                 ratio_sid_avian=self.ratio_sid_avian,
+                 ratio_vid_mammal=self.ratio_vid_mammal,
+                 ratio_sid_mammal=self.ratio_sid_mammal,
+                 loc_vid_avian=self.loc_vid_avian,
+                 loc_sid_avian=self.loc_sid_avian,
+                 loc_vid_mammal=self.loc_vid_mammal,
+                 loc_sid_mammal=self.loc_sid_mammal))
+        # create pandas properties for acceptance testing
+        self.pd_obj_out = pd_obj_out
+
+    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
+        """
+            Convert DataFrames to JSON, returning a tuple
+            of JSON strings (inputs, outputs, exp_out)
+        """
+
+        pd_obj_json = pd_obj.to_json()
+        pd_obj_out_json = pd_obj_out.to_json()
+        try:
+            pd_obj_exp_json = pd_obj_exp.to_json()
+        except:
+            pd_obj_exp_json = "{}"
+
+        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
     # eq. 1 saturated air concentration in mg/m^3
     def CalcSatAirConc(self):
