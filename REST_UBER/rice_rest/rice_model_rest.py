@@ -23,21 +23,6 @@ class rice(object):
         # Callable from Bottle that returns JSON
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
-    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
-        """
-            Convert DataFrames to JSON, returning a tuple
-            of JSON strings (inputs, outputs, exp_out)
-        """
-
-        pd_obj_json = pd_obj.to_json()
-        pd_obj_out_json = pd_obj_out.to_json()
-        try:
-            pd_obj_exp_json = pd_obj_exp.to_json()
-        except:
-            pd_obj_exp_json = "{}"
-
-        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
-
     def populate_input_properties(self):
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
         # Inputs: Assign object attribute variables from the input Pandas DataFrame
@@ -57,12 +42,6 @@ class rice(object):
         self.out_mass_area = pd.Series(name="out_mass_area")
         self.out_cw = pd.Series(name="out_cw")
 
-    def run_methods(self):
-        self.Calcmsed()
-        self.Calcvw()
-        self.Calcmass_area()
-        self.Calccw()
-
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
         pd_obj_out = pd.DataFrame({
@@ -73,9 +52,15 @@ class rice(object):
         })
         self.pd_obj_out = pd_obj_out
 
+    def run_methods(self):
+        self.Calcmsed()
+        self.Calcvw()
+        self.Calcmass_area()
+        self.Calccw()
+
     def json(self, pd_obj, pd_obj_out, pd_obj_exp):
         """
-            Convert DataFrames to JSON, returning a tuple 
+            Convert DataFrames to JSON, returning a tuple
             of JSON strings (inputs, outputs, exp_out)
         """
 
@@ -85,7 +70,6 @@ class rice(object):
             pd_obj_exp_json = pd_obj_exp.to_json()
         except:
             pd_obj_exp_json = "{}"
-
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
     # The mass of the sediment at equilibrium with the water column
