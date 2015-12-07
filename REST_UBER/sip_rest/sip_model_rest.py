@@ -71,7 +71,6 @@ class sip(object):
         self.ld50_mammal_water = self.pd_obj['ld50_mammal_water']
         self.noael_mammal_water = self.pd_obj['noael_mammal_water']
         self.mineau_scaling_factor = self.pd_obj['mineau_scaling_factor']
-
         self.bodyweight_assessed_bird = 20.
         self.bodyweight_assessed_mammal = 1000.
 

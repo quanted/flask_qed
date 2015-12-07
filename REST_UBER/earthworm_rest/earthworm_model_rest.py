@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import division
 import logging
 import pandas as pd
@@ -15,20 +16,12 @@ class earthworm(object):
         if self.run_type != "empty":
             self.execute_model()
 
-    def create_output_dataframe(self):
-        # Create DataFrame containing output value Series
-        pd_obj_out = pd.DataFrame({
-            'earthworm_fugacity_out': self.earthworm_fugacity_out,
-        })
-
-        #create pandas properties for acceptance testing
-        logging.info("here is the output object")
-        logging.info(pd_obj_out)
-        self.pd_obj_out = pd_obj_out
-
-    def create_output_properties(self):
-        # Outputs: Assign object attribute variables to Pandas Series
-        self.earthworm_fugacity_out = pd.Series(name="earthworm_fugacity_out")
+    def execute_model(self):
+        self.populate_input_properties()
+        self.create_output_properties()
+        self.run_methods()
+        self.create_output_dataframe()
+        self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
     def populate_input_properties(self):
         # Inputs: Assign object attribute variables from the input Pandas Dataframe
@@ -41,18 +34,21 @@ class earthworm(object):
         # self.m_w = self.pd_obj['m_w']
         # self.p_e = self.pd_obj['p_e']
 
-    def execute_model(self):
-        logging.info("1")
-        self.populate_input_properties()
-        logging.info("2")
-        self.create_output_properties()
-        logging.info("3")
-        self.run_methods()
-        logging.info("4")
-        self.create_output_dataframe()
-        # Callable from Bottle that returns JSON
-        logging.info("5")
-        self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
+    def create_output_properties(self):
+        # Outputs: Assign object attribute variables to Pandas Series
+        self.earthworm_fugacity_out = pd.Series(name="earthworm_fugacity_out")
+
+    # Begin model methods
+    def run_methods(self):
+        self.earthworm_fugacity()
+
+    def create_output_dataframe(self):
+        # Create DataFrame containing output value Series
+        pd_obj_out = pd.DataFrame({
+            'earthworm_fugacity_out': self.earthworm_fugacity_out,
+        })
+        #create pandas properties for acceptance testing
+        self.pd_obj_out = pd_obj_out
 
     def json(self, pd_obj, pd_obj_out, pd_obj_exp):
         """
@@ -68,10 +64,6 @@ class earthworm(object):
             pd_obj_exp_json = "{}"
 
         return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
-
-    # Begin model methods
-    def run_methods(self):
-        self.earthworm_fugacity()
 
     def earthworm_fugacity(self):
         #self.earthworm_fugacity_out = self.k_ow*self.l_f_e*(self.c_s/(self.k_d*self.p_s)+self.c_w)*self.m_w/self.p_e
