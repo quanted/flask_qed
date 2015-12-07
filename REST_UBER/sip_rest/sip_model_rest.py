@@ -53,21 +53,52 @@ class sip(object):
         # Callable from Bottle that returns JSON
         self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
 
-    # @timefn
-    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
-        """
-            Convert DataFrames to JSON, returning a tuple 
-            of JSON strings (inputs, outputs, exp_out)
-        """
+    def populate_input_properties(self):
+        # Inputs: Assign object attribute variables from the input Pandas DataFrame
+        self.chemical_name = self.pd_obj['chemical_name']
+        self.solubility = self.pd_obj['solubility']
+        # try:
+        #     self.species_tested_bird = self.pd_obj['species_tested_bird']
+        # except:
+        #     self.species_tested_bird = None
+        self.bodyweight_tested_bird = self.pd_obj['bodyweight_tested_bird']
+        self.ld50_avian_water = self.pd_obj['ld50_avian_water']
+        self.noaec_quail = self.pd_obj['noaec_quail']
+        self.noaec_duck = self.pd_obj['noaec_duck']
+        self.noaec_bird_other_1 = self.pd_obj['noaec_bird_other_1']
+        self.noaec_bird_other_2 = self.pd_obj['noaec_bird_other_2']
+        # self.ld50_species_tested_mammal = self.pd_obj['ld50_species_tested_mammal']
+        self.bodyweight_tested_mammal = self.pd_obj['bodyweight_tested_mammal']
+        self.ld50_mammal_water = self.pd_obj['ld50_mammal_water']
+        self.noael_mammal_water = self.pd_obj['noael_mammal_water']
+        self.mineau_scaling_factor = self.pd_obj['mineau_scaling_factor']
 
-        pd_obj_json = pd_obj.to_json()
-        pd_obj_out_json = pd_obj_out.to_json()
-        try:
-            pd_obj_exp_json = pd_obj_exp.to_json()
-        except:
-            pd_obj_exp_json = "{}"
+        self.bodyweight_assessed_bird = 20.
+        self.bodyweight_assessed_mammal = 1000.
 
-        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
+    def create_output_properties(self):
+        # Outputs: Assign object attribute variables to Pandas Series
+        self.fw_bird_out = pd.Series(name="fw_bird_out")
+        self.fw_mamm_out = pd.Series(name="fw_mamm_out")
+        self.dose_bird_out = pd.Series(name="dose_bird_out")
+        self.dose_mamm_out = pd.Series(name="dose_mamm_out")
+        self.at_bird_out = pd.Series(name="at_bird_out")
+        self.at_mamm_out = pd.Series(name="at_mamm_out")
+        self.fi_bird_out = pd.Series(name="fi_bird_out")
+        self.det_out = pd.Series(name="det_out")
+        self.act_out = pd.Series(name="act_out")
+        self.acute_bird_out = pd.Series(name="acute_bird_out")
+        self.acuconb_out = pd.Series(name="acuconb_out")
+        self.acute_mamm_out = pd.Series(name="acute_mamm_out")
+        self.acuconm_out = pd.Series(name="acuconm_out")
+        self.chron_bird_out = pd.Series(name="chron_bird_out")
+        self.chronconb_out = pd.Series(name="chronconb_out")
+        self.chron_mamm_out = pd.Series(name="chron_mamm_out")
+        self.chronconm_out = pd.Series(name="chronconm_out")
+        self.det_quail = pd.Series(name="det_quail")
+        self.det_duck = pd.Series(name="det_duck")
+        self.det_other_1 = pd.Series(name="det_other_1")
+        self.det_other_2 = pd.Series(name="det_other_2")
 
     # @timefn
     def run_methods(self):
@@ -109,52 +140,24 @@ class sip(object):
             'chron_mamm_out': self.chron_mamm_out,
             'chronconm_out': self.chronconm_out
         })
-
         # create pandas properties for acceptance testing
         self.pd_obj_out = pd_obj_out
 
-    def create_output_properties(self):
-        # Outputs: Assign object attribute variables to Pandas Series
-        self.fw_bird_out = pd.Series(name="fw_bird_out")
-        self.fw_mamm_out = pd.Series(name="fw_mamm_out")
-        self.dose_bird_out = pd.Series(name="dose_bird_out")
-        self.dose_mamm_out = pd.Series(name="dose_mamm_out")
-        self.at_bird_out = pd.Series(name="at_bird_out")
-        self.at_mamm_out = pd.Series(name="at_mamm_out")
-        self.fi_bird_out = pd.Series(name="fi_bird_out")
-        self.det_out = pd.Series(name="det_out")
-        self.act_out = pd.Series(name="act_out")
-        self.acute_bird_out = pd.Series(name="acute_bird_out")
-        self.acuconb_out = pd.Series(name="acuconb_out")
-        self.acute_mamm_out = pd.Series(name="acute_mamm_out")
-        self.acuconm_out = pd.Series(name="acuconm_out")
-        self.chron_bird_out = pd.Series(name="chron_bird_out")
-        self.chronconb_out = pd.Series(name="chronconb_out")
-        self.chron_mamm_out = pd.Series(name="chron_mamm_out")
-        self.chronconm_out = pd.Series(name="chronconm_out")
+    # @timefn
+    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
+        """
+            Convert DataFrames to JSON, returning a tuple 
+            of JSON strings (inputs, outputs, exp_out)
+        """
 
-    def populate_input_properties(self):
-        # Inputs: Assign object attribute variables from the input Pandas DataFrame
-        self.chemical_name = self.pd_obj['chemical_name']
-        self.solubility = self.pd_obj['solubility']
-        # try:
-        #     self.species_tested_bird = self.pd_obj['species_tested_bird']
-        # except:
-        #     self.species_tested_bird = None
-        self.bodyweight_tested_bird = self.pd_obj['bodyweight_tested_bird']
-        self.ld50_avian_water = self.pd_obj['ld50_avian_water']
-        self.noaec_quail = self.pd_obj['noaec_quail']
-        self.noaec_duck = self.pd_obj['noaec_duck']
-        self.noaec_bird_other_1 = self.pd_obj['noaec_bird_other_1']
-        self.noaec_bird_other_2 = self.pd_obj['noaec_bird_other_2']
-        # self.ld50_species_tested_mammal = self.pd_obj['ld50_species_tested_mammal']
-        self.bodyweight_tested_mammal = self.pd_obj['bodyweight_tested_mammal']
-        self.ld50_mammal_water = self.pd_obj['ld50_mammal_water']
-        self.noael_mammal_water = self.pd_obj['noael_mammal_water']
-        self.mineau_scaling_factor = self.pd_obj['mineau_scaling_factor']
+        pd_obj_json = pd_obj.to_json()
+        pd_obj_out_json = pd_obj_out.to_json()
+        try:
+            pd_obj_exp_json = pd_obj_exp.to_json()
+        except:
+            pd_obj_exp_json = "{}"
 
-        self.bodyweight_assessed_bird = 20.
-        self.bodyweight_assessed_mammal = 1000.
+        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
 
     # Begin model methods
     # @timefn
@@ -524,43 +527,40 @@ class sip(object):
         #         raise ValueError\
         #         ('self.bodyweight_tested_bird=%g is a non-physical value.' % self.bodyweight_tested_bird)
 
-
-        # Create method Series for each potential NOAEC value
-        det_quail = pd.Series(name="det_quail")
-        det_duck = pd.Series(name="det_duck")
-        det_other_1 = pd.Series(name="det_other_1")
-        det_other_2 = pd.Series(name="det_other_2")
-
         try:
             # Body weight of bobtail quail is 178 g
-            det_quail = (self.noaec_quail * self.fi_bird(178.)) / (178. / 1000.)
+            self.det_quail = (self.noaec_quail * self.fi_bird(178.)) / (178. / 1000.)
         except:
-            det_quail = None
+            #TODO: vectorize
+            self.det_quail = None
 
         try:
             # Body weight of mallard duck is 1580 g
-            det_duck = (self.noaec_duck * self.fi_bird(1580.)) / (1580. / 1000.)
+            self.det_duck = (self.noaec_duck * self.fi_bird(1580.)) / (1580. / 1000.)
         except:
-            det_duck = None
+            # TODO: vectorize
+            self.det_duck = None
 
         try:
-            det_other_1 = (self.noaec_bird_other_1 * self.fi_bird(self.bodyweight_bird_other_1)) / (
+            self.det_other_1 = (self.noaec_bird_other_1 * self.fi_bird(self.bodyweight_bird_other_1)) / (
                 self.bodyweight_bird_other_1 / 1000.)
         except:
-            det_other_1 = None
+            # TODO: Vectorize
+            self.det_other_1 = None
 
         try:
-            det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_2)) / (
+            self.det_other_2 = (self.noaec_bird_other_2 * self.fi_bird(self.bodyweight_bird_other_2)) / (
                 self.bodyweight_bird_other_2 / 1000.)
         except:
+            # TODO: vectorize
             det_other_2 = None
 
         # Create DataFrame containing method Series created above
         df_noaec = pd.DataFrame({
-            'det_quail': det_quail,
-            'det_duck': det_duck,
-            'det_other_1': det_other_1,
-            'det_other_2': det_other_2
+            'det_quail': self.det_quail,
+            'det_duck': self.det_duck,
+            'det_other_1': self.det_other_1,
+            'det_other_2': self.det_other_2
         })
 
         # Create a Series of the minimum values for each row/model run of the above DataFrame
