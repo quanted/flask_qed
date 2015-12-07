@@ -4,6 +4,7 @@ import numpy.testing as npt
 import pandas as pd
 import pandas.util.testing as pdt
 
+#importing as a package (specified in ../../setup.py
 from .. import sip_model_rest as sip_model
 
 # create empty pandas dataframes to create empty sip object for testing
@@ -179,7 +180,7 @@ class TestSip(unittest.TestCase):
     #     finally:
     #         pass
     #     return
-    # 
+    #
     # def test_det_quail(self):
     #     '''
     #     unittest for function sip.det_quail:

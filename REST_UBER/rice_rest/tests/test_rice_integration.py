@@ -1,24 +1,42 @@
+import pkgutil
 import unittest
 import pandas as pd
 import numpy.testing as npt
 from .. import rice_model_rest as rice_model
+from StringIO import StringIO
+from tabulate import tabulate
 import pandas.util.testing as pdt
 
 # load transposed qaqc data for inputs
 #csv_transpose_path_in = "./tests/rice_qaqc_in_transpose.csv"
-csv_transpose_path_in = "./rice_qaqc_in_transpose.csv"
-pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
+#csv_transpose_path_in = "./rice_qaqc_in_transpose.csv"
+#pd_obj_inputs = pd.read_csv(csv_transpose_path_in, index_col=0, engine='python')
 # print(pd_obj_inputs)
 # load transposed qaqc data for inputs
 #csv_transpose_path_exp = "./tests/rice_qaqc_exp_transpose.csv"
-csv_transpose_path_exp = "./rice_qaqc_exp_transpose.csv"
-pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
+#csv_transpose_path_exp = "./rice_qaqc_exp_transpose.csv"
+#pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
 # print(pd_obj_exp_out)
+data_inputs = StringIO(pkgutil.get_data(__package__, 'rice_qaqc_in_transpose.csv'))
+pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
+print("rice inputs")
+print(pd_obj_inputs.shape)
+print(tabulate(pd_obj_inputs.iloc[:,:], headers='keys', tablefmt='fancy_grid'))
+
+# load transposed qaqc data for inputs
+#works for local nosetests, but not for travis container that calls nosetests:
+#csv_transpose_path_exp = "./tests/sip_qaqc_exp_transpose.csv"
+#pd_obj_exp_out = pd.read_csv(csv_transpose_path_exp, index_col=0, engine='python')
+#this works for both local nosetests and travis deploy
+data_exp_outputs = StringIO(pkgutil.get_data(__package__, 'rice_qaqc_exp_transpose.csv'))
+pd_obj_exp_out = pd.read_csv(data_exp_outputs, index_col=0, engine='python')
+print("rice expected outputs")
+print(pd_obj_exp_out.shape)
+print(tabulate(pd_obj_exp_out.iloc[:,:], headers='keys', tablefmt='fancy_grid'))
 
 # create an instance of rice object with qaqc data
 rice_calc = rice_model.rice("batch", pd_obj_inputs, pd_obj_exp_out)
 test = {}
-
 
 class Testrice(unittest.TestCase):
     def setup(self):
