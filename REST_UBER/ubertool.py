@@ -3,11 +3,8 @@ import pandas as pd
 
 
 class UberModel(object):
-    # TODO: Move this base class, UberModel, into its own utility module. This class is inherited by all Ubertool models
     def __init__(self):
-        """
-        Main utility class for building Ubertool model classes for model execution.
-        """
+        """Main utility class for building Ubertool model classes for model execution."""
         super(UberModel, self).__init__()
         self.name = self.__class__.__name__
         self.inputs = None
@@ -17,12 +14,12 @@ class UberModel(object):
     def populate_inputs(self, pd_obj, model_obj):
         """
         Validate and assign user-provided model inputs to their respective class attributes
-        :param model:
-        :param model_obj:
         :param pd_obj: Pandas DataFrame object of model input parameters
+        :param model_obj:
         """
 
-        module = importlib.import_module('.' + model_obj.name.lower() + '_model_rest', model_obj.name.lower() + '_rest')
+        module = importlib.import_module(
+            '.' + model_obj.name.lower() + '_model_rest', 'REST_UBER.' + model_obj.name.lower() + '_rest')
         ModelInputs = getattr(module, model_obj.name + "Inputs")
         model_inputs_obj = ModelInputs()
 
@@ -39,7 +36,15 @@ class UberModel(object):
                 setattr(model_obj, column, pd_obj[column])
             pass
         else:
-            raise ValueError("Inputs parameters do not have all required inputs. Please see API documentation.")
+            df['model'] = pd.Series(name=self.name)
+            if df.columns.order().equals(pd_obj.columns.order()):
+                # If the user-supplied DataFrame has the same column names as required by TerrplantInputs...
+                # set each Series in the DataFrame to the corresponding TerrplantInputs attribute (member variable)
+                for column in pd_obj.columns:
+                    setattr(model_obj, column, pd_obj[column])
+                pass
+            else:
+                raise ValueError("Inputs parameters do not have all required inputs. Please see API documentation.")
 
     def populate_outputs(self, model_obj):
         # Create temporary DataFrame where each column name is the same as TerrplantOutputs attributes
@@ -50,7 +55,8 @@ class UberModel(object):
         :return:
         """
 
-        module = importlib.import_module('.' + model_obj.name.lower() + '_model_rest', model_obj.name.lower() + '_rest')
+        module = importlib.import_module(
+            '.' + model_obj.name.lower() + '_model_rest', 'REST_UBER.' + model_obj.name.lower() + '_rest')
         ModelOutputs = getattr(module, model_obj.name + "Outputs")
         model_outputs_obj = ModelOutputs()
         df = pd.DataFrame()
@@ -63,21 +69,14 @@ class UberModel(object):
         for column in model_obj.pd_obj_out:
             model_obj.pd_obj_out[column] = getattr(model_obj, column)
 
-    def get_json(self, model_obj):
+    @staticmethod
+    def get_dict_rep(model_obj):
         """
-        Convert DataFrames to JSON, returning a tuple
-        of JSON strings (inputs, outputs, exp_out)
-        :param pd_obj:
-        :param pd_obj_out:
-        :param pd_obj_exp:
-        :return: ( , , )
+        Convert DataFrames to dictionary, returning a tuple (inputs, outputs, exp_out)
+        :param model_obj: model instance
+        :return: (dict(input DataFrame), dict(outputs DataFrame), dict(expected outputs DataFrame))
         """
-
-        pd_obj_json = model_obj.pd_obj.to_json()
-        pd_obj_out_json = model_obj.pd_obj_out.to_json()
         try:
-            pd_obj_exp_json = model_obj.pd_obj_exp.to_json()
-        except:
-            pd_obj_exp_json = "{}"
-
-        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
+            return model_obj.pd_obj.to_dict(), model_obj.pd_obj_out.to_dict(), model_obj.pd_obj_exp.to_dict()
+        except AttributeError:
+            return model_obj.pd_obj.to_dict(), model_obj.pd_obj_out.to_dict(), {}

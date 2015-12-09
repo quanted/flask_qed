@@ -1,14 +1,17 @@
 import json, logging, importlib
 from flask import Flask, request, jsonify, render_template, make_response
 from flask_restful import Resource, Api
-from flask_swagger import swagger
+# from flask_swagger import swagger
+from uber_swagger import swagger
 import pandas as pd
-from terrplant_rest import terrplant_model_rest
+import terrplant_rest
+
 
 app = Flask(__name__)
 api = Api(app)
 
 
+# TODO: Generic API endpoint (TEMPORARY, remove once all endpoints are explicitly stated)
 class ModelCaller(Resource):
     def get(self, model, jid):
         return {'result': 'model=%s, jid=%s' % (model, jid)}
@@ -107,36 +110,18 @@ class ModelCaller(Resource):
         return {'user_id': 'admin', 'result': {'error': e}, '_id': jid}
 
 
-class TerrplantHandler(Resource):
-    def get(self, jid):
-        return {'result': 'model=terrplant, jid=%s' % (jid)}
-
-    def post(self, jid):
-        pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
-        terrplant = terrplant_model_rest.Terrplant(pd_obj, None)
-        terrplant.execute_model()
-        result_json_tuple = terrplant.get_json(terrplant)
-        inputs_json = json.loads(result_json_tuple[0])
-        outputs_json = json.loads(result_json_tuple[1])
-        exp_out_json = json.loads(result_json_tuple[2])
-
-        return {
-            'user_id': 'admin',
-            'inputs': inputs_json,
-            'outputs': outputs_json,
-            'exp_out': exp_out_json,
-            '_id': jid,
-            'run_type': "single"
-        }
-
-
-api.add_resource(TerrplantHandler, '/terrplant/<string:jid>')
-api.add_resource(ModelCaller, '/<string:model>/<string:jid>')
+api.add_resource(terrplant_rest.TerrplantHandler, '/terrplant/<string:jid>')
+api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 @app.route("/api/spec")
 def spec():
+    """
+    Route that returns the Swagger formatted JSON representing the Ubertool API.
+    :return: Swagger formatted JSON string
+    """
     swag = swagger(app)
+    # Additional Swagger documentation key-values describing the ubertool API
     swag['info']['version'] = "0.1"
     swag['info']['title'] = u"\u00FCbertool API Documentation"
     swag['info']['description'] = "Welcome to the EPA's ubertool interactive RESTful API documentation."
@@ -145,6 +130,10 @@ def spec():
 
 @app.route("/api")
 def api_doc():
+    """
+    Route to serve the API documentation (Swagger UI) static page being served by the backend.
+    :return:
+    """
     return render_template('index.html')
 
 

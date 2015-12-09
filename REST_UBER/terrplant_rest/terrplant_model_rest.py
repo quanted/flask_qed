@@ -5,9 +5,7 @@ import logging
 
 class TerrplantInputs(object):
     def __init__(self):
-        """
-        Class representing the inputs for TerrPlant
-        """
+        """Class representing the inputs for TerrPlant"""
         super(TerrplantInputs, self).__init__()
         self.version_terrplant = pd.Series([], dtype="object")
         self.application_rate = pd.Series([], dtype="float")
@@ -32,6 +30,7 @@ class TerrplantInputs(object):
 
 class TerrplantOutputs(object):
     def __init__(self):
+        """Class representing the outputs for TerrPlant"""
         super(TerrplantOutputs, self).__init__()
         self.out_rundry = pd.Series(name="out_rundry").astype("float")
         self.out_runsemi = pd.Series(name="out_runsemi").astype("float")
@@ -70,6 +69,7 @@ class TerrplantOutputs(object):
 
 class Terrplant(UberModel, TerrplantInputs, TerrplantOutputs):
     def __init__(self, pd_obj, pd_obj_exp):
+        """Class representing the Terrplant model and containing all its methods"""
         super(Terrplant, self).__init__()
         self.pd_obj = pd_obj
         self.pd_obj_exp = pd_obj_exp
@@ -89,9 +89,7 @@ class Terrplant(UberModel, TerrplantInputs, TerrplantOutputs):
         self.fill_output_dataframe(self)
 
     def run_methods(self):
-        """
-        Execute the model's methods to generate the model output
-        """
+        """Execute the model's methods to generate the model output"""
         try:
             self.rundry()
             self.runsemi()
@@ -1023,3 +1021,12 @@ class Terrplant(UberModel, TerrplantInputs, TerrplantOutputs):
         logging.info("minldsspray")
         logging.info(self.out_min_lds_spray)
         return self.out_min_lds_spray
+
+
+class TerrplantApiMetadata(object):
+    def __init__(self):
+        pass
+
+    def post(self):
+        description = "Run TerrPlant with the user-supplied JSON"
+        # parameters =
