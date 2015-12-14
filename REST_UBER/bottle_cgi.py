@@ -8,20 +8,20 @@
 
 import bottle
 from bottle import route, run, debug, post, request, auth_basic, abort, error
-# Needed for apache/mod_wsgi/nginx/uwsgi
-from bottle import default_app
+from bottle import default_app  # Needed for apache/mod_wsgi/nginx/uwsgi
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.s3.bucket import Bucket
-import os, sys
+import os
+import sys
 import boto.utils
 import json
 import warnings
 import logging
 import pandas as pd
 from bottle import static_file
+from pymongo import MongoClient
 
-print repr(sys.path)
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
@@ -29,9 +29,8 @@ os.environ.update({
 })
 
 # Check whether running on EB/EC2 or Tao's EC2
-if os.environ.has_key("eb_server"):
+if "eb_server" in os.environ:
     print "Has 'eb_server' key"
-    pass
 else:
     print "Does not have 'eb_server' key"
     import keys_Picloud_S3
@@ -67,8 +66,6 @@ class NumPyArangeEncoder(json.JSONEncoder):
 """
     Connect to MongoDB server
 """
-from pymongo import MongoClient
-
 connection = MongoClient('localhost', 27017)
 db = connection.ubertool
 
@@ -260,25 +257,26 @@ def sip_rest(jid):
 @route('/stir/<jid>', method='POST')
 # @auth_basic(check)
 def stir_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from stir_rest import stir_model_rest
-        result = stir_model_rest.stir(run_type, chemical_name, application_rate, column_height, spray_drift_fraction,
-                                      direct_spray_duration,
-                                      molecular_weight, vapor_pressure, avian_oral_ld50, body_weight_assessed_bird,
-                                      body_weight_tested_bird, mineau_scaling_factor,
-                                      mammal_inhalation_lc50, duration_mammal_inhalation_study,
-                                      body_weight_assessed_mammal, body_weight_tested_mammal,
-                                      mammal_oral_ld50)
-        if (result):
-            all_result[jid]['status'] = 'done'
-            all_result[jid]['input'] = request.json
-            all_result[jid]['result'] = result
-        return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid, {}).setdefault('status', 'none')
+    #     from stir_rest import stir_model_rest
+    #     result = stir_model_rest.stir(run_type, chemical_name, application_rate, column_height, spray_drift_fraction,
+    #                                   direct_spray_duration,
+    #                                   molecular_weight, vapor_pressure, avian_oral_ld50, body_weight_assessed_bird,
+    #                                   body_weight_tested_bird, mineau_scaling_factor,
+    #                                   mammal_inhalation_lc50, duration_mammal_inhalation_study,
+    #                                   body_weight_assessed_mammal, body_weight_tested_mammal,
+    #                                   mammal_oral_ld50)
+    #     if (result):
+    #         all_result[jid]['status'] = 'done'
+    #         all_result[jid]['input'] = request.json
+    #         all_result[jid]['result'] = result
+    #     return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('stir', jid)
 
 
 ##################################sip#############################################
@@ -372,19 +370,20 @@ def therps_rest(jid):
 @route('/iec/<jid>', method='POST')
 # @auth_basic(check)
 def iec_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from iec_rest import iec_model_rest
-        result = iec_model_rest.iec(dose_response, LC50, threshold)
-        if (result):
-            all_result[jid]['status'] = 'done'
-            all_result[jid]['input'] = request.json
-            all_result[jid]['result'] = result
-        return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid, {}).setdefault('status', 'none')
+    #     from iec_rest import iec_model_rest
+    #     result = iec_model_rest.iec(dose_response, LC50, threshold)
+    #     if (result):
+    #         all_result[jid]['status'] = 'done'
+    #         all_result[jid]['input'] = request.json
+    #         all_result[jid]['result'] = result
+    #     return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('iec', jid)
 
 
 ##################################iec#############################################
@@ -417,19 +416,20 @@ def agdrift_rest(jid):
 @route('/earthworm/<jid>', method='POST')
 # @auth_basic(check)
 def earthworm_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from earthworm_rest import earthworm_model_rest
-        result = earthworm_model_rest.earthworm(k_ow, l_f_e, c_s, k_d, p_s, c_w, m_w, p_e)
-        if (result):
-            all_result[jid]['status'] = 'done'
-            all_result[jid]['input'] = request.json
-            all_result[jid]['result'] = result
-        return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid, {}).setdefault('status', 'none')
+    #     from earthworm_rest import earthworm_model_rest
+    #     result = earthworm_model_rest.earthworm(k_ow, l_f_e, c_s, k_d, p_s, c_w, m_w, p_e)
+    #     if (result):
+    #         all_result[jid]['status'] = 'done'
+    #         all_result[jid]['input'] = request.json
+    #         all_result[jid]['result'] = result
+    #     return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('earthworm', jid)
 
 
 ##################################earthworm#############################################
@@ -438,19 +438,20 @@ def earthworm_rest(jid):
 @route('/rice/<jid>', method='POST')
 # @auth_basic(check)
 def rice_rest(jid):
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from rice_rest import rice_model_rest
-        result = rice_model_rest.rice(chemical_name, mai, dsed, a, pb, dw, osed, kd)
-        if (result):
-            all_result[jid]['status'] = 'done'
-            all_result[jid]['input'] = request.json
-            all_result[jid]['result'] = result
-        return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
-    except Exception, e:
-        return errorMessage(e, jid)
+    # try:
+    #     for k, v in request.json.iteritems():
+    #         exec '%s = v' % k
+    #     all_result.setdefault(jid, {}).setdefault('status', 'none')
+    #     from rice_rest import rice_model_rest
+    #     result = rice_model_rest.rice(chemical_name, mai, dsed, a, pb, dw, osed, kd)
+    #     if (result):
+    #         all_result[jid]['status'] = 'done'
+    #         all_result[jid]['input'] = request.json
+    #         all_result[jid]['result'] = result
+    #     return {'user_id': 'admin', 'result': result.__dict__, '_id': jid}
+    # except Exception, e:
+    #     return errorMessage(e, jid)
+    return model_caller('rice', jid)
 
 
 ##################################rice#############################################

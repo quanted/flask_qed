@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import division
 import logging
 import pandas as pd
@@ -42,6 +41,8 @@ class iec(object):
             self.z_score_f()
             self.F8_f()
             self.chance_f()
+        finally:
+            pass
 
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series

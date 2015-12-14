@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import division
 import pandas as pd
 import logging
@@ -89,6 +88,8 @@ class stir(object):
             self.ReturnLocVidMammal()  # results #6
             self.ReturnRatioSidMammal()  # results #7
             self.ReturnLocSidMammal()  # results #8
+        except:
+            pass
 
     def create_output_dataframe(self):
         # Create DataFrame containing output value Series
@@ -142,7 +143,6 @@ class stir(object):
         pressure = 760.0
         conv = 1000000.0
         self.sat_air_conc = (self.vapor_pressure * self.molecular_weight * conv) / (pressure * air_vol)
-        logging.info(self.sat_air_conc)
         return self.sat_air_conc
 
     # eq. 2 Avian inhalation rate
@@ -154,7 +154,6 @@ class stir(object):
         conversion = 60.
         activity_factor = 3.
         self.inh_rate_avian = magic1 * (self.body_weight_assessed_bird ** magic2) * conversion * activity_factor
-        logging.info(self.inh_rate_avian)
         return self.inh_rate_avian
 
     # eq. 3  Maximum avian vapor inhalation dose
@@ -168,7 +167,6 @@ class stir(object):
         # 1 (hr) is duration of exposure
         self.vid_avian = (self.sat_air_conc * self.inh_rate_avian * duration_hours) / (
             conversion_factor * self.body_weight_assessed_bird)
-        logging.info(self.vid_avian)
         return self.vid_avian
 
     # eq. 4 Mammalian inhalation rate
@@ -181,7 +179,6 @@ class stir(object):
         activity_factor = 3.
         self.inh_rate_mammal = magic1 * (
             self.body_weight_assessed_mammal ** magic2) * minutes_conversion * activity_factor
-        logging.info(self.inh_rate_mammal)
         return self.inh_rate_mammal
 
     # eq. 5 Maximum mammalian vapor inhalation dose
@@ -195,7 +192,6 @@ class stir(object):
         # 1 hr = duration of exposure
         self.vid_mammal = (self.sat_air_conc * self.inh_rate_mammal * duration_hours) / (
             conversion_factor * self.body_weight_assessed_mammal)
-        logging.info(self.vid_mammal)
         return self.vid_mammal
 
     # eq. 6 Air column concentration after spray
@@ -209,9 +205,7 @@ class stir(object):
         cf_mg_g = 1000.
         cf_cm2_acre = 40468564.2
         self.ar2 = (self.application_rate * cf_g_lbs * cf_mg_g) / cf_cm2_acre
-        logging.info(self.ar2)
         self.air_conc = self.ar2 / (self.column_height * conversion_factor)
-        logging.info(self.air_conc)
         return self.air_conc
 
     # eq. 7 Avian spray droplet inhalation dose
@@ -224,12 +218,12 @@ class stir(object):
         #    self.body_weight_assessed_bird = float(self.body_weight_assessed_bird)
         self.sid_avian = (self.air_conc * self.inh_rate_avian * (
             self.direct_spray_duration / 60.0) * self.spray_drift_fraction) / (self.body_weight_assessed_bird)
-        # logging.info("self.air_conc = " + self.air_conc)
-        # logging.info("self.inh_rate_avian = " + self.inh_rate_avian)
-        # logging.info("self.direct_spray_duration = " + self.direct_spray_duration)
-        # logging.info("self.spray_drift_fraction = " + self.spray_drift_fraction)
-        # logging.info("self.body_weight_assessed_bird = " + self.body_weight_assessed_bird)
-        # logging.info("self.sid_avian = " + self.sid_avian)
+
+
+
+
+
+
         return self.sid_avian
 
     # eq. 8 Mammalian spray droplet inhalation dose
@@ -242,7 +236,6 @@ class stir(object):
         #    self.body_weight_assessed_mammal = float(self.body_weight_assessed_mammal)
         self.sid_mammal = (self.air_conc * self.inh_rate_mammal * (
             self.direct_spray_duration / 60.0) * self.spray_drift_fraction) / (self.body_weight_assessed_mammal)
-        logging.info(self.sid_mammal)
         return self.sid_mammal
 
     # eq. 9 Conversion of mammalian LC50 to LD50
@@ -254,11 +247,9 @@ class stir(object):
         #    self.body_weight_tested_mammal = float(self.body_weight_tested_mammal)
         #    self.duration_mammal_inhalation_study = float(self.duration_mammal_inhalation_study)
         self.cf = ((self.inh_rate_mammal * 0.001) / self.body_weight_tested_mammal)
-        logging.info(self.cf)
         activity_factor = 1.
         absorption = 1.
         self.mammal_inhalation_ld50 = self.mammal_inhalation_lc50 * absorption * self.cf * self.duration_mammal_inhalation_study * activity_factor
-        logging.info(self.mammal_inhalation_ld50)
         return self.mammal_inhalation_ld50
 
     # eq. 10 Adjusted mammalian inhalation LD50
@@ -270,7 +261,6 @@ class stir(object):
         magicpower = 0.25
         self.adjusted_mammal_inhalation_ld50 = self.mammal_inhalation_ld50 * (
                                                                                  self.body_weight_tested_mammal / self.body_weight_assessed_mammal) ** magicpower
-        logging.info(self.adjusted_mammal_inhalation_ld50)
         return self.adjusted_mammal_inhalation_ld50
 
     # eq. 11 Estimated avian inhalation LD50
@@ -282,7 +272,6 @@ class stir(object):
         three_five = 3.5
         self.estimated_avian_inhalation_ld50 = (self.avian_oral_ld50 * self.mammal_inhalation_ld50) / (
             three_five * self.mammal_oral_ld50)
-        logging.info(self.estimated_avian_inhalation_ld50)
         return self.estimated_avian_inhalation_ld50
 
     # eq. 12 Adjusted avian inhalation LD50
@@ -295,7 +284,6 @@ class stir(object):
         self.adjusted_avian_inhalation_ld50 = self.estimated_avian_inhalation_ld50 * (
                                                                                          self.body_weight_assessed_bird / self.body_weight_tested_bird) ** (
                                                                                          self.mineau_scaling_factor - 1)
-        logging.info(self.adjusted_avian_inhalation_ld50)
         return self.adjusted_avian_inhalation_ld50
 
     # ----------------------------------------------
@@ -307,7 +295,6 @@ class stir(object):
         #    self.vid_avian = float(self.vid_avian)
         #    self.adjusted_avian_inhalation_ld50 = float(self.adjusted_avian_inhalation_ld50)
         self.ratio_vid_avian = self.vid_avian / self.adjusted_avian_inhalation_ld50
-        logging.info(self.ratio_vid_avian)
         return self.ratio_vid_avian
 
     # results #2: Level of Concern for avian vapor phase risk
@@ -320,7 +307,6 @@ class stir(object):
         self.loc_vid_avian = exceed_boolean.map(lambda x:
                                                 'Exposure not Likely Significant' if x == True
                                                 else 'Proceed to Refinements')
-        logging.info(self.loc_vid_avian)
         return self.loc_vid_avian
 
     # results #3: Ratio of avian droplet inhalation dose to adjusted inhalation LD50
@@ -329,7 +315,6 @@ class stir(object):
         #    self.sid_avian = float(self.sid_avian)
         #    self.adjusted_avian_inhalation_ld50 = float(self.adjusted_avian_inhalation_ld50)
         self.ratio_sid_avian = self.sid_avian / self.adjusted_avian_inhalation_ld50
-        logging.info(self.ratio_sid_avian)
         return self.ratio_sid_avian
 
     # results #4: Level of Concern for avian droplet inhalation risk
@@ -342,7 +327,6 @@ class stir(object):
         self.loc_sid_avian = exceed_boolean.map(lambda x:
                                                 'Exposure not Likely Significant' if x == True
                                                 else 'Proceed to Refinements')
-        logging.info(self.loc_sid_avian)
         return self.loc_sid_avian
 
     # results #5: Ratio of mammalian vapor dose to adjusted inhalation LD50
@@ -351,7 +335,6 @@ class stir(object):
         #    self.vid_mammal = float(self.vid_mammal)
         #    self.adjusted_mammal_inhalation_ld50 = float(self.adjusted_mammal_inhalation_ld50)
         self.ratio_vid_mammal = self.vid_mammal / self.adjusted_mammal_inhalation_ld50
-        logging.info(self.ratio_vid_mammal)
         return self.ratio_vid_mammal
 
     # results #6: Level of Concern for mammalian vapor phase risk
@@ -364,7 +347,6 @@ class stir(object):
         self.loc_vid_mammal = exceed_boolean.map(lambda x:
                                                  'Exposure not Likely Significant' if x == True
                                                  else 'Proceed to Refinements')
-        logging.info(self.loc_vid_mammal)
         return self.loc_vid_mammal
 
     # results #7: Ratio of mammalian droplet inhalation dose to adjusted inhalation LD50
@@ -373,7 +355,6 @@ class stir(object):
         #    self.sid_mammal = float(self.sid_mammal)
         #    self.adjusted_mammal_inhalation_ld50 = float(self.adjusted_mammal_inhalation_ld50)
         self.ratio_sid_mammal = self.sid_mammal / self.adjusted_mammal_inhalation_ld50
-        logging.info(self.ratio_sid_mammal)
         return self.ratio_sid_mammal
 
     # results #8: Level of Concern for mammaliam droplet inhalation risk
@@ -386,7 +367,6 @@ class stir(object):
         self.loc_sid_mammal = exceed_boolean.map(lambda x:
                                                  'Exposure not Likely Significant' if x == True
                                                  else 'Proceed to Refinements')
-        logging.info(self.loc_sid_mammal)
         return self.loc_sid_mammal
 
 
