@@ -11,21 +11,21 @@ import string
 import random
 import keys_Picloud_S3
 
+
 # Generate a random ID for file save
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
 
 def sam():
-
-##########################################################################################
-#####AMAZON KEY, store output files. You might have to write your own import approach#####
-##########################################################################################
+    ##########################################################################################
+    #####AMAZON KEY, store output files. You might have to write your own import approach#####
+    ##########################################################################################
     key = keys_Picloud_S3.amazon_s3_key
     secretkey = keys_Picloud_S3.amazon_s3_secretkey
-##########################################################################################
-##########################################################################################
-##########################################################################################
+    ##########################################################################################
+    ##########################################################################################
+    ##########################################################################################
 
     curr_dir = os.path.dirname(os.path.realpath(__file__))
     exe = "SuperPRZMpesticide_win.exe"
@@ -36,15 +36,16 @@ def sam():
     a.wait()
     print "Done"
 
-    name_temp=id_generator()
+    name_temp = id_generator()
     print name_temp
-    
+
     ##zip the output files
-    zout=zipfile.ZipFile("temp.zip", "w", zipfile.ZIP_DEFLATED)
+    zout = zipfile.ZipFile("temp.zip", "w", zipfile.ZIP_DEFLATED)
     # for name in fname:
     #     if name !='przm5.exe' and name !='test.dvf':
     #         zout.write(name)
-    superPRZM_ouput = os.path.join(curr_dir, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs', '1838_pestAvgConc_distrib.out')
+    superPRZM_ouput = os.path.join(curr_dir, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs',
+                                   '1838_pestAvgConc_distrib.out')
     print superPRZM_ouput
     zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
     zout.close()
@@ -52,14 +53,14 @@ def sam():
     ##Create connection to S3
     conn = S3Connection(key, secretkey)
     bucket = Bucket(conn, 'super_przm')
-    k=Key(bucket)
+    k = Key(bucket)
 
     ##Generate link to zip file
-    name1='SAM_'+name_temp+'.zip'
-    k.key=name1
-    link='https://s3.amazonaws.com/super_przm/'+name1
+    name1 = 'SAM_' + name_temp + '.zip'
+    k.key = name1
+    link = 'https://s3.amazonaws.com/super_przm/' + name1
     print link
-    
+
     ##Upload zip file to S3
     k.set_contents_from_filename('temp.zip')
     k.set_acl('public-read-write')

@@ -2,9 +2,11 @@ import unittest
 import pandas as pd
 import numpy.testing as npt
 import pandas.util.testing as pdt
+
 #following works when running test script in parent directory as package:
 # python -m tests.stir_unit_test
 # following works for running as nosetests from parent directory:
+#importing as a package (specified in ../../setup.py
 from .. import stir_model_rest as stir_model
 
 # # load transposed qaqc data for inputs and expected outputs

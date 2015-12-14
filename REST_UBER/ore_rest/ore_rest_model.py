@@ -1,9 +1,10 @@
+from __future__ import division
 from collections import OrderedDict
 import json
 import OreCalculator
 
-def ore(inputs, query_result_list):
 
+def ore(inputs, query_result_list):
     ore_class_list = []
     class_inputs = exp_duration_handler(inputs)
 
@@ -45,7 +46,7 @@ def ore(inputs, query_result_list):
         bw_inhal = class_inputs['inhal']['bw_adult']
         pod_inhal = class_inputs['inhal']['nc_POD']
         loc_inhal = class_inputs['inhal']['nc_LOC']
-        #Inhalation PPE (personal protection equipment)
+        # Inhalation PPE (personal protection equipment)
         inhal_unit_exp_no_r = query['IUENoR']
         inhal_unit_exp_pf5r = query['IUEPF5R']
         inhal_unit_exp_pf10r = query['IUEPF10R']
@@ -53,21 +54,21 @@ def ore(inputs, query_result_list):
 
         # Create DermalNonCancer class instance
         dermal = OreCalculator.DermalNonCancer(
-                activity, crop_target, app_rate, app_rate_unit, crop_name,
-                loc_dermal, loc_inhal, area_treated, area_treated_unit, active_ingredient,
-                formulation, app_equip, app_type,
-                abs_frac_dermal, bw_dermal, pod_dermal,
-                dermal_unit_exp_sl_no_G, dermal_unit_exp_sl_G, dermal_unit_exp_dl_g,
-                dermal_unit_exp_sl_G_crh, dermal_unit_exp_dl_G_crh, dermal_unit_exp_ec
+            activity, crop_target, app_rate, app_rate_unit, crop_name,
+            loc_dermal, loc_inhal, area_treated, area_treated_unit, active_ingredient,
+            formulation, app_equip, app_type,
+            abs_frac_dermal, bw_dermal, pod_dermal,
+            dermal_unit_exp_sl_no_G, dermal_unit_exp_sl_G, dermal_unit_exp_dl_g,
+            dermal_unit_exp_sl_G_crh, dermal_unit_exp_dl_G_crh, dermal_unit_exp_ec
         )
 
         # Create InhalNonCancer class instance
         inhal = OreCalculator.InhalNonCancer(
-                activity, crop_target, app_rate, app_rate_unit, crop_name,
-                loc_dermal, loc_inhal, area_treated, area_treated_unit, active_ingredient,
-                formulation, app_equip, app_type,
-                abs_frac_inhal, bw_inhal, pod_inhal,
-                inhal_unit_exp_no_r, inhal_unit_exp_pf5r, inhal_unit_exp_pf10r, inhal_unit_exp_ec
+            activity, crop_target, app_rate, app_rate_unit, crop_name,
+            loc_dermal, loc_inhal, area_treated, area_treated_unit, active_ingredient,
+            formulation, app_equip, app_type,
+            abs_frac_inhal, bw_inhal, pod_inhal,
+            inhal_unit_exp_no_r, inhal_unit_exp_pf5r, inhal_unit_exp_pf10r, inhal_unit_exp_ec
         )
 
         # Combined results?
@@ -78,11 +79,10 @@ def ore(inputs, query_result_list):
                 combined = OreCalculator.CombinedDose(dermal, inhal).one_over_moe()
             if inputs['expComboType'] == '4':  # Aggregate Risk Index
                 combined = OreCalculator.CombinedDose(dermal, inhal).ari()
-            ore_class_list.append( (dermal, inhal, combined) )
+            ore_class_list.append((dermal, inhal, combined))
 
         else:  # Not combined
-            ore_class_list.append( (dermal, inhal) )
-
+            ore_class_list.append((dermal, inhal))
 
     ore_output = OreOutputFormatter(ore_class_list)
     output_dict = ore_output.get_output_dict()
@@ -101,7 +101,7 @@ def exp_duration_handler(inputs):
     :return: float
     """
 
-    class_inputs = { 'dermal': {}, 'inhal': {} }
+    class_inputs = {'dermal': {}, 'inhal': {}}
     type = '_st'
     if inputs['expDurationType_st']:
         print "Short term"
@@ -112,7 +112,6 @@ def exp_duration_handler(inputs):
     if inputs['expDurationType_lt']:
         print "Long term"
         type = '_lt'
-
 
     class_inputs['dermal']['abs_frac'] = float(inputs['dermal_abs_frac' + type]) / 100.
     class_inputs['dermal']['bw_adult'] = inputs['bw_dermal_NC' + type]
@@ -125,7 +124,6 @@ def exp_duration_handler(inputs):
     class_inputs['inhal']['nc_LOC'] = inputs['inhalation_NC_LOC' + type]
 
     return class_inputs
-
 
 
 class OreOutputFormatter(object):
@@ -291,7 +289,6 @@ class OreOutputFormatter(object):
     def combined_formatter(self):
         i = 1
         for combined in self.combined_list:
-
             print combined
 
             self.output_dict[str(i)].update(combined)
