@@ -2,7 +2,7 @@ from __future__ import division
 import logging
 import pandas as pd
 import numpy as np
-import scipy.special as sp
+from scipy.special import erfc
 
 
 class iec(object):
@@ -52,8 +52,6 @@ class iec(object):
             "chance_f_out": self.chance_f_out
         })
         # create pandas properties for acceptance testing
-        logging.info("here is the output object")
-        logging.info(pd_obj_out)
         self.pd_obj_out = pd_obj_out
 
     def json(self, pd_obj, pd_obj_out, pd_obj_exp):
@@ -83,8 +81,6 @@ class iec(object):
         #     raise ValueError\
         #         ('self.threshold=%g is a non-physical value.' % self.threshold)
         self.z_score_f_out = self.dose_response * (np.log10(self.LC50 * self.threshold) - np.log10(self.LC50))
-        logging.info('z_score_f')
-        logging.info(self.z_score_f_out)
         return self.z_score_f_out
 
     def F8_f(self):
@@ -95,9 +91,7 @@ class iec(object):
         #     self.F8_f_out = 10 ^ (-16)
         # else:
         #     self.F8_f_out = self.F8_f_out
-        self.F8_f_out = 0.5 * sp.erfc(-self.z_score_f_out / np.sqrt(2))
-        logging.info('F8_f')
-        logging.info(self.F8_f_out)
+        self.F8_f_out = 0.5 * erfc(-self.z_score_f_out / np.sqrt(2))
         return self.F8_f_out
 
     def chance_f(self):
@@ -106,6 +100,4 @@ class iec(object):
         #         ('F8_f variable equals None and therefore this function cannot be run.')
         # else:
         self.chance_f_out = 1 / self.F8_f_out
-        logging.info('chance_f')
-        logging.info(self.chance_f_out)
         return self.chance_f_out
