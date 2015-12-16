@@ -4,9 +4,9 @@ import logging
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
 # from flask_swagger import swagger
-from uber_swagger import swagger
+from REST_UBER.uber_swagger import swagger
 import pandas as pd
-import terrplant_rest
+import REST_UBER.terrplant_rest
 
 
 app = Flask(__name__)
@@ -136,7 +136,7 @@ def therps_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from therps_rest import therps_model_rest
+        from REST_UBER.therps_rest import therps_model_rest
         result = therps_model_rest.therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50, avian_lc50,
                                           avian_NOAEC, avian_NOAEL,
                                           Species_of_the_tested_bird_avian_ld50, Species_of_the_tested_bird_avian_lc50,
@@ -163,7 +163,7 @@ def agdrift_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from agdrift_rest import agdrift_model_rest
+        from REST_UBER.agdrift_rest import agdrift_model_rest
         result = agdrift_model_rest.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
                                             application_rate, distance, aquatic_type, calculation_input,
                                             init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
@@ -184,7 +184,7 @@ def kabam_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from kabam_rest import kabam_model_rest
+        from REST_UBER.kabam_rest import kabam_model_rest
         result = kabam_model_rest.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
                                         mineau_scaling_factor, x_poc, x_doc, c_ox, w_t, c_ss, oc, k_ow,
                                         Species_of_the_tested_bird, bw_quail, bw_duck, bwb_other, avian_ld50,
@@ -219,7 +219,7 @@ def kabam_rest(jid):
 
 
 # TODO: Add model endpoints here once they are refactored
-api.add_resource(terrplant_rest.TerrplantHandler, '/terrplant/<string:jid>')
+api.add_resource(REST_UBER.terrplant_rest.TerrplantHandler, '/terrplant/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
