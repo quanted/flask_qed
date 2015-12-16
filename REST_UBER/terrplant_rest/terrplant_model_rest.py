@@ -1,53 +1,96 @@
-# -*- coding: utf-8 -*-
 from __future__ import division
+from REST_UBER.ubertool import UberModel
 import pandas as pd
 import logging
 
 
-class terrplant(object):
-    def __init__(self, run_type, pd_obj, pd_obj_exp):
+class TerrplantInputs(object):
+    def __init__(self):
+        """Class representing the inputs for TerrPlant"""
+        super(TerrplantInputs, self).__init__()
+        self.version_terrplant = pd.Series([], dtype="object")
+        self.application_rate = pd.Series([], dtype="float")
+        self.incorporation_depth = pd.Series([], dtype="float")
+        self.runoff_fraction = pd.Series([], dtype="float")
+        self.drift_fraction = pd.Series([], dtype="float")
+        self.chemical_name = pd.Series([], dtype="object")
+        self.pc_code = pd.Series([], dtype="object")
+        self.use = pd.Series([], dtype="object")
+        self.application_method = pd.Series([], dtype="object")
+        self.application_form = pd.Series([], dtype="object")
+        self.solubility = pd.Series([], dtype="float")
+        self.ec25_nonlisted_seedling_emergence_monocot = pd.Series([], dtype="float")
+        self.ec25_nonlisted_seedling_emergence_dicot = pd.Series([], dtype="float")
+        self.noaec_listed_seedling_emergence_monocot = pd.Series([], dtype="float")
+        self.noaec_listed_seedling_emergence_dicot = pd.Series([], dtype="float")
+        self.ec25_nonlisted_vegetative_vigor_monocot = pd.Series([], dtype="float")
+        self.ec25_nonlisted_vegetative_vigor_dicot = pd.Series([], dtype="float")
+        self.noaec_listed_vegetative_vigor_monocot = pd.Series([], dtype="float")
+        self.noaec_listed_vegetative_vigor_dicot = pd.Series([], dtype="float")
 
-        logging.info(pd_obj)
 
-        # Inputs: Assign object attribute variables from the input Pandas DataFrame
-        self.run_type = run_type
+class TerrplantOutputs(object):
+    def __init__(self):
+        """Class representing the outputs for TerrPlant"""
+        super(TerrplantOutputs, self).__init__()
+        self.out_rundry = pd.Series(name="out_rundry").astype("float")
+        self.out_runsemi = pd.Series(name="out_runsemi").astype("float")
+        self.out_totaldry = pd.Series(name="out_totaldry").astype("float")
+        self.out_totalsemi = pd.Series(name="out_totalsemi").astype("float")
+        self.out_spray = pd.Series(name="out_spray").astype("float")
+        self.out_min_nms_spray = pd.Series(name="out_min_nms_spray").astype("float")
+        self.out_min_lms_spray = pd.Series(name="out_min_lms_spray").astype("float")
+        self.out_min_nds_spray = pd.Series(name="out_min_nds_spray").astype("float")
+        self.out_min_lds_spray = pd.Series(name="out_min_lds_spray").astype("float")
+        self.out_nms_rq_dry = pd.Series(name="out_nms_rq_dry").astype("float")
+        self.out_nms_loc_dry = pd.Series(name="out_nms_loc_dry").astype("float")
+        self.out_nms_rq_semi = pd.Series(name="out_nms_rq_semi").astype("float")
+        self.out_nms_loc_semi = pd.Series(name="out_nms_loc_semi").astype("float")
+        self.out_nms_rq_spray = pd.Series(name="out_nms_rq_spray").astype("float")
+        self.out_nms_loc_spray = pd.Series(name="out_nms_loc_spray").astype("float")
+        self.out_lms_rq_dry = pd.Series(name="out_lms_rq_dry").astype("float")
+        self.out_lms_loc_dry = pd.Series(name="out_lms_loc_dry").astype("float")
+        self.out_lms_rq_semi = pd.Series(name="out_lms_rq_semi").astype("float")
+        self.out_lms_loc_semi = pd.Series(name="out_lms_loc_semi").astype("float")
+        self.out_lms_rq_spray = pd.Series(name="out_lms_rq_spray").astype("float")
+        self.out_lms_loc_spray = pd.Series(name="out_lms_loc_spray").astype("float")
+        self.out_nds_rq_dry = pd.Series(name="out_nds_rq_dry").astype("float")
+        self.out_nds_loc_dry = pd.Series(name="out_nds_loc_dry").astype("float")
+        self.out_nds_rq_semi = pd.Series(name="out_nds_rq_semi").astype("float")
+        self.out_nds_loc_semi = pd.Series(name="out_nds_loc_semi").astype("float")
+        self.out_nds_rq_spray = pd.Series(name="out_nds_rq_spray").astype("float")
+        self.out_nds_loc_spray = pd.Series(name="out_nds_loc_spray").astype("float")
+        self.out_lds_rq_dry = pd.Series(name="out_lds_rq_dry").astype("float")
+        self.out_lds_loc_dry = pd.Series(name="out_lds_loc_dry").astype("float")
+        self.out_lds_rq_semi = pd.Series(name="out_lds_rq_semi").astype("float")
+        self.out_lds_loc_semi = pd.Series(name="out_lds_loc_semi").astype("float")
+        self.out_lds_rq_spray = pd.Series(name="out_lds_rq_spray").astype("float")
+        self.out_lds_loc_spray = pd.Series(name="out_lds_loc_spray").astype("float")
+
+
+class Terrplant(UberModel, TerrplantInputs, TerrplantOutputs):
+    def __init__(self, pd_obj, pd_obj_exp):
+        """Class representing the Terrplant model and containing all its methods"""
+        super(Terrplant, self).__init__()
         self.pd_obj = pd_obj
         self.pd_obj_exp = pd_obj_exp
-
-        # Execute model methods if requested
-        if self.run_type != "empty":
-            self.execute_model()
+        self.pd_obj_out = None
 
     def execute_model(self):
-        logging.info("1")
-        self.populate_input_properties()
-        logging.info("2")
-        self.create_output_properties()
-        logging.info("3")
+        """
+        Callable to execute the running of the model:
+            1) Populate input parameters
+            2) Create output DataFrame to hold the model outputs
+            3) Run the model's methods to generate outputs
+            4) Fill the output DataFrame with the generated model outputs
+        """
+        self.populate_inputs(self.pd_obj, self)
+        self.pd_obj_out = self.populate_outputs(self)
         self.run_methods()
-        logging.info("4")
-        self.create_output_dataframe()
-        # Callable from Bottle that returns JSON
-        logging.info("5")
-        self.json = self.json(self.pd_obj, self.pd_obj_out, self.pd_obj_exp)
+        self.fill_output_dataframe(self)
 
-    def json(self, pd_obj, pd_obj_out, pd_obj_exp):
-        """
-            Convert DataFrames to JSON, returning a tuple
-            of JSON strings (inputs, outputs, exp_out)
-        """
-
-        pd_obj_json = pd_obj.to_json()
-        pd_obj_out_json = pd_obj_out.to_json()
-        try:
-            pd_obj_exp_json = pd_obj_exp.to_json()
-        except:
-            pd_obj_exp_json = "{}"
-
-        return pd_obj_json, pd_obj_out_json, pd_obj_exp_json
-
-    # Begin model methods
     def run_methods(self):
+        """Execute the model's methods to generate the model output"""
         try:
             self.rundry()
             self.runsemi()
@@ -84,107 +127,6 @@ class terrplant(object):
             self.LOCldsspray()
         except TypeError:
             print "Type Error: Your variables are not set correctly."
-
-    def create_output_dataframe(self):
-        # Create DataFrame containing output value Series
-        pd_obj_out = pd.DataFrame({
-            "out_rundry": self.out_rundry,
-            "out_runsemi": self.out_runsemi,
-            "out_totaldry": self.out_totaldry,
-            "out_totalsemi": self.out_totalsemi,
-            "out_spray": self.out_spray,
-            "out_min_nms_spray": self.out_min_nms_spray,
-            "out_min_lms_spray": self.out_min_lms_spray,
-            "out_min_nds_spray": self.out_min_nds_spray,
-            "out_min_lds_spray": self.out_min_lds_spray,
-            "out_nms_rq_dry": self.out_nms_rq_dry,
-            "out_nms_loc_dry": self.out_nms_loc_dry,
-            "out_nms_rq_semi": self.out_nms_rq_semi,
-            "out_nms_loc_semi": self.out_nms_loc_semi,
-            "out_nms_rq_spray": self.out_nms_rq_spray,
-            "out_nms_loc_spray": self.out_nms_loc_spray,
-            "out_lms_rq_dry": self.out_lms_rq_dry,
-            "out_lms_loc_dry": self.out_lms_loc_dry,
-            "out_lms_rq_semi": self.out_lms_rq_semi,
-            "out_lms_loc_semi": self.out_lms_loc_semi,
-            "out_lms_rq_spray": self.out_lms_rq_spray,
-            "out_lms_loc_spray": self.out_lms_loc_spray,
-            "out_nds_rq_dry": self.out_nds_rq_dry,
-            "out_nds_loc_dry": self.out_nds_loc_dry,
-            "out_nds_rq_semi": self.out_nds_rq_semi,
-            "out_nds_loc_semi": self.out_nds_loc_semi,
-            "out_nds_rq_spray": self.out_nds_rq_spray,
-            "out_nds_loc_spray": self.out_nds_loc_spray,
-            "out_lds_rq_dry": self.out_lds_rq_dry,
-            "out_lds_loc_dry": self.out_lds_loc_dry,
-            "out_lds_rq_semi": self.out_lds_rq_semi,
-            "out_lds_loc_semi": self.out_lds_loc_semi,
-            "out_lds_rq_spray": self.out_lds_rq_spray,
-            "out_lds_loc_spray": self.out_lds_loc_spray
-        })
-
-        # create pandas properties for acceptance testing
-        logging.info("here is the output object")
-        logging.info(pd_obj_out)
-        self.pd_obj_out = pd_obj_out
-
-    def create_output_properties(self):
-        # Outputs: Assign object attribute variables to Pandas Series
-        self.out_rundry = pd.Series(name="out_rundry")
-        self.out_runsemi = pd.Series(name="out_runsemi")
-        self.out_totaldry = pd.Series(name="out_totaldry")
-        self.out_totalsemi = pd.Series(name="out_totalsemi")
-        self.out_spray = pd.Series(name="out_spray")
-        self.out_min_nms_spray = pd.Series(name="out_min_nms_spray")
-        self.out_min_lms_spray = pd.Series(name="out_min_lms_spray")
-        self.out_min_nds_spray = pd.Series(name="out_min_nds_spray")
-        self.out_min_lds_spray = pd.Series(name="out_min_lds_spray")
-        self.out_nms_rq_dry = pd.Series(name="out_nms_rq_dry")
-        self.out_nms_loc_dry = pd.Series(name="out_nms_loc_dry")
-        self.out_nms_rq_semi = pd.Series(name="out_nms_rq_semi")
-        self.out_nms_loc_semi = pd.Series(name="out_nms_loc_semi")
-        self.out_nms_rq_spray = pd.Series(name="out_nms_rq_spray")
-        self.out_nms_loc_spray = pd.Series(name="out_nms_loc_spray")
-        self.out_lms_rq_dry = pd.Series(name="out_lms_rq_dry")
-        self.out_lms_loc_dry = pd.Series(name="out_lms_loc_dry")
-        self.out_lms_rq_semi = pd.Series(name="out_lms_rq_semi")
-        self.out_lms_loc_semi = pd.Series(name="out_lms_loc_semi")
-        self.out_lms_rq_spray = pd.Series(name="out_lms_rq_spray")
-        self.out_lms_loc_spray = pd.Series(name="out_lms_loc_spray")
-        self.out_nds_rq_dry = pd.Series(name="out_nds_rq_dry")
-        self.out_nds_loc_dry = pd.Series(name="out_nds_loc_dry")
-        self.out_nds_rq_semi = pd.Series(name="out_nds_rq_semi")
-        self.out_nds_loc_semi = pd.Series(name="out_nds_loc_semi")
-        self.out_nds_rq_spray = pd.Series(name="out_nds_rq_spray")
-        self.out_nds_loc_spray = pd.Series(name="out_nds_loc_spray")
-        self.out_lds_rq_dry = pd.Series(name="out_lds_rq_dry")
-        self.out_lds_loc_dry = pd.Series(name="out_lds_loc_dry")
-        self.out_lds_rq_semi = pd.Series(name="out_lds_rq_semi")
-        self.out_lds_loc_semi = pd.Series(name="out_lds_loc_semi")
-        self.out_lds_rq_spray = pd.Series(name="out_lds_rq_spray")
-        self.out_lds_loc_spray = pd.Series(name="out_lds_loc_spray")
-
-    def populate_input_properties(self):
-        # Inputs: Assign object attribute variables from the input Pandas Dataframe
-        self.version_terrplant = self.pd_obj["version_terrplant"]
-        self.application_rate = self.pd_obj["application_rate"]
-        self.incorporation_depth = self.pd_obj["incorporation_depth"]
-        self.runoff_fraction = self.pd_obj["runoff_fraction"]
-        self.drift_fraction = self.pd_obj["drift_fraction"]
-        self.chemical_name = self.pd_obj["chemical_name"]
-        self.pc_code = self.pd_obj["pc_code"]
-        self.use = self.pd_obj["use"]
-        self.application_method = self.pd_obj["application_method"]
-        self.application_form = self.pd_obj["application_form"]
-        self.solubility = self.pd_obj["solubility"]
-        self.ec25_nonlisted_seedling_emergence_monocot = self.pd_obj["ec25_nonlisted_seedling_emergence_monocot"]
-        self.ec25_nonlisted_seedling_emergence_dicot = self.pd_obj["ec25_nonlisted_seedling_emergence_dicot"]
-        self.noaec_listed_seedling_emergence_monocot = self.pd_obj["noaec_listed_seedling_emergence_monocot"]
-        self.noaec_listed_seedling_emergence_dicot = self.pd_obj["noaec_listed_seedling_emergence_dicot"]
-        self.ec25_nonlisted_vegetative_vigor_monocot = self.pd_obj["ec25_nonlisted_vegetative_vigor_monocot"]
-        self.ec25_nonlisted_vegetative_vigor_dicot = self.pd_obj["ec25_nonlisted_vegetative_vigor_dicot"]
-        self.noaec_listed_vegetative_vigor_monocot = self.pd_obj["noaec_listed_vegetative_vigor_monocot"]
-        self.noaec_listed_vegetative_vigor_dicot = self.pd_obj["noaec_listed_vegetative_vigor_dicot"]
 
     # EEC for runoff for dry areas
     def rundry(self):
@@ -1018,10 +960,12 @@ class terrplant(object):
         # else:
         #     self.out_lds_loc_spray = ('The risk quotient for listed monocot seedlings exposed to the'\
         #     ' pesticide via spray drift indicates that potential risk is minimal.')
-        exceed_boolean = self.out_lds_rq_spray >= 1.0
-        self.out_lds_loc_spray = exceed_boolean.map(lambda x:
-                                                    'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.' if x == True
-                                                    else 'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.')
+        exceed_boolean = self.out_lds_rq_spray>= 1.0
+        self.out_lds_loc_spray = exceed_boolean.map(
+            lambda x: 'The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates '
+                      'a potential risk.' if x == True else 'The risk quotient for listed dicot seedlings exposed to '
+                                                            'the pesticide via spray drift indicates that potential '
+                                                            'risk is minimal.')
         logging.info("LOCldsspray")
         logging.info(self.out_lds_loc_spray)
         return self.out_lds_loc_spray
@@ -1069,3 +1013,12 @@ class terrplant(object):
         logging.info("minldsspray")
         logging.info(self.out_min_lds_spray)
         return self.out_min_lds_spray
+
+
+class TerrplantApiMetadata(object):
+    def __init__(self):
+        pass
+
+    def post(self):
+        description = "Run TerrPlant with the user-supplied JSON"
+        # parameters =

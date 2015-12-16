@@ -6,6 +6,9 @@ import pkgutil
 from StringIO import StringIO
 from .. import terrplant_model_rest as terrplant_model
 from tabulate import tabulate
+import sys
+import os
+
 
 # load transposed qaqc data for inputs and expected outputs
 # works for local nosetests from parent directory
@@ -18,10 +21,10 @@ data_inputs = StringIO(pkgutil.get_data(__package__, 'terrplant_qaqc_in_transpos
 pd_obj_inputs = pd.read_csv(data_inputs, index_col=0, engine='python')
 print("terrplant inputs")
 print(pd_obj_inputs.shape)
-print(tabulate(pd_obj_inputs.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_inputs.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_inputs.iloc[:,11:13], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_inputs.iloc[:,14:17], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_inputs.iloc[:, 0:5], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_inputs.iloc[:, 6:10], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_inputs.iloc[:, 11:13], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_inputs.iloc[:, 14:17], headers='keys', tablefmt='fancy_grid'))
 
 # load transposed qaqc data for expected outputs
 # works for local nosetests from parent directory
@@ -31,24 +34,24 @@ print(tabulate(pd_obj_inputs.iloc[:,14:17], headers='keys', tablefmt='fancy_grid
 # print(pd_obj_exp_out)
 # this works for both local nosetests and travis deploy
 data_exp_outputs = StringIO(pkgutil.get_data(__package__, 'terrplant_qaqc_exp_transpose.csv'))
-pd_obj_exp = pd.read_csv(data_exp_outputs, index_col=0, engine= 'python')
+pd_obj_exp = pd.read_csv(data_exp_outputs, index_col=0, engine='python')
 print("terrplant expected outputs")
 print(pd_obj_exp.shape)
-print(tabulate(pd_obj_exp.iloc[:,0:5], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_exp.iloc[:,6:10], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_exp.iloc[:,11:14], headers='keys', tablefmt='fancy_grid'))
-print(tabulate(pd_obj_exp.iloc[:,15:16], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:, 0:5], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:, 6:10], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:, 11:14], headers='keys', tablefmt='fancy_grid'))
+print(tabulate(pd_obj_exp.iloc[:, 15:16], headers='keys', tablefmt='fancy_grid'))
 
 # create an instance of terrplant object with qaqc data
-terrplant_calc = terrplant_model.terrplant("batch", pd_obj_inputs, pd_obj_exp)
+terrplant = terrplant_model.Terrplant(pd_obj_inputs, pd_obj_exp)
 print("####")
-print(terrplant_calc)
+print(terrplant)
 test = {}
 
 
 class TestTerrplant(unittest.TestCase):
     def setUp(self):
-        pass
+        terrplant.execute_model()
 
     def tearDown(self):
         pass
@@ -82,6 +85,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_totaldry(self):
         """
         Integration test for terrplant.totaldry
@@ -91,6 +95,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_totalsemi(self):
         """
         Integration test for terrplant.totalsemi
@@ -100,6 +105,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nms_rq_dry(self):
         """
         Integration test for terrplant.nms_rq_dry
@@ -109,6 +115,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nms_loc_dry(self):
         """
         Integration test for terrplant.nms_loc_dry
@@ -118,6 +125,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nms_rq_semi(self):
         """
         Integration test for terrplant.nms_rq_semi
@@ -127,6 +135,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nms_loc_semi(self):
         """
         Integration test for terrplant.nms_loc_semi
@@ -136,6 +145,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nms_rq_spray(self):
         """
         Integration test for terrplant.nms_rq_spray
@@ -145,6 +155,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nms_loc_spray(self):
         """
         Integration test for terrplant.nms_loc_spray
@@ -154,6 +165,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lms_rq_dry(self):
         """
         Integration test for terrplant.lms_rq_dry
@@ -163,6 +175,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lms_loc_dry(self):
         """
         Integration test for terrplant.lms_loc_dry
@@ -172,6 +185,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lms_rq_semi(self):
         """
         Integration test for terrplant.lms_rq_semi
@@ -181,6 +195,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lms_loc_semi(self):
         """
         Integration test for terrplant.lms_loc_semi
@@ -190,6 +205,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lms_rq_spray(self):
         """
         Integration test for terrplant.lms_rq_spray
@@ -199,6 +215,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lms_loc_spray(self):
         """
         Integration test for terrplant.lms_loc_spray
@@ -208,6 +225,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nds_rq_dry(self):
         """
         Integration test for terrplant.nds_rq_dry
@@ -217,6 +235,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nds_loc_dry(self):
         """
         Integration test for terrplant.nds_loc_dry
@@ -226,6 +245,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nds_rq_semi(self):
         """
         Integration test for terrplant.nds_rq_semi
@@ -235,6 +255,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nds_loc_semi(self):
         """
         Integration test for terrplant.nds_loc_semi
@@ -244,6 +265,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nds_rq_spray(self):
         """
         Integration test for terrplant.nds_rq_spray
@@ -253,6 +275,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_nds_loc_spray(self):
         """
         Integration test for terrplant.nds_loc_spray
@@ -262,6 +285,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lds_rq_dry(self):
         """
         Integration test for terrplant.lds_rq_dry
@@ -271,6 +295,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lds_loc_dry(self):
         """
         Integration test for terrplant.lds_loc_dry
@@ -280,6 +305,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lds_rq_semi(self):
         """
         Integration test for terrplant.lds_rq_semi
@@ -289,6 +315,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lds_loc_semi(self):
         """
         Integration test for terrplant.lds_loc_semi
@@ -298,6 +325,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lds_rq_spray(self):
         """
         Integration test for terrplant.lds_rq_spray
@@ -307,6 +335,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_lds_loc_spray(self):
         """
         Integration test for terrplant.lds_loc_spray
@@ -316,6 +345,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_min_nms_spray(self):
         """
         Integration test for terrplant.minnmsspray
@@ -325,6 +355,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_min_lms_spray(self):
         """
         Integration test for terrplant.minlmsspray
@@ -334,6 +365,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_min_nds_spray(self):
         """
         Integration test for terrplant.minndsspray
@@ -343,6 +375,7 @@ class TestTerrplant(unittest.TestCase):
         finally:
             pass
         return
+
     def test_min_lds_spray(self):
         """
         Integration test for terrplant.minldsspray
@@ -353,17 +386,15 @@ class TestTerrplant(unittest.TestCase):
             pass
         return
 
-
     def blackbox_method_int(self, output):
         """
         Helper method to reuse code for testing numpy array outputs from TerrPlant model
         :param output: String; Pandas Series name (e.g. column name) without '_out'
         :return:
         """
-        pd.set_option('display.float_format','{:.4E}'.format) # display model output in scientific notation
-        result = terrplant_calc.pd_obj_out["out_" + output]
-        expected = terrplant_calc.pd_obj_exp["exp_" + output]
-        tab = pd.concat([result,expected], axis=1)
+        result = terrplant.pd_obj_out["out_" + output]
+        expected = terrplant.pd_obj_exp["exp_" + output]
+        tab = pd.concat([result, expected], axis=1)
         print(" ")
         print(tabulate(tab, headers='keys', tablefmt='fancy_grid'))
         # npt.assert_array_almost_equal(result, expected, 4, '', True)
@@ -371,12 +402,13 @@ class TestTerrplant(unittest.TestCase):
         npt.assert_allclose(result, expected, rtol, 0, '', True)
 
     def blackbox_method_str(self, output):
-        result = terrplant_calc.pd_obj_out["out_" + output]
-        expected = terrplant_calc.pd_obj_exp["exp_" + output]
-        tab = pd.concat([result,expected], axis=1)
+        result = terrplant.pd_obj_out["out_" + output]
+        expected = terrplant.pd_obj_exp["exp_" + output]
+        tab = pd.concat([result, expected], axis=1)
         print(" ")
         print(tabulate(tab, headers='keys', tablefmt='fancy_grid'))
         npt.assert_array_equal(result, expected)
+
 
 # unittest will
 # 1) call the setup method,

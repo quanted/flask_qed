@@ -12,4 +12,6 @@ requests
 snakefood
 tabulate
 twine
-
+flask
+flask_restful
+flask_swagger
