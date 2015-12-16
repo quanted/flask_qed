@@ -34,7 +34,6 @@ class UberModel(object):
             # set each Series in the DataFrame to the corresponding TerrplantInputs attribute (member variable)
             for column in pd_obj.columns:
                 setattr(model_obj, column, pd_obj[column])
-            pass
         else:
             df['model'] = pd.Series(name=self.name)
             if df.columns.order().equals(pd_obj.columns.order()):
@@ -42,7 +41,6 @@ class UberModel(object):
                 # set each Series in the DataFrame to the corresponding TerrplantInputs attribute (member variable)
                 for column in pd_obj.columns:
                     setattr(model_obj, column, pd_obj[column])
-                pass
             else:
                 raise ValueError("Inputs parameters do not have all required inputs. Please see API documentation.")
 

@@ -17,6 +17,7 @@ class ModelCaller(Resource):
         return {'result': 'model=%s, jid=%s' % (model, jid)}
 
     def post(self, model, jid):
+        # TODO: Remove the YAML part of this docstring
         """
         Execute model
         ---
@@ -110,6 +111,7 @@ class ModelCaller(Resource):
         return {'user_id': 'admin', 'result': {'error': e}, '_id': jid}
 
 
+# TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant_rest.TerrplantHandler, '/terrplant/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
