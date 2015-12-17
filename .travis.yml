@@ -9,9 +9,9 @@ install: "pip install -r requirements.txt"
 
 # command to run tests
 script:
-  - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.sip_rest.sip_model_rest -sv
-  - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.stir_rest.stir_model_rest -sv
-  - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.rice_rest.rice_model_rest -sv
-  - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.terrplant_rest.terrplant_model_rest -sv
-  - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.iec_rest.iec_model_rest -sv
-  - nosetests --with-coverage --cover-erase --cover-package=ubertool_ecorest.REST_UBER.earthworm_rest.earthworm_model_rest -sv
+  - nosetests --with-coverage --cover-erase --cover-package=ubertool.ubertool.sip.sip -sv
+  - nosetests --with-coverage --cover-erase --cover-package=ubertool.ubertool.stir.stir -sv
+  - nosetests --with-coverage --cover-erase --cover-package=ubertool.ubertool.rice.rice -sv
+  - nosetests --with-coverage --cover-erase --cover-package=ubertool.ubertool.terrplant.terrplant -sv
+  - nosetests --with-coverage --cover-erase --cover-package=ubertool.ubertool.iec.iec -sv
+  - nosetests --with-coverage --cover-erase --cover-package=ubertool.ubertool.earthworm.earthworm -sv
