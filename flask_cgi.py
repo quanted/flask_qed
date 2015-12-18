@@ -4,10 +4,9 @@ import logging
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
 # from flask_swagger import swagger
-from REST_UBER.uber_swagger import swagger
+from uber_swagger import swagger
 import pandas as pd
-import REST_UBER.terrplant_rest
-
+import ubertool.ubertool.terrplant as terrplant
 
 app = Flask(__name__)
 api = Api(app)
@@ -59,7 +58,7 @@ class ModelCaller(Resource):
         """
         try:
             # Dynamically import the model Python module
-            model_module = importlib.import_module('.' + model + '_model_rest', model + '_rest')
+            model_module = importlib.import_module('.' + model, 'ubertool.ubertool.' + model)
             # Set the model Object to a local variable (class name = model)
             model_object = getattr(model_module, model)
 
@@ -136,16 +135,19 @@ def therps_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from REST_UBER.therps_rest import therps_model_rest
-        result = therps_model_rest.therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50, avian_lc50,
-                                          avian_NOAEC, avian_NOAEL,
-                                          Species_of_the_tested_bird_avian_ld50, Species_of_the_tested_bird_avian_lc50,
-                                          Species_of_the_tested_bird_avian_NOAEC,
-                                          Species_of_the_tested_bird_avian_NOAEL,
-                                          bw_avian_ld50, bw_avian_lc50, bw_avian_NOAEC, bw_avian_NOAEL,
-                                          mineau_scaling_factor, bw_herp_a_sm, bw_herp_a_md, bw_herp_a_lg, wp_herp_a_sm,
-                                          wp_herp_a_md,
-                                          wp_herp_a_lg, c_mamm_a, c_herp_a)
+        from ubertool.ubertool.therps import therps
+        result = therps.therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
+                                                 avian_lc50,
+                                                 avian_NOAEC, avian_NOAEL,
+                                                 Species_of_the_tested_bird_avian_ld50,
+                                                 Species_of_the_tested_bird_avian_lc50,
+                                                 Species_of_the_tested_bird_avian_NOAEC,
+                                                 Species_of_the_tested_bird_avian_NOAEL,
+                                                 bw_avian_ld50, bw_avian_lc50, bw_avian_NOAEC, bw_avian_NOAEL,
+                                                 mineau_scaling_factor, bw_herp_a_sm, bw_herp_a_md, bw_herp_a_lg,
+                                                 wp_herp_a_sm,
+                                                 wp_herp_a_md,
+                                                 wp_herp_a_lg, c_mamm_a, c_herp_a)
         if (result):
             result_json = json.dumps(result.__dict__, cls=NumPyArangeEncoder)
             # all_result[jid]['status']='done'
@@ -163,8 +165,8 @@ def agdrift_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from REST_UBER.agdrift_rest import agdrift_model_rest
-        result = agdrift_model_rest.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
+        from ubertool.ubertool.agdrift import agdrift
+        result = agdrift.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
                                             application_rate, distance, aquatic_type, calculation_input,
                                             init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
                                             deposition_mgcm, nasae, y, x, express_y)
@@ -184,8 +186,8 @@ def kabam_rest(jid):
         for k, v in request.json.iteritems():
             exec '%s = v' % k
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from REST_UBER.kabam_rest import kabam_model_rest
-        result = kabam_model_rest.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
+        from ubertool.ubertool.kabam import kabam
+        result = kabam.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
                                         mineau_scaling_factor, x_poc, x_doc, c_ox, w_t, c_ss, oc, k_ow,
                                         Species_of_the_tested_bird, bw_quail, bw_duck, bwb_other, avian_ld50,
                                         avian_lc50, avian_noaec, m_species, bw_rat, bwm_other, mammalian_ld50,
@@ -219,7 +221,7 @@ def kabam_rest(jid):
 
 
 # TODO: Add model endpoints here once they are refactored
-api.add_resource(REST_UBER.terrplant_rest.TerrplantHandler, '/terrplant/<string:jid>')
+api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
