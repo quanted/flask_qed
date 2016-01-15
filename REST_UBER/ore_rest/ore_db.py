@@ -1,5 +1,7 @@
 import logging
-import os, sqlite3
+import os
+import sqlite3
+
 
 file_path = os.path.abspath(os.path.dirname(__file__))
 db = os.path.join(file_path, 'sqliteDB', 'ore.s3db')
@@ -12,6 +14,7 @@ def loadChoices(query):
     choices = []
 
     if query == 'crop':
+        # TODO: I don't think this is used anymore
         choices = cropQuery()
     elif query == 'oreDb':
         choices = oreDbQuery()
@@ -25,35 +28,43 @@ def loadChoices(query):
 
 
 def cropQuery():
-    c.execute('SELECT DISTINCT Crop FROM CCA')
+    # TODO: This is not currently used...
+    c.execute('SELECT DISTINCT CCA FROM CCA')
 
     return c.fetchall()
 
 
 # , GrpName, SubGrpNo, SubGrpName
 def oreDbQuery():
+    """
+    SQLite query returning all of the available data needed to populate the "Crop-Target Category Lookup" tab
+    :return: SQLite cursor
+    """
+    # TODO: Change TABLE name to the Crop Slection table that has not yet been Created :-(
+    # TODO: Currently using the old DB for Crop Lookup table
+
     c.execute('SELECT DISTINCT Crop, GrpNo, GrpName, SubGrpNo, SubGrpName, Category FROM CCA')
 
     return c.fetchall()
 
 
-def generateSQLFilter(filter, es_type, category):
+def generateSQLFilter(sql_filter, es_type, category):
     """
-    Generates the trailing part of the SQLite query (e.g. "Category=? AND AppEquip IN (?, ?, ?, ?)") resulting in:
-    SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE Category=? AND AppEquip IN (?, ?, ?, ?)
+    Generates the SQLite query to populate the Exposure Scenario tab.
+    (e.g. "Category=? AND AppEquip IN (?, ?, ?, ?)") resulting in:
+    SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM OccHandlerNC WHERE Category=? AND AppEquip IN (?, ?, ?, ?)
 
-
-    :param filter:
-    :param es_type:
-    :param category:
-    :return:
+    :param sql_filter:
+    :param es_type: string
+    :param category: string
+    :return: (SQLite query string, list of insertion values)
     """
     query_string = "Category = ? AND ("
     insertion_list = [category]
 
     i = 0
-    while i < len(filter):
-        insertion_list.append(filter[i])  # append values to be inserted into SQL statement (? substitution)
+    while i < len(sql_filter):
+        insertion_list.append(sql_filter[i])  # append values to be inserted into SQL statement (? substitution)
         if (i + 1) != 1:  # NOT first loop
             query_string += " OR "
         query_string += es_type + " = ?"
@@ -68,27 +79,41 @@ def generateSQLFilter(filter, es_type, category):
 
 def oreWorkerActivities(query):
     """
-    Get
+    SQL query of to populate the exposure scenario tab
     """
     category = query['crop_category']
-    _query_root = 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM CCA WHERE '
+    _query_root = 'SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM OccHandlerNC WHERE '
 
-    try:  # Exposure Scenario filtering (e.g. has 'es_type' key in request)
-        filter = query['es_type_filter']
+    if 'es_type' in query:  # Exposure Scenario filtering (e.g. has 'es_type' key in request)
+        sql_filter = query['es_type_filter']
         es_type = query['es_type']
 
-        query_string = generateSQLFilter(filter, es_type, category)
+        # TODO: Handle "Spray(all starting formulations)" logic
+        """
+        Spray = [L, SC, EC], DF, WDG, WP, or WSP
+        Spray + Flagger = above + "Broadcast" AppType
+        """
+
+        query_string = generateSQLFilter(sql_filter, es_type, category)
         print _query_root + query_string[0] + ', ' + str(query_string[1])
 
         crop_category = tuple(query_string[1])
         c.execute(_query_root + query_string[0],
                   crop_category)
+    else:  # Crop-Target query (Crop-Target Category Lookup Tab)
+        """
+        SQL query example (Target Category == "Field crop, high-acreage"):
 
-    except KeyError, e:  # Crop-Target query (Crop-Target Category Lookup Tab)
-        logging.exception(e)
+        SELECT DISTINCT Activity, AppType, AppEquip, Formulation FROM OccHandlerNC WHERE
+             (Category="Field crop, high-acreage"
+             AND Formulation NOT IN (SELECT Formulation FROM OccHandlerNC WHERE Formulation LIKE 'Spray%'));
+        """
         crop_category = (category,)  # Must be a tuple
-        print _query_root + 'Category=?'
-        c.execute(_query_root + 'Category=?',
+        print _query_root + "(Category=? AND Formulation NOT IN "\
+                            "(SELECT Formulation FROM OccHandlerNC WHERE Formulation LIKE 'Spray%'))"
+        c.execute(_query_root +
+                  "(Category=? AND Formulation NOT IN "
+                  "(SELECT Formulation FROM OccHandlerNC WHERE Formulation LIKE 'Spray%'))",
                   crop_category)
 
     query = c.fetchall()
@@ -122,49 +147,47 @@ def oreWorkerActivities(query):
             'Formulation': formulation}
 
 
-def oreOutputQuery(query):
+def oreOutputQuery(inputs):
     """
-    SELECT * FROM CCA WHERE Crop = 'Corn, field' AND (Activity = 'M/L' OR Activity = 'Applicator' OR Activity = 'Fla
+    SELECT * FROM OccHandlerNC WHERE Crop = 'Corn, field' AND (Activity = 'M/L' OR Activity = 'Applicator' OR Activity = 'Fla
     gger') AND AppEquip = 'Aerial' AND AppType = 'Broadcast' AND (Formulation = 'L/SC/EC' OR Formulation = 'Spray (all start
     ing formulations)');
     """
+
+    # TODO: This is set up to work with only ONE crop/target category; it must be changed to allow for multiple
 
     conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    crop = query['exp_crop']
-    activities = query['exp_scenario']['Activity']
-    app_eqips = query['exp_scenario']['AppEquip']
-    app_types = query['exp_scenario']['AppType']
-    formulations = query['exp_scenario']['Formulation']
+    category = inputs['exp_category']
+    activities = inputs['exp_scenario']['Activity']
+    app_eqips = inputs['exp_scenario']['AppEquip']
+    app_types = inputs['exp_scenario']['AppType']
+    formulations = inputs['exp_scenario']['Formulation']
 
-    params = []
-    params.append(crop)
+    params = [category]
 
     def query_generator(exp_scenario, exp_scenario_list):
 
-        query = exp_scenario + " = ?"  # E.g. "Activity = ?"
+        query_string = exp_scenario + " = ?"  # E.g. "Activity = ?"
         i = 0
         while i < len(exp_scenario_list):
             params.append(exp_scenario_list[i])  # append item to params[] to pass to SQL statement
-            if i > 0:  # skip 1st list item bc it is handle by default in the 'query' string definition
-                query += " OR " + exp_scenario + " = ?"  # E.g. "Activity = ? OR Activity = ? OR Activity = ?"
+            if i > 0:  # skip 1st list item bc it is handle by default in the 'query_string' string definition
+                query_string += " OR " + exp_scenario + " = ?"  # E.g. "Activity = ? OR Activity = ? OR Activity = ?"
             i += 1
-        return query
+        return query_string
 
-    sql_query = 'SELECT * FROM CCA WHERE Crop = ? ' \
+    sql_query = 'SELECT * FROM OccHandlerNC WHERE Category = ? ' \
                 'AND (' + query_generator('Activity', activities) + ') ' \
-                                                                    'AND (' + query_generator('AppEquip',
-                                                                                              app_eqips) + ') ' \
-                                                                                                           'AND (' + query_generator(
-        'AppType', app_types) + ') ' \
-                                'AND (' + query_generator('Formulation', formulations) + ')'
+                'AND (' + query_generator('AppEquip', app_eqips) + ') ' \
+                'AND (' + query_generator('AppType', app_types) + ') ' \
+                'AND (' + query_generator('Formulation', formulations) +')'
 
     # TreatedVal, TreatedUnit, DUESLNoG, DUESLG, DUEDLG, DUESLGCRH, DUEDLGCRH, IUENoR, IUEPF5R, IUEPF10R, IUEEC
     print sql_query
-    # print len(params)
-    # print params
+    print params
 
     c.execute(sql_query, tuple(params))
 

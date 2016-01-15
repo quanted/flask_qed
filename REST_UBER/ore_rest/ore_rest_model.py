@@ -21,7 +21,7 @@ def ore(inputs, query_result_list):
         app_equip = query['AppEquip']
         app_type = query['AppType']
         crop_target = query['Category']
-        crop_name = query['Crop']
+        crop_name = inputs['exp_crop']
         app_rate = inputs['app_rate']['app_rate_' + query['Formulation']]
         app_rate_unit = query['AppRateUnit']
         area_treated = query['TreatedVal']

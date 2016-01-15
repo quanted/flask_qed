@@ -248,5 +248,71 @@ def api_doc():
     return render_template('index.html')
 
 
+
+"""
+=============================================================================================
+                              O R E  T E S T I N G
+=============================================================================================
+"""
+
+
+@app.route('/ore/load/<query>', methods=['GET'])
+def ore_rest_load_query(query):
+    """
+    Endpoint returns the list of Crops to populate the Crop-Target Category Lookup tab
+    :param query:
+    :return:
+    """
+    from REST_UBER.ore_rest import ore_db
+    # print query
+
+    result = ore_db.loadChoices(query)
+
+    return json.dumps({"result": result})
+
+
+@app.route('/ore/category', methods=['POST'])
+def ore_rest_category_query():
+    """
+    Endpoint for populating the exposure scenario tab. OnPageLoad: based on the default crop target category.
+    :return: JSON string
+    """
+    from REST_UBER.ore_rest import ore_db
+
+    query = {}
+    for k, v in request.json.iteritems():
+        exec "query['%s'] = v" % k
+        # print k, v
+
+    result = ore_db.oreWorkerActivities(query)
+
+    return json.dumps({"result": result})
+
+
+@app.route('/ore/output', methods=['POST'])
+def ore_rest_output_query():
+    """
+    Endpoint for running the ORCA calculations on a user-set exposure scenario and returning the model output
+    :return: JSON string
+    """
+    from REST_UBER.ore_rest import ore_db, ore_rest_model
+    inputs = request.json
+
+    # query = {}
+    # for k, v in request.json.iteritems():
+    #     exec "query['%s'] = v" % k
+    #     # print k, v
+
+    query_result_list = ore_db.oreOutputQuery(inputs)
+    output = ore_rest_model.ore(inputs, query_result_list)
+
+    return json.dumps({
+        "result": {
+                "input": inputs,
+                "output": output
+        }
+    })
+
+
 if __name__ == '__main__':
     app.run(port=7777, debug=True)
