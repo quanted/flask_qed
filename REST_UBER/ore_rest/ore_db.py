@@ -154,7 +154,7 @@ def oreOutputQuery(inputs):
     ing formulations)');
     """
 
-    # TODO: This is set up to work with only ONE crop/target category; it must be changed to allow for multiple
+    # TODO: This is set up to work with only ONE crop/target category; it must be changed to allow for multiple...
 
     conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row

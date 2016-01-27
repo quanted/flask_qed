@@ -52,6 +52,13 @@ def ore(inputs, query_result_list):
         inhal_unit_exp_pf10r = query['IUEPF10R']
         inhal_unit_exp_ec = query['IUEEC']
 
+        # Source Columns
+        sources = [query['SourceCategory'], query['SourceMRID'], query['SourceDescription'], query['SourceDER']]
+        # source_category = query['SourceCategory']
+        # source_mrid = query['SourceMRID']
+        # source_description = query['SourceDescription']
+        # source_der = query['SourceDER']
+
         # Create DermalNonCancer class instance
         dermal = OreCalculator.DermalNonCancer(
             activity, crop_target, app_rate, app_rate_unit, crop_name,
@@ -79,10 +86,10 @@ def ore(inputs, query_result_list):
                 combined = OreCalculator.CombinedDose(dermal, inhal).one_over_moe()
             if inputs['expComboType'] == '4':  # Aggregate Risk Index
                 combined = OreCalculator.CombinedDose(dermal, inhal).ari()
-            ore_class_list.append((dermal, inhal, combined))
+            ore_class_list.append((dermal, inhal, sources, combined))
 
         else:  # Not combined
-            ore_class_list.append((dermal, inhal))
+            ore_class_list.append((dermal, inhal, sources))
 
     ore_output = OreOutputFormatter(ore_class_list)
     output_dict = ore_output.get_output_dict()
@@ -135,28 +142,25 @@ class OreOutputFormatter(object):
         (<ore_rest.OreCalculator.DermalNonCancer object at ...>, <ore_rest.OreCalculator.InhalNonCancer object at ...>)
         ]
         """
-        print ore_class_list
 
         self.dermal_class_list = []
         self.inhal_class_list = []
+        self.sources_list = []
         self.combined_list = []
 
         for item in ore_class_list:
             self.dermal_class_list.append(item[0])
             self.inhal_class_list.append(item[1])
+            self.sources_list.append(item[2])
             try:
-                self.combined_list.append(item[2])
+                self.combined_list.append(item[3])
             except IndexError:
                 pass
 
         self.output_dict = {}
-        self.dermal_formatter()
-        self.inhal_formatter()
 
-        if len(self.combined_list) > 0:
-            self.combined_formatter()
-
-    """
+    """ Example JSON schema:
+    [
         'mix_loader': {
             'activity': "M/L",
             'app_equip': 'Aerial',
@@ -205,6 +209,7 @@ class OreOutputFormatter(object):
             'inhal_dose': ['0.000148'],
             'inhal_moe': ['170000']
         }
+    ]
     """
 
     def get_output_dict(self):
@@ -213,6 +218,11 @@ class OreOutputFormatter(object):
         else:
             self.dermal_formatter()
             self.inhal_formatter()
+            self.sources_formatter()
+            if len(self.combined_list) > 0:
+                self.combined_formatter()
+
+            return self.output_dict
 
     def dermal_formatter(self):
         """
@@ -292,4 +302,18 @@ class OreOutputFormatter(object):
             print combined
 
             self.output_dict[str(i)].update(combined)
+            i += 1
+
+    def sources_formatter(self):
+        i = 1
+        for sources in self.sources_list:
+            sources_dict = {
+                'source': {
+                    'category': sources[0],
+                    'mrid': sources[1],
+                    'description': sources[2],
+                    'der': sources[3],
+                }
+            }
+            self.output_dict[str(i)].update(sources_dict)
             i += 1

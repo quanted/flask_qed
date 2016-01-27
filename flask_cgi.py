@@ -21,40 +21,6 @@ class ModelCaller(Resource):
         # TODO: Remove the YAML part of this docstring
         """
         Execute model
-        ---
-        tags:
-          - users
-        parameters:
-          - in: body
-            name: body
-            schema:
-              id: User
-              required:
-                - email
-                - name
-              properties:
-                email:
-                  type: string
-                  description: email for user
-                name:
-                  type: string
-                  description: name for user
-                address:
-                  description: address for user
-                  schema:
-                    id: Address
-                    properties:
-                      street:
-                        type: string
-                      state:
-                        type: string
-                      country:
-                        type: string
-                      postalcode:
-                        type: string
-        responses:
-          201:
-            description: User created
         """
         try:
             # Dynamically import the model Python module
@@ -65,7 +31,7 @@ class ModelCaller(Resource):
             try:
                 run_type = request.json["run_type"]
             except KeyError, e:
-                return self.errorMessage(e, jid)
+                return rest_error_message(e, jid)
 
             if run_type == "qaqc":
                 logging.info('============= QAQC Run =============')
@@ -103,20 +69,18 @@ class ModelCaller(Resource):
                     'run_type': run_type}
 
         except Exception, e:
-            return self.errorMessage(e, jid)
-
-    def errorMessage(self, error, jid):
-        """Returns exception error message as valid JSON string to caller"""
-        logging.exception(error)
-        e = str(error)
-        return {'user_id': 'admin', 'result': {'error': e}, '_id': jid}
+            return rest_error_message(e, jid)
 
 
-def errorMessage(error, jid):
-    """Returns exception error message as valid JSON string to caller"""
+def rest_error_message(error, jid):
+    """Returns exception error message as valid JSON string to caller
+    :param error: Exception, error message
+    :param jid: string, job ID
+    :return: JSON string
+    """
     logging.exception(error)
     e = str(error)
-    return {'user_id': 'admin', 'result': {'error': e}, '_id': jid}
+    return json.dumps({'user_id': 'admin', 'result': {'error': e}, '_id': jid})
 
 
 # TODO: Used for THERPS, is this needed???
@@ -155,7 +119,7 @@ def therps_rest(jid):
             # all_result[jid]['result']=result
         return json.dumps({'user_id': 'admin', 'result': result_json, '_id': jid})
     except Exception, e:
-        return errorMessage(e, jid)
+        return rest_error_message(e, jid)
 
 
 @app.route('/agdrift/<jid>', methods=['POST'])
@@ -176,7 +140,7 @@ def agdrift_rest(jid):
             # all_result[jid]['result']=result
             return json.dumps({'user_id': 'admin', 'result': result.__dict__, '_id': jid})
     except Exception, e:
-        return errorMessage(e, jid)
+        return rest_error_message(e, jid)
 
 
 @app.route('/kabam/<jid>', methods=['POST'])
@@ -217,9 +181,11 @@ def kabam_rest(jid):
             # all_result[jid]['result']=result
             return json.dumps({'user_id': 'admin', 'result': result_json, '_id': jid})
     except Exception, e:
-        return errorMessage(e, jid)
+        return rest_error_message(e, jid)
 
 
+# Declare endpoints for each model
+# These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
@@ -232,10 +198,7 @@ def spec():
     :return: Swagger formatted JSON string
     """
     swag = swagger(app)
-    # Additional Swagger documentation key-values describing the ubertool API
-    swag['info']['version'] = "0.1"
-    swag['info']['title'] = u"\u00FCbertool API Documentation"
-    swag['info']['description'] = "Welcome to the EPA's ubertool interactive RESTful API documentation."
+
     return jsonify(swag)
 
 
