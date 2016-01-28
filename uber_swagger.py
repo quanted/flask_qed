@@ -58,9 +58,21 @@ def swagger(app):
             rule = rule.replace(arg[0], '{%s}' % arg[2])
 
         # TODO: Make generic...
+
+        terrplant_tag = {
+            'name': 'Terrplant',
+            'description': 'Terrplant Model',
+        }
+        sip_tag = {
+            'name': 'Sip',
+            'description': 'SIP Model',
+        }
+
+        tags = [terrplant_tag, sip_tag]
+
         path_json = {
             "post": {
-                "tags": ["Terrplant"],
+                "tags": tags,
                 "summary": "Testing this Swagger stuff out",
                 "description": "Tasty Endpoints",
                 "operationId": "terrplant",

@@ -6,7 +6,8 @@ from flask_restful import Resource, Api
 # from flask_swagger import swagger
 from uber_swagger import swagger
 import pandas as pd
-import ubertool.ubertool.terrplant as terrplant
+from REST_UBER import terrplant_rest as terrplant
+from REST_UBER import sip_rest as sip
 
 app = Flask(__name__)
 api = Api(app)
@@ -188,6 +189,7 @@ def kabam_rest(jid):
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
+api.add_resource(sip.SipHandler, '/sip/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
