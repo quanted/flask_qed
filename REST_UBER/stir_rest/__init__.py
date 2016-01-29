@@ -44,7 +44,7 @@ class StirHandler(Resource):
     @staticmethod
     def get_model_inputs():
         """
-        Return terrplant input class.
+        Return model's input class.
         :return:
         """
         return stir.StirInputs()
@@ -52,7 +52,7 @@ class StirHandler(Resource):
     @staticmethod
     def get_model_outputs():
         """
-        Return terrplant output class.
+        Return model's output class.
         :return:
         """
         return stir.StirOutputs()
