@@ -25,9 +25,13 @@ class ModelCaller(Resource):
         """
         try:
             # Dynamically import the model Python module
-            model_module = importlib.import_module('.' + model, 'ubertool.ubertool.' + model)
+            model_module_name = 'ubertool.ubertool.' + model
+            model_module = importlib.import_module('.' + model, model_module_name)
+            logging.info('============= ' + model_module_name)
             # Set the model Object to a local variable (class name = model)
-            model_object = getattr(model_module, model)
+            model_cap = model.capitalize()
+            model_object = getattr(model_module, model_cap)
+            #logging.info('============= ' + model_object)
 
             try:
                 run_type = request.json["run_type"]
