@@ -10,7 +10,7 @@ class SipHandler(Resource):
 
     def get(self, jid):
         """
-        Terrplant get handler.
+        SIP get handler.
         :param jid:
         :return:
         """
@@ -23,7 +23,7 @@ class SipHandler(Resource):
 
     def post(self, jid):
         """
-        Terrplant post handler.
+        SIP post handler.
         :param jid:
         :return:
         """
@@ -44,7 +44,7 @@ class SipHandler(Resource):
     @staticmethod
     def get_model_inputs():
         """
-        Return terrplant input class.
+        Return model's input class.
         :return:
         """
         return sip.SipInputs()
@@ -52,7 +52,7 @@ class SipHandler(Resource):
     @staticmethod
     def get_model_outputs():
         """
-        Return terrplant output class.
+        Return model's output class.
         :return:
         """
         return sip.SipOutputs()

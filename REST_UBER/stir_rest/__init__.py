@@ -10,7 +10,7 @@ class StirHandler(Resource):
 
     def get(self, jid):
         """
-        Terrplant get handler.
+        STIR get handler.
         :param jid:
         :return:
         """
@@ -23,7 +23,7 @@ class StirHandler(Resource):
 
     def post(self, jid):
         """
-        Terrplant post handler.
+        STIR post handler.
         :param jid:
         :return:
         """
