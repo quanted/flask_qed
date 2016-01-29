@@ -1,16 +1,16 @@
 from flask_restful import Resource
-from ubertool.ubertool.terrplant import terrplant
+from ubertool.ubertool.iec import iec
 from flask import request
 import pandas as pd
 
 
-class TerrplantHandler(Resource):
+class IecHandler(Resource):
     def __init__(self):
-        self.name = "terrplant"
+        self.name = "iec"
 
-    def get(self, jid="000000100000011"):
+    def get(self, jid):
         """
-        Terrplant get handler.
+        IEC get handler.
         :param jid:
         :return:
         """
@@ -23,14 +23,14 @@ class TerrplantHandler(Resource):
 
     def post(self, jid):
         """
-        Terrplant post handler.
+        IEC post handler.
         :param jid:
         :return:
         """
         pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
-        terrplant_obj = terrplant.Terrplant(pd_obj, None)
-        terrplant_obj.execute_model()
-        inputs_json, outputs_json, exp_out_json = terrplant_obj.get_dict_rep(terrplant_obj)
+        iec_obj = iec.Iec(pd_obj, None)
+        iec_obj.execute_model()
+        inputs_json, outputs_json, exp_out_json = iec_obj.get_dict_rep(iec_obj)
 
         return {
             'user_id': 'admin',
@@ -47,7 +47,7 @@ class TerrplantHandler(Resource):
         Return model's input class.
         :return:
         """
-        return terrplant.TerrplantInputs()
+        return iec.IecInputs()
 
     @staticmethod
     def get_model_outputs():
@@ -55,4 +55,4 @@ class TerrplantHandler(Resource):
         Return model's output class.
         :return:
         """
-        return terrplant.TerrplantOutputs()
+        return iec.IecOutputs()

@@ -1,16 +1,16 @@
 from flask_restful import Resource
-from ubertool.ubertool.terrplant import terrplant
+from ubertool.ubertool.earthworm import earthworm
 from flask import request
 import pandas as pd
 
 
-class TerrplantHandler(Resource):
+class EarthwormHandler(Resource):
     def __init__(self):
-        self.name = "terrplant"
+        self.name = "earthworm"
 
-    def get(self, jid="000000100000011"):
+    def get(self, jid):
         """
-        Terrplant get handler.
+        Earthworm get handler.
         :param jid:
         :return:
         """
@@ -23,14 +23,14 @@ class TerrplantHandler(Resource):
 
     def post(self, jid):
         """
-        Terrplant post handler.
+        Earthworm post handler.
         :param jid:
         :return:
         """
         pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
-        terrplant_obj = terrplant.Terrplant(pd_obj, None)
-        terrplant_obj.execute_model()
-        inputs_json, outputs_json, exp_out_json = terrplant_obj.get_dict_rep(terrplant_obj)
+        earthworm_obj = earthworm.Earthworm(pd_obj, None)
+        earthworm_obj.execute_model()
+        inputs_json, outputs_json, exp_out_json = earthworm_obj.get_dict_rep(earthworm_obj)
 
         return {
             'user_id': 'admin',
@@ -47,7 +47,7 @@ class TerrplantHandler(Resource):
         Return model's input class.
         :return:
         """
-        return terrplant.TerrplantInputs()
+        return earthworm.EarthwormInputs()
 
     @staticmethod
     def get_model_outputs():
@@ -55,4 +55,4 @@ class TerrplantHandler(Resource):
         Return model's output class.
         :return:
         """
-        return terrplant.TerrplantOutputs()
+        return earthworm.EarthwormOutputs()
