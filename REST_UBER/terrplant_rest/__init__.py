@@ -5,13 +5,21 @@ import pandas as pd
 
 
 class TerrplantHandler(Resource):
-    def get(self, jid):
+    def __init__(self):
+        self.name = "terrplant"
+
+    def get(self, jid="000000100000011"):
         """
         Terrplant get handler.
         :param jid:
         :return:
         """
-        return {'result': 'model=terrplant, jid=%s' % jid}
+        return {
+            'result': {
+                'model: ' + self.name,
+                'jid: %s' % jid
+            }
+        }
 
     def post(self, jid):
         """

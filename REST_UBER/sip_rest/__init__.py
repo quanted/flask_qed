@@ -5,13 +5,21 @@ import pandas as pd
 
 
 class SipHandler(Resource):
+    def __init__(self):
+        self.name = "sip"
+
     def get(self, jid):
         """
         Terrplant get handler.
         :param jid:
         :return:
         """
-        return {'result': 'model=sip, jid=%s' % jid}
+        return {
+            'result': {
+                'model: ' + self.name,
+                'jid: %s' % jid
+            }
+        }
 
     def post(self, jid):
         """

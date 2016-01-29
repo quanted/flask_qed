@@ -68,14 +68,17 @@ def swagger(app):
             'description': 'SIP Model',
         }
 
-        tags = [terrplant_tag, sip_tag]
+        top_level_tags = [terrplant_tag, sip_tag]
+        output['tags'] = top_level_tags
+
+        model_name = class_name.name
 
         path_json = {
             "post": {
-                "tags": tags,
+                "tags": [model_name.capitalize()],  # path_tags,
                 "summary": "Testing this Swagger stuff out",
                 "description": "Tasty Endpoints",
-                "operationId": "terrplant",
+                "operationId": model_name,
                 "consumes": [
                     "application/json",
                 ],

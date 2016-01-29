@@ -201,8 +201,13 @@ def spec():
     """
     swag = swagger(app)
 
-    return jsonify(swag)
+    # TODO: Use in production and remove 'jsonify' below
+    # return json.dumps(
+    #     swag,
+    #     separators=(',', ':')  # This produces a 'minified' JSON output
+    # )
 
+    return jsonify(swag)  # This produces a 'pretty printed' JSON output
 
 @app.route("/api")
 def api_doc():
