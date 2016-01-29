@@ -8,6 +8,7 @@ from uber_swagger import swagger
 import pandas as pd
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
+from REST_UBER import agdrift_rest as agdrift
 
 app = Flask(__name__)
 api = Api(app)
@@ -35,6 +36,7 @@ class ModelCaller(Resource):
 
             try:
                 run_type = request.json["run_type"]
+                logging.info('============= run_type =' + run_type)
             except KeyError, e:
                 return rest_error_message(e, jid)
 
@@ -127,25 +129,25 @@ def therps_rest(jid):
         return rest_error_message(e, jid)
 
 
-@app.route('/agdrift/<jid>', methods=['POST'])
-def agdrift_rest(jid):
-    all_result = {}
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from ubertool.ubertool.agdrift import agdrift
-        result = agdrift.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
-                                            application_rate, distance, aquatic_type, calculation_input,
-                                            init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
-                                            deposition_mgcm, nasae, y, x, express_y)
-        if (result):
-            # all_result[jid]['status']='done'
-            # all_result[jid]['input']=request.json
-            # all_result[jid]['result']=result
-            return json.dumps({'user_id': 'admin', 'result': result.__dict__, '_id': jid})
-    except Exception, e:
-        return rest_error_message(e, jid)
+# @app.route('/agdrift/<jid>', methods=['POST'])
+# def agdrift_rest(jid):
+#     all_result = {}
+#     try:
+#         for k, v in request.json.iteritems():
+#             exec '%s = v' % k
+#         all_result.setdefault(jid, {}).setdefault('status', 'none')
+#         from ubertool.ubertool.agdrift import agdrift
+#         result = agdrift.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
+#                                             application_rate, distance, aquatic_type, calculation_input,
+#                                             init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
+#                                             deposition_mgcm, nasae, y, x, express_y)
+#         if (result):
+#             # all_result[jid]['status']='done'
+#             # all_result[jid]['input']=request.json
+#             # all_result[jid]['result']=result
+#             return json.dumps({'user_id': 'admin', 'result': result.__dict__, '_id': jid})
+#     except Exception, e:
+#         return rest_error_message(e, jid)
 
 
 @app.route('/kabam/<jid>', methods=['POST'])
@@ -194,6 +196,7 @@ def kabam_rest(jid):
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
 api.add_resource(sip.SipHandler, '/sip/<string:jid>')
+api.add_resource(agdrift.AgdriftHandler, '/sip/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
