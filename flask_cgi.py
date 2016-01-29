@@ -11,6 +11,7 @@ from REST_UBER import sip_rest as sip
 from REST_UBER import stir_rest as stir
 from REST_UBER import iec_rest as iec
 from REST_UBER import earthworm_rest as earthworm
+from REST_UBER import rice_rest as rice
 
 
 app = Flask(__name__)
@@ -201,6 +202,7 @@ api.add_resource(sip.SipHandler, '/sip/<string:jid>')
 api.add_resource(stir.StirHandler, '/stir/<string:jid>')
 api.add_resource(iec.IecHandler, '/iec/<string:jid>')
 api.add_resource(earthworm.EarthwormHandler, '/earthworm/<string:jid>')
+api.add_resource(rice.RiceHandler, '/rice/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
