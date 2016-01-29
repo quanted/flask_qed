@@ -8,6 +8,7 @@ from uber_swagger import swagger
 import pandas as pd
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
+from REST_UBER import stir_rest as stir
 
 app = Flask(__name__)
 api = Api(app)
@@ -194,6 +195,7 @@ def kabam_rest(jid):
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
 api.add_resource(sip.SipHandler, '/sip/<string:jid>')
+api.add_resource(stir.StirHandler, '/stir/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
@@ -212,6 +214,7 @@ def spec():
     # )
 
     return jsonify(swag)  # This produces a 'pretty printed' JSON output
+
 
 @app.route("/api")
 def api_doc():
