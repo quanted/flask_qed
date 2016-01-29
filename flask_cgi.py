@@ -201,7 +201,7 @@ def kabam_rest(jid):
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
 api.add_resource(sip.SipHandler, '/sip/<string:jid>')
-api.add_resource(agdrift.AgdriftHandler, '/sip/<string:jid>')
+api.add_resource(agdrift.AgdriftHandler, '/agdrift/<string:jid>')
 api.add_resource(stir.StirHandler, '/stir/<string:jid>')
 api.add_resource(iec.IecHandler, '/iec/<string:jid>')
 api.add_resource(earthworm.EarthwormHandler, '/earthworm/<string:jid>')
