@@ -2,7 +2,7 @@ from flask_restful import Resource
 from ubertool.ubertool.agdrift import agdrift
 from flask import request
 import pandas as pd
-
+import logging
 
 class AgdriftHandler(Resource):
     def __init__(self):
@@ -31,6 +31,10 @@ class AgdriftHandler(Resource):
         agdrift_obj = agdrift.Agdrift(pd_obj, None)
         agdrift_obj.execute_model()
         inputs_json, outputs_json, exp_out_json = agdrift_obj.get_dict_rep(agdrift_obj)
+
+        logging.info(inputs_json)
+        logging.info(outputs_json)
+        logging.info(exp_out_json)
 
         return {
             'user_id': 'admin',
