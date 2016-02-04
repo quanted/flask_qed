@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from ubertool.ubertool.terrplant import terrplant
+from REST_UBER.terrplant_rest import documentation
 from flask import request
 import pandas as pd
 
@@ -7,6 +8,7 @@ import pandas as pd
 class TerrplantHandler(Resource):
     def __init__(self):
         self.name = "terrplant"
+        self.api_spec = documentation.Documentation(self.name)
 
     def get(self, jid="000000100000011"):
         """

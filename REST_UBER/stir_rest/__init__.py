@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from ubertool.ubertool.stir import stir
+from REST_UBER.stir_rest import documentation
 from flask import request
 import pandas as pd
 
@@ -7,6 +8,7 @@ import pandas as pd
 class StirHandler(Resource):
     def __init__(self):
         self.name = "stir"
+        self.api_spec = documentation.Documentation(self.name)
 
     def get(self, jid):
         """

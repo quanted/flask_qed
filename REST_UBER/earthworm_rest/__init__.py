@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from ubertool.ubertool.earthworm import earthworm
+from REST_UBER.earthworm_rest import documentation
 from flask import request
 import pandas as pd
 
@@ -7,6 +8,7 @@ import pandas as pd
 class EarthwormHandler(Resource):
     def __init__(self):
         self.name = "earthworm"
+        self.api_spec = documentation.Documentation(self.name)
 
     def get(self, jid):
         """

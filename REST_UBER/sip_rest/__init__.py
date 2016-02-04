@@ -1,4 +1,5 @@
 from flask_restful import Resource
+from REST_UBER.sip_rest import documentation
 from ubertool.ubertool.sip import sip
 from flask import request
 import pandas as pd
@@ -7,6 +8,7 @@ import pandas as pd
 class SipHandler(Resource):
     def __init__(self):
         self.name = "sip"
+        self.api_spec = documentation.Documentation(self.name)
 
     def get(self, jid):
         """
