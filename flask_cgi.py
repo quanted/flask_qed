@@ -6,7 +6,14 @@ from flask_restful import Resource, Api
 # from flask_swagger import swagger
 from uber_swagger import swagger
 import pandas as pd
-import ubertool.ubertool.terrplant as terrplant
+from REST_UBER import terrplant_rest as terrplant
+from REST_UBER import sip_rest as sip
+from REST_UBER import agdrift_rest as agdrift
+from REST_UBER import stir_rest as stir
+from REST_UBER import iec_rest as iec
+from REST_UBER import earthworm_rest as earthworm
+from REST_UBER import rice_rest as rice
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -24,12 +31,17 @@ class ModelCaller(Resource):
         """
         try:
             # Dynamically import the model Python module
-            model_module = importlib.import_module('.' + model, 'ubertool.ubertool.' + model)
+            model_module_name = 'ubertool.ubertool.' + model
+            model_module = importlib.import_module('.' + model, model_module_name)
+            logging.info('============= ' + model_module_name)
             # Set the model Object to a local variable (class name = model)
-            model_object = getattr(model_module, model)
+            model_cap = model.capitalize()
+            model_object = getattr(model_module, model_cap)
+            #logging.info('============= ' + model_object)
 
             try:
                 run_type = request.json["run_type"]
+                logging.info('============= run_type =' + run_type)
             except KeyError, e:
                 return rest_error_message(e, jid)
 
@@ -122,25 +134,25 @@ def therps_rest(jid):
         return rest_error_message(e, jid)
 
 
-@app.route('/agdrift/<jid>', methods=['POST'])
-def agdrift_rest(jid):
-    all_result = {}
-    try:
-        for k, v in request.json.iteritems():
-            exec '%s = v' % k
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from ubertool.ubertool.agdrift import agdrift
-        result = agdrift.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
-                                            application_rate, distance, aquatic_type, calculation_input,
-                                            init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
-                                            deposition_mgcm, nasae, y, x, express_y)
-        if (result):
-            # all_result[jid]['status']='done'
-            # all_result[jid]['input']=request.json
-            # all_result[jid]['result']=result
-            return json.dumps({'user_id': 'admin', 'result': result.__dict__, '_id': jid})
-    except Exception, e:
-        return rest_error_message(e, jid)
+# @app.route('/agdrift/<jid>', methods=['POST'])
+# def agdrift_rest(jid):
+#     all_result = {}
+#     try:
+#         for k, v in request.json.iteritems():
+#             exec '%s = v' % k
+#         all_result.setdefault(jid, {}).setdefault('status', 'none')
+#         from ubertool.ubertool.agdrift import agdrift
+#         result = agdrift.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
+#                                             application_rate, distance, aquatic_type, calculation_input,
+#                                             init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
+#                                             deposition_mgcm, nasae, y, x, express_y)
+#         if (result):
+#             # all_result[jid]['status']='done'
+#             # all_result[jid]['input']=request.json
+#             # all_result[jid]['result']=result
+#             return json.dumps({'user_id': 'admin', 'result': result.__dict__, '_id': jid})
+#     except Exception, e:
+#         return rest_error_message(e, jid)
 
 
 @app.route('/kabam/<jid>', methods=['POST'])
@@ -188,6 +200,12 @@ def kabam_rest(jid):
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
+api.add_resource(sip.SipHandler, '/sip/<string:jid>')
+api.add_resource(agdrift.AgdriftHandler, '/agdrift/<string:jid>')
+api.add_resource(stir.StirHandler, '/stir/<string:jid>')
+api.add_resource(iec.IecHandler, '/iec/<string:jid>')
+api.add_resource(earthworm.EarthwormHandler, '/earthworm/<string:jid>')
+api.add_resource(rice.RiceHandler, '/rice/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
@@ -199,7 +217,13 @@ def spec():
     """
     swag = swagger(app)
 
-    return jsonify(swag)
+    # TODO: Use in production and remove 'jsonify' below
+    # return json.dumps(
+    #     swag,
+    #     separators=(',', ':')  # This produces a 'minified' JSON output
+    # )
+
+    return jsonify(swag)  # This produces a 'pretty printed' JSON output
 
 
 @app.route("/api")

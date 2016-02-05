@@ -23,11 +23,14 @@ def swagger(app):
             "version": "0.0.1"
         },
         "paths": defaultdict(dict),
-        "definitions": defaultdict(dict)
+        "definitions": defaultdict(dict),
+        "tags": []
     }
-
     paths = output['paths']
     definitions = output['definitions']
+    tags = output['tags']
+
+    # TODO: Are these needed (from 'flask_swagger')
     ignore_verbs = {"HEAD", "OPTIONS"}
     # technically only responses is non-optional
     optional_fields = ['tags', 'consumes', 'produces', 'schemes', 'security',
@@ -35,35 +38,49 @@ def swagger(app):
 
     # Loop over the Flask-RESTful endpoints being served (called "rules"...e.g. /terrplant/)
     for rule in app.url_map.iter_rules():
-        # TODO: Remove print statement
-        print "Endpoint: %s" % str(rule)
         endpoint = app.view_functions[rule.endpoint]
         try:
             class_name = endpoint.view_class()
-            # model_obj = getattr(class_name)
         except AttributeError:
             continue  # skip to next iteration in for-loop ("rule" does not contain an ubertool REST endpoint)
-        print "I'm an Endpoint: %s, %s: %s" % (str(class_name), type(class_name), class_name.__dict__)
         try:
             inputs = class_name.get_model_inputs().__dict__
             outputs = class_name.get_model_outputs().__dict__
         except AttributeError:
-            # This endpoint does not have get_model_inputs()
+            # This endpoint does not have get_model_inputs() or get_model_outputs()
             logging.exception(AttributeError.message)
-            continue  # skip to next iteration
+            continue  # skip to next iteration, as this is not an ubertool endpoint
 
+        methods = {}
+        for verb in rule.methods.difference(ignore_verbs):
+            if hasattr(endpoint, 'methods') and verb in endpoint.methods:
+                verb = verb.lower()
+                methods[verb] = endpoint.view_class.__dict__.get(verb)
+            else:
+                methods[verb.lower()] = endpoint
+        for verb, method in methods.items():
+            pass
+            # 'path' JSON is created here for each method in the endpoint (e.g. GET, POST)
+
+
+        # TODO: This has to be at the end of the for-loop because it converts the 'rule' object to a string
         # Rule = endpoint URL relative to hostname; needs to have special characters escaped to be defaultdict key
         rule = str(rule)
         for arg in re.findall('(<(.*?\:)?(.*?)>)', rule):
             rule = rule.replace(arg[0], '{%s}' % arg[2])
 
+        # Append the 'tag' (top-level) JSON for each rule/endpoint
+        tag = class_name.api_spec.tag.json
+        tags.append(tag)
+
         # TODO: Make generic...
+        model_name = class_name.name
+
         path_json = {
             "post": {
-                "tags": ["Terrplant"],
+                "tags": [model_name],  # path_tags,
                 "summary": "Testing this Swagger stuff out",
                 "description": "Tasty Endpoints",
-                "operationId": "terrplant",
                 "consumes": [
                     "application/json",
                 ],
@@ -77,7 +94,7 @@ def swagger(app):
                         "description": "Pet object that needs to be added to the store",
                         "required": True,
                         "schema": {
-                            "$ref": "#/definitions/TerrplantInputs"
+                            "$ref": "#/definitions/" + model_name.capitalize() + "Inputs"
                         }
                     }
                 ],
@@ -85,7 +102,7 @@ def swagger(app):
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "$ref": "#/definitions/TerrplantOutputs"
+                            "$ref": "#/definitions/" + model_name.capitalize() + "Outputs"
                         }
                     },
                     "405": {
@@ -96,7 +113,7 @@ def swagger(app):
         }
         paths[rule].update(path_json)
 
-        # TODO: Definitions JSON
+        # TODO: Definitions JSON; move to separate class
         definition_template_inputs = {
             'type': "object",
             'properties': {
@@ -141,14 +158,14 @@ def swagger(app):
             }
         }
 
-        terrplant_def = {
-            'TerrplantInputs': definition_template_inputs,
-            'TerrplantOutputs': definition_template_outputs
+        model_def = {
+            model_name.capitalize() + "Inputs": definition_template_inputs,
+            model_name.capitalize() + "Outputs": definition_template_outputs
         }
         for k, v in inputs.items():
             # Set the inputs to the input and output definition template
-            terrplant_def['TerrplantInputs']['properties']['inputs']['properties'][k] = \
-                terrplant_def['TerrplantOutputs']['properties']['inputs']['properties'][k] = {
+            model_def[model_name.capitalize() + "Inputs"]['properties']['inputs']['properties'][k] = \
+                model_def[model_name.capitalize() + "Outputs"]['properties']['inputs']['properties'][k] = {
                     "type": "object",
                     "properties": {
                         "0": {
@@ -162,7 +179,7 @@ def swagger(app):
 
         for k, v in outputs.items():
             # Set the outputs to the output definition template
-            terrplant_def['TerrplantOutputs']['properties']['outputs']['properties'][k] = {
+            model_def[model_name.capitalize() + "Outputs"]['properties']['outputs']['properties'][k] = {
                 "type": "object",
                 "properties": {
                     "0": {
@@ -172,15 +189,9 @@ def swagger(app):
                 }
             }
 
-        definitions.update(terrplant_def)
+        definitions.update(model_def)
 
-        methods = {}
-        # for verb in rule.methods.difference(ignore_verbs):
-        #     if hasattr(endpoint, 'methods') and verb in endpoint.methods:
-        #         verb = verb.lower()
-        #         methods[verb] = endpoint.view_class.__dict__.get(verb)
-        #     else:
-        #         methods[verb.lower()] = endpoint
+
         operations = {}
         # for verb, method in methods.items():
         #     """This is where the object parsing (introspection) occurs to generate the Swagger JSON"""
