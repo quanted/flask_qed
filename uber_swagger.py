@@ -158,14 +158,14 @@ def swagger(app):
             }
         }
 
-        terrplant_def = {
-            'TerrplantInputs': definition_template_inputs,
-            'TerrplantOutputs': definition_template_outputs
+        model_def = {
+            model_name.capitalize() + "Inputs": definition_template_inputs,
+            model_name.capitalize() + "Outputs": definition_template_outputs
         }
         for k, v in inputs.items():
             # Set the inputs to the input and output definition template
-            terrplant_def['TerrplantInputs']['properties']['inputs']['properties'][k] = \
-                terrplant_def['TerrplantOutputs']['properties']['inputs']['properties'][k] = {
+            model_def[model_name.capitalize() + "Inputs"]['properties']['inputs']['properties'][k] = \
+                model_def[model_name.capitalize() + "Outputs"]['properties']['inputs']['properties'][k] = {
                     "type": "object",
                     "properties": {
                         "0": {
@@ -179,7 +179,7 @@ def swagger(app):
 
         for k, v in outputs.items():
             # Set the outputs to the output definition template
-            terrplant_def['TerrplantOutputs']['properties']['outputs']['properties'][k] = {
+            model_def[model_name.capitalize() + "Outputs"]['properties']['outputs']['properties'][k] = {
                 "type": "object",
                 "properties": {
                     "0": {
@@ -189,7 +189,7 @@ def swagger(app):
                 }
             }
 
-        definitions.update(terrplant_def)
+        definitions.update(model_def)
 
 
         operations = {}
