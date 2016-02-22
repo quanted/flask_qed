@@ -1,6 +1,6 @@
 import re
 from collections import defaultdict
-
+from REST_UBER.swagger_ui import ApiSpec
 import logging
 
 
@@ -51,6 +51,7 @@ def swagger(app):
             logging.exception(AttributeError.message)
             continue  # skip to next iteration, as this is not an ubertool endpoint
 
+        # TODO: Logic for UBERTOOL API ENDPOINTS - Move to separate function for code clarity???
         methods = {}
         for verb in rule.methods.difference(ignore_verbs):
             if hasattr(endpoint, 'methods') and verb in endpoint.methods:
@@ -60,58 +61,27 @@ def swagger(app):
                 methods[verb.lower()] = endpoint
         for verb, method in methods.items():
             pass
+            # TODO: Needed when multiple METHODS are used (e.g. POST and GET)
             # 'path' JSON is created here for each method in the endpoint (e.g. GET, POST)
 
-
-        # TODO: This has to be at the end of the for-loop because it converts the 'rule' object to a string
+        # This has to be at the end of the for-loop because it converts the 'rule' object to a string
         # Rule = endpoint URL relative to hostname; needs to have special characters escaped to be defaultdict key
         rule = str(rule)
         for arg in re.findall('(<(.*?\:)?(.*?)>)', rule):
             rule = rule.replace(arg[0], '{%s}' % arg[2])
 
+        # Get model name
+        model_name = class_name.name
+        # Instantiate ApiSpec() class for current endpoint
+        api_spec = ApiSpec(model_name)
+
         # Append the 'tag' (top-level) JSON for each rule/endpoint
-        tag = class_name.api_spec.tag.json
+        tag = api_spec.tag.json
         tags.append(tag)
 
-        # TODO: Make generic...
-        model_name = class_name.name
-
-        path_json = {
-            "post": {
-                "tags": [model_name],  # path_tags,
-                "summary": "Testing this Swagger stuff out",
-                "description": "Tasty Endpoints",
-                "consumes": [
-                    "application/json",
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "Pet object that needs to be added to the store",
-                        "required": True,
-                        "schema": {
-                            "$ref": "#/definitions/" + model_name.capitalize() + "Inputs"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/" + model_name.capitalize() + "Outputs"
-                        }
-                    },
-                    "405": {
-                        "description": "Invalid input"
-                    }
-                }
-            }
-        }
-        paths[rule].update(path_json)
+        # Paths
+        path = api_spec.path.path_item
+        paths[rule].update(path)
 
         # TODO: Definitions JSON; move to separate class
         definition_template_inputs = {

@@ -1,6 +1,5 @@
 from flask_restful import Resource
 from ubertool.ubertool.rice import rice
-from REST_UBER.rice_rest import documentation
 from flask import request
 import pandas as pd
 
@@ -8,7 +7,6 @@ import pandas as pd
 class RiceHandler(Resource):
     def __init__(self):
         self.name = "rice"
-        self.api_spec = documentation.Documentation(self.name)
 
     def get(self, jid):
         """

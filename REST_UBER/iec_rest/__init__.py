@@ -1,6 +1,5 @@
 from flask_restful import Resource
 from ubertool.ubertool.iec import iec
-from REST_UBER.iec_rest import documentation
 from flask import request
 import pandas as pd
 
@@ -8,7 +7,6 @@ import pandas as pd
 class IecHandler(Resource):
     def __init__(self):
         self.name = "iec"
-        self.api_spec = documentation.Documentation(self.name)
 
     def get(self, jid):
         """

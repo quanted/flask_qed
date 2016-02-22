@@ -1,10 +1,21 @@
-from REST_UBER.swagger_ui import ApiSpec
+TAG_DESCRIPTION = "SIP Model"
 
+SHORT_DESCRIPTION = "The SIP model is designed to estimate chemical exposure from drinking water alone in birds " \
+                    "and mammals."
 
-class Documentation(ApiSpec):
-    def __init__(self, model_name):
-        """
-        Provides the API documentation for SIP
-        """
-        description = "SIP Model"
-        super(Documentation, self).__init__(model_name, description)
+CONSUMES = ["application/json"]
+
+PRODUCES = ["application/json"]
+
+PARAMETERS = [
+    {
+        "description": "Run SIP model",
+        "required": True,
+    }
+]
+
+RESPONSES = {
+    "200": {
+        "description": "Successful Operation",
+    }
+}

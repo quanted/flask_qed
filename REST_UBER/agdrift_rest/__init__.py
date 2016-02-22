@@ -1,6 +1,5 @@
 from flask_restful import Resource
 from ubertool.ubertool.agdrift import agdrift
-from REST_UBER.agdrift_rest import documentation
 from flask import request
 import pandas as pd
 
@@ -8,7 +7,6 @@ import pandas as pd
 class AgdriftHandler(Resource):
     def __init__(self):
         self.name = "agdrift"
-        self.api_spec = documentation.Documentation(self.name)
 
     def get(self, jid="000000100000011"):
         """
