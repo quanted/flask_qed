@@ -209,7 +209,7 @@ api.add_resource(rice.RiceHandler, '/rice/<string:jid>')
 api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
-@app.route("/api/spec")
+@app.route("/api/spec/")
 def spec():
     """
     Route that returns the Swagger formatted JSON representing the Ubertool API.
@@ -226,7 +226,7 @@ def spec():
     return jsonify(swag)  # This produces a 'pretty printed' JSON output
 
 
-@app.route("/api")
+@app.route("/api/")
 def api_doc():
     """
     Route to serve the API documentation (Swagger UI) static page being served by the backend.

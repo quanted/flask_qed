@@ -1,10 +1,25 @@
-from REST_UBER.swagger_ui import ApiSpec
+TAG_DESCRIPTION = "STIR Model"
 
+SHORT_DESCRIPTION = "The STIR model was developed as a screening model to estimate inhalation risk of chemicals to " \
+                    "birds and mammals. Chemical specific physical properties are required for executing the model. " \
+                    "Vapor phase and droplet-spray exposure risks are estimated in STIR and then compared to avian " \
+                    "inhalation or mammalian inhalation and oral toxicity data. Inhalation exposure routes addressed " \
+                    "by the model include directly applied spray, volatilization of residues on plant canopy and " \
+                    "volatilization of residues in soil."
 
-class Documentation(ApiSpec):
-    def __init__(self, model_name):
-        """
-        Provides the API documentation for Stir
-        """
-        description = "Stir Model"
-        super(Documentation, self).__init__(model_name, description)
+CONSUMES = ["application/json"]
+
+PRODUCES = ["application/json"]
+
+PARAMETERS = [
+    {
+        "description": "Run STIR model",
+        "required": True,
+    }
+]
+
+RESPONSES = {
+    "200": {
+        "description": "Successful Operation",
+    }
+}

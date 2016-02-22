@@ -1,10 +1,23 @@
-from REST_UBER.swagger_ui import ApiSpec
+TAG_DESCRIPTION = "IEC Model"
 
+SHORT_DESCRIPTION = "IECV1.1 (Individual Effect Chance Model Version 1.1) estimates potential effects at an " \
+                    "individual level. Generally, available toxicity data provides an LC50 or an EC50, (the " \
+                    "concentration at which 50% of the test population exhibits the designated endpoint, usually " \
+                    "mortality)."
 
-class Documentation(ApiSpec):
-    def __init__(self, model_name):
-        """
-        Provides the API documentation for IEC
-        """
-        description = "IEC Model"
-        super(Documentation, self).__init__(model_name, description)
+CONSUMES = ["application/json"]
+
+PRODUCES = ["application/json"]
+
+PARAMETERS = [
+    {
+        "description": "Run IEC model",
+        "required": True,
+    }
+]
+
+RESPONSES = {
+    "200": {
+        "description": "Successful Operation",
+    }
+}
