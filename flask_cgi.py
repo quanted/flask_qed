@@ -3,6 +3,10 @@ import json
 import logging
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
+try:
+    from flask.ext.cors import CORS
+except ImportError:
+    cors = False
 # from flask_swagger import swagger
 from uber_swagger import swagger
 import pandas as pd
@@ -17,6 +21,10 @@ from REST_UBER import rice_rest as rice
 
 app = Flask(__name__)
 api = Api(app)
+try:
+    CORS(app)
+except Exception, e:
+    print e
 
 
 # TODO: Generic API endpoint (TEMPORARY, remove once all endpoints are explicitly stated)
