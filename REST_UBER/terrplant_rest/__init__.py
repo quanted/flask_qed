@@ -8,23 +8,23 @@ class TerrplantHandler(Resource):
     def __init__(self):
         self.name = "terrplant"
 
-    def get(self, jid="000000100000011"):
+    def get(self, jobId="000000100000011"):
         """
         Terrplant get handler.
-        :param jid:
+        :param jobId:
         :return:
         """
         return {
             'result': {
                 'model: ' + self.name,
-                'jid: %s' % jid
+                'jid: %s' % jobId
             }
         }
 
-    def post(self, jid):
+    def post(self, jobId):
         """
         Terrplant post handler.
-        :param jid:
+        :param jobId:
         :return:
         """
         pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
@@ -37,7 +37,7 @@ class TerrplantHandler(Resource):
             'inputs': inputs_json,
             'outputs': outputs_json,
             'exp_out': exp_out_json,
-            '_id': jid,
+            '_id': jobId,
             'run_type': "single"
         }
 

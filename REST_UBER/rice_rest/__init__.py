@@ -8,23 +8,23 @@ class RiceHandler(Resource):
     def __init__(self):
         self.name = "rice"
 
-    def get(self, jid):
+    def get(self, jobId):
         """
         RICE get handler.
-        :param jid:
+        :param jobId:
         :return:
         """
         return {
             'result': {
                 'model: ' + self.name,
-                'jid: %s' % jid
+                'jid: %s' % jobId
             }
         }
 
-    def post(self, jid):
+    def post(self, jobId):
         """
         RICE post handler.
-        :param jid:
+        :param jobId:
         :return:
         """
         pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
@@ -37,7 +37,7 @@ class RiceHandler(Resource):
             'inputs': inputs_json,
             'outputs': outputs_json,
             'exp_out': exp_out_json,
-            '_id': jid,
+            '_id': jobId,
             'run_type': "single"
         }
 
