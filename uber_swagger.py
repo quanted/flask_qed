@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from REST_UBER.swagger_ui import ApiSpec
+from werkzeug.routing import parse_rule
 import logging
 
 
@@ -59,10 +60,12 @@ def swagger(app):
                 methods[verb] = endpoint.view_class.__dict__.get(verb)
             else:
                 methods[verb.lower()] = endpoint
-        for verb, method in methods.items():
-            pass
-            # TODO: Needed when multiple METHODS are used (e.g. POST and GET)
-            # 'path' JSON is created here for each method in the endpoint (e.g. GET, POST)
+
+        # Extract the Rule argument from URL endpoint (e.g. /<jobId>)
+        rule_param = None
+        for converter, arguments, variable in parse_rule(str(rule)):  # rule must already be converted to a string
+            if converter:
+                rule_param = variable
 
         # This has to be at the end of the for-loop because it converts the 'rule' object to a string
         # Rule = endpoint URL relative to hostname; needs to have special characters escaped to be defaultdict key
@@ -70,10 +73,29 @@ def swagger(app):
         for arg in re.findall('(<(.*?\:)?(.*?)>)', rule):
             rule = rule.replace(arg[0], '{%s}' % arg[2])
 
+        # For each Rule (endpoint) iterate over its HTTP methods (e.g. POST, GET, PUT, etc...)
+        for verb, method in methods.items():
+            print verb, method
+            # TODO: Needed when multiple METHODS are used (e.g. POST and GET)
+            # 'path' JSON is created here for each method in the endpoint (e.g. GET, POST)
+
         # Get model name
         model_name = class_name.name
         # Instantiate ApiSpec() class for current endpoint
         api_spec = ApiSpec(model_name)
+
+        # Append Rule parameter name to parameters list if needed
+        if rule_param:
+            param = {
+                'in': "path",
+                'name': rule_param,
+                'description': "Job ID for model run",
+                'required': True,
+                "type": "string"
+            }
+            # api_spec.parameters = [param] + api_spec.parameters
+            api_spec.parameters.insert(0, param)
+            # api_spec.parameters.append(param)
 
         # Append the 'tag' (top-level) JSON for each rule/endpoint
         tag = api_spec.tag.json

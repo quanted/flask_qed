@@ -1,4 +1,6 @@
 import importlib
+import yaml
+import os
 
 
 class ApiSpec(object):
@@ -7,33 +9,34 @@ class ApiSpec(object):
         Provides the API documentation JSON for Swagger
         """
         self.model = model
-        self.tag_description = None
-        self.short_description = None
+        self.summary = None
+        self.description = None
         self.consumes = None
         self.produces = None
         self.parameters = None
         self.responses = None
+        self.PROJECT_ROOT = os.environ['PROJECT_ROOT']
 
-        doc_mod = importlib.import_module("REST_UBER." + self.model + "_rest.documentation")
-
-        for doc in dir(doc_mod):
-            if doc.isupper():
-                doc_value = getattr(doc_mod, doc)
-
-                if type(doc_value) is dict:
-                    for key, value in doc_value.items():
-                        # TODO: Is forcing the keys to be lower case necessary?
-                        doc_value[key.lower()] = doc_value.pop(key)
-                    # TODO: Handle multiple levels of dictionaries....
-
-                setattr(self, doc.lower(), doc_value)  # Set each documentation variable to class attribute (lower case)
+        self.parse_yaml()
 
         # TODO: Add validation logic
 
         self.path = PathJSON(model, 'post')  # TODO: Allow for ALL HTTP methods: "for verb, method in methods.items():"
-        self.tag = TagJSON(model, self.tag_description)
+        self.tag = TagJSON(model, self.summary)
 
         self.update()
+
+    def parse_yaml(self):
+        yaml_path = os.path.join(self.PROJECT_ROOT, 'REST_UBER', self.model + '_rest', 'apidoc.yaml')
+        with open(yaml_path, 'r') as f:
+            api_doc = yaml.load(f)
+
+        self.summary = api_doc['summary']
+        self.description = api_doc['description']
+        self.consumes = api_doc['consumes']
+        self.produces = api_doc['produces']
+        self.parameters = api_doc['parameters']
+        self.responses = api_doc['responses']
 
     def update(self):
 
@@ -59,8 +62,8 @@ class ApiSpec(object):
                 self.responses[code]['schema'] = {'$ref': '#/definitions/' + self.model.capitalize() + 'Outputs'}
 
         api_doc = dict(
-            summary=self.tag_description,
-            description=self.short_description,
+            summary=self.summary,
+            description=self.description,
             consumes=self.consumes,
             produces=self.produces,
             parameters=self.parameters,

@@ -1,6 +1,7 @@
 import importlib
 import json
 import logging
+import os
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
 try:
@@ -18,6 +19,11 @@ from REST_UBER import iec_rest as iec
 from REST_UBER import earthworm_rest as earthworm
 from REST_UBER import rice_rest as rice
 
+
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+os.environ.update({
+    'PROJECT_ROOT': PROJECT_ROOT
+})
 
 app = Flask(__name__)
 api = Api(app)
@@ -112,7 +118,7 @@ class NumPyArangeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-@app.route('/therps/<jid>', methods=['POST'])
+@app.route('/rest/therps/<jobId>', methods=['POST'])
 def therps_rest(jid):
     all_result = {}
     try:
@@ -142,7 +148,7 @@ def therps_rest(jid):
         return rest_error_message(e, jid)
 
 
-# @app.route('/agdrift/<jid>', methods=['POST'])
+# @app.route('/rest/agdrift/<jobId>', methods=['POST'])
 # def agdrift_rest(jid):
 #     all_result = {}
 #     try:
@@ -163,7 +169,7 @@ def therps_rest(jid):
 #         return rest_error_message(e, jid)
 
 
-@app.route('/kabam/<jid>', methods=['POST'])
+@app.route('/rest/kabam/<jobId>', methods=['POST'])
 def kabam_rest(jid):
     all_result = {}
     try:
@@ -207,14 +213,14 @@ def kabam_rest(jid):
 # Declare endpoints for each model
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
-api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
-api.add_resource(sip.SipHandler, '/sip/<string:jid>')
-api.add_resource(agdrift.AgdriftHandler, '/agdrift/<string:jid>')
-api.add_resource(stir.StirHandler, '/stir/<string:jid>')
-api.add_resource(iec.IecHandler, '/iec/<string:jid>')
-api.add_resource(earthworm.EarthwormHandler, '/earthworm/<string:jid>')
-api.add_resource(rice.RiceHandler, '/rice/<string:jid>')
-api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+api.add_resource(terrplant.TerrplantHandler, '/rest/terrplant/<string:jobId>')
+api.add_resource(sip.SipHandler, '/rest/sip/<string:jobId>')
+api.add_resource(agdrift.AgdriftHandler, '/rest/agdrift/<string:jobId>')
+api.add_resource(stir.StirHandler, '/rest/stir/<string:jobId>')
+api.add_resource(iec.IecHandler, '/rest/iec/<string:jobId>')
+api.add_resource(earthworm.EarthwormHandler, '/rest/earthworm/<string:jobId>')
+api.add_resource(rice.RiceHandler, '/rest/rice/<string:jobId>')
+api.add_resource(ModelCaller, '/rest/<string:model>/<string:jobId>')  # Temporary generic route for API endpoints
 
 
 @app.route("/api/spec/")
