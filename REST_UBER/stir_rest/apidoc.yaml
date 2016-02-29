@@ -8,9 +8,11 @@ description: |
   by the model include directly applied spray, volatilization of residues on plant canopy and
   volatilization of residues in soil.
 
-consumes: application/json
+consumes:
+  - application/json
 
-produces: application/json
+produces:
+  - application/json
 
 parameters:
   -

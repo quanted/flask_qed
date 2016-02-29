@@ -6,9 +6,11 @@ description: |
   found in dry or semi-aquatic habitats can be evaluated using this model. Exposure
   estimates can be generated for both listed and non-listed species using TerrPLANT.
 
-consumes: application/json
+consumes:
+  - application/json
 
-produces: application/json
+produces:
+  - application/json
 
 parameters:
   -

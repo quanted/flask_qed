@@ -3,9 +3,11 @@ summary: SIP Model
 description: |
   The SIP model is designed to estimate chemical exposure from drinking water alone in birds and mammals
 
-consumes: application/json
+consumes:
+  - application/json
 
-produces: application/json
+produces:
+  - application/json
 
 parameters:
   -

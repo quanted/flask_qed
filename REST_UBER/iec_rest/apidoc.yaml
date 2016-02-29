@@ -6,9 +6,11 @@ description: |
   concentration at which 50% of the test population exhibits the designated endpoint, usually
   mortality).
 
-consumes: application/json
+consumes:
+  - application/json
 
-produces: application/json
+produces:
+  - application/json
 
 parameters:
   -

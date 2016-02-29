@@ -6,9 +6,11 @@ description: |
   chemical from a particular phase. Fugacity has units of presure, generally pascals (Pa), and
   can be related to phase concentratons.
 
-consumes: application/json
+consumes:
+  - application/json
 
-produces: application/json
+produces:
+  - application/json
 
 parameters:
   -

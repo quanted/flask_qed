@@ -9,9 +9,11 @@ description: |
   aquatic ecological risk assessments and drinking water exposure assessments for human health
   risk assessment.
 
-consumes: application/json
+consumes:
+  - application/json
 
-produces: application/json
+produces:
+  - application/json
 
 parameters:
   -
