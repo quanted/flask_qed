@@ -16,7 +16,7 @@ produces:
 
 parameters:
   -
-    description: Run STIR model
+    description: Input JSON for STIR model run
     required: true
 
 responses:

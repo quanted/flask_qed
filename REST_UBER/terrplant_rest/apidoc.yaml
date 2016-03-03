@@ -14,7 +14,7 @@ produces:
 
 parameters:
   -
-    description: Run TerrPlant model
+    description: Input JSON for TerrPlant model run
     required: true
 
 responses:

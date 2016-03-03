@@ -11,7 +11,7 @@ produces:
 
 parameters:
   -
-    description: Run SIP model
+    description: Input JSON for SIP model run
     required: true
 
 responses:

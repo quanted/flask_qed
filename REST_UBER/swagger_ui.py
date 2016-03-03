@@ -1,27 +1,171 @@
-import importlib
 import yaml
 import os
 
 
 class ApiSpec(object):
-    def __init__(self, model):
+    def __init__(self, model, http_methods):
         """
-        Provides the API documentation JSON for Swagger
+        Provides the API documentation JSON for Swagger UI front end.  Swagger JSON specifications can be found
+        at: http://swagger.io/specification
+
+        Example Swagger compliant JSON (http://petstore.swagger.io):
+
+        {
+            "swagger": "2.0",
+            "info": {
+                "description": "This is a sample server Petstore server.",
+                "version": "1.0.0",
+                "title": "Swagger Petstore",
+                "termsOfService": "http://swagger.io/terms/",
+                "contact": {
+                    "email": "apiteam@swagger.io"
+                },
+                "license": {
+                    "name": "Apache 2.0",
+                    "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+                }
+            },
+            "host": "www.example.com",
+            "basePath": "/",
+            "externalDocs": {
+                "description": "Find out more about Swagger",
+                "url": "http://swagger.io"
+            }
+            "tags": [{
+                "name": "pet",
+                "description": "Everything about your Pets",
+            }, {
+                "name": "store",
+                "description": "Access to Petstore orders"
+            }],
+            "schemes": ["http"],
+            "paths": {
+                "/pet": {
+                    "post": {
+                        "tags": ["pet"],
+                        "summary": "Add a new pet to the store",
+                        "description": "",
+                        "operationId": "addPet",
+                        "consumes": ["application/json", "application/xml"],
+                        "produces": ["application/xml", "application/json"],
+                        "parameters": [{
+                            "in": "body",
+                            "name": "body",
+                            "description": "Pet object that needs to be added to the store",
+                            "required": true,
+                            "schema": {
+                                "$ref": "#/definitions/Pet"
+                            }
+                        }],
+                        "responses": {
+                            "405": {
+                                "description": "Invalid input"
+                            }
+                        }
+                    },
+                },
+                "/pet/findByStatus": {
+                    "get": {
+                        "tags": ["pet"],
+                        "summary": "Finds Pets by status",
+                        "description": "Multiple status values can be provided with comma separated strings",
+                        "operationId": "findPetsByStatus",
+                        "produces": ["application/xml", "application/json"],
+                        "parameters": [{
+                            "name": "status",
+                            "in": "query",
+                            "description": "Status values that need to be considered for filter",
+                            "required": true,
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["available", "pending", "sold"],
+                                "default": "available"
+                            },
+                            "collectionFormat": "multi"
+                        }],
+                        "responses": {
+                            "200": {
+                                "description": "successful operation",
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/Pet"
+                                    }
+                                }
+                            },
+                            "400": {
+                                "description": "Invalid status value"
+                            }
+                        }
+                    }
+                },
+            },
+            "definitions": {
+                "Pet": {
+                    "type": "object",
+                    "required": ["name", "photoUrls"],
+                    "properties": {
+                        "id": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "category": {
+                            "$ref": "#/definitions/Category"
+                        },
+                        "name": {
+                            "type": "string",
+                            "example": "doggie"
+                        },
+                        "photoUrls": {
+                            "type": "array",
+                            "xml": {
+                                "name": "photoUrl",
+                                "wrapped": true
+                            },
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "tags": {
+                            "type": "array",
+                            "xml": {
+                                "name": "tag",
+                                "wrapped": true
+                            },
+                            "items": {
+                                "$ref": "#/definitions/Tag"
+                            }
+                        },
+                        "status": {
+                            "type": "string",
+                            "description": "pet status in the store",
+                            "enum": ["available", "pending", "sold"]
+                        }
+                    },
+                    "xml": {
+                        "name": "Pet"
+                    }
+                }
+            }
+
+        }
         """
+        self.PROJECT_ROOT = os.environ['PROJECT_ROOT']
         self.model = model
+        self.http_methods = http_methods
         self.summary = None
         self.description = None
         self.consumes = None
         self.produces = None
         self.parameters = None
         self.responses = None
-        self.PROJECT_ROOT = os.environ['PROJECT_ROOT']
 
         self.parse_yaml()
 
         # TODO: Add validation logic
 
-        self.path = PathJSON(model, 'post')  # TODO: Allow for ALL HTTP methods: "for verb, method in methods.items():"
+        self.path = PathJSON(model, 'post')
         self.tag = TagJSON(model, self.summary)
 
         self.update()

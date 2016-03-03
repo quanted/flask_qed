@@ -14,7 +14,7 @@ produces:
 
 parameters:
   -
-    description: Run AgDrift model
+    description: Input JSON for AgDrift model run
     required: true
 
 responses:

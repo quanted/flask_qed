@@ -67,6 +67,11 @@ def swagger(app):
             if converter:
                 rule_param = variable
 
+        # Get model name
+        model_name = class_name.name
+        # Instantiate ApiSpec() class for current endpoint
+        api_spec = ApiSpec(model_name, http_methods)
+
         # This has to be at the end of the for-loop because it converts the 'rule' object to a string
         # Rule = endpoint URL relative to hostname; needs to have special characters escaped to be defaultdict key
         rule = str(rule)
@@ -76,118 +81,113 @@ def swagger(app):
         # For each Rule (endpoint) iterate over its HTTP methods (e.g. POST, GET, PUT, etc...)
         for verb, method in methods.items():
             print verb, method
-            # TODO: Needed when multiple METHODS are used (e.g. POST and GET)
-            # 'path' JSON is created here for each method in the endpoint (e.g. GET, POST)
 
-        # Get model name
-        model_name = class_name.name
-        # Instantiate ApiSpec() class for current endpoint
-        api_spec = ApiSpec(model_name)
+            if verb == 'post':
+                # Append Rule parameter name to parameters list if needed
+                if rule_param:
+                    param = {
+                        'in': "path",
+                        'name': rule_param,
+                        'description': "Job ID for model run",
+                        'required': True,
+                        "type": "string"
+                    }
+                    # api_spec.parameters = [param] + api_spec.parameters
+                    api_spec.parameters.insert(0, param)
+                    # api_spec.parameters.append(param)
 
-        # Append Rule parameter name to parameters list if needed
-        if rule_param:
-            param = {
-                'in': "path",
-                'name': rule_param,
-                'description': "Job ID for model run",
-                'required': True,
-                "type": "string"
-            }
-            # api_spec.parameters = [param] + api_spec.parameters
-            api_spec.parameters.insert(0, param)
-            # api_spec.parameters.append(param)
+                # Append the 'tag' (top-level) JSON for each rule/endpoint
+                tag = api_spec.tag.json
+                tags.append(tag)
 
-        # Append the 'tag' (top-level) JSON for each rule/endpoint
-        tag = api_spec.tag.json
-        tags.append(tag)
+                # Paths
+                path = api_spec.path.path_item
+                paths[rule].update(path)
 
-        # Paths
-        path = api_spec.path.path_item
-        paths[rule].update(path)
-
-        # TODO: Definitions JSON; move to separate class
-        definition_template_inputs = {
-            'type': "object",
-            'properties': {
-                'inputs': {
-                    "type": "object",
-                    "properties": {}
-                },
-                'run_type': {
-                    "type": 'string',
-                    "example": "single"
-                }
-            }
-        }
-
-        definition_template_outputs = {
-            'type': "object",
-            'properties': {
-                'user_id': {
-                    'type': 'string',
-                },
-                'inputs': {
-                    # inputs_json
-                    'type': 'object',
-                    'properties': {}
-                },
-                'outputs': {
-                    # outputs_json
-                    'type': 'object',
-                    'properties': {}
-                },
-                'exp_out': {
-                    # exp_out_json
-                    'type': 'object',
-                    'properties': {}
-                },
-                '_id': {
-                    'type': 'string',
-                },
-                'run_type': {
-                    'type': 'string',
-                }
-            }
-        }
-
-        model_def = {
-            model_name.capitalize() + "Inputs": definition_template_inputs,
-            model_name.capitalize() + "Outputs": definition_template_outputs
-        }
-        for k, v in inputs.items():
-            # Set the inputs to the input and output definition template
-            model_def[model_name.capitalize() + "Inputs"]['properties']['inputs']['properties'][k] = \
-                model_def[model_name.capitalize() + "Outputs"]['properties']['inputs']['properties'][k] = {
-                    "type": "object",
-                    "properties": {
-                        "0": {
-                            # 'type' is JSON data type (e.g. 'number' is a float; 'string' is a string or binary)
-                            "type": 'string' if str(v.dtype) == 'object' else 'number',
-                            # 'format' is an optional modifier for primitives
-                            "format": 'string' if str(v.dtype) == 'object' else 'float'
+                # TODO: Definitions JSON; move to separate class
+                definition_template_inputs = {
+                    'type': "object",
+                    'properties': {
+                        'inputs': {
+                            "type": "object",
+                            "properties": {}
+                        },
+                        'run_type': {
+                            "type": 'string',
+                            "example": "single"
                         }
                     }
-            }
+                }
 
-        for k, v in outputs.items():
-            # Set the outputs to the output definition template
-            model_def[model_name.capitalize() + "Outputs"]['properties']['outputs']['properties'][k] = {
-                "type": "object",
-                "properties": {
-                    "0": {
-                        "type": 'string' if str(v.dtype) == 'object' else 'number',
-                        "format": 'string' if str(v.dtype) == 'object' else 'float'
+                definition_template_outputs = {
+                    'type': "object",
+                    'properties': {
+                        'user_id': {
+                            'type': 'string',
+                        },
+                        'inputs': {
+                            # inputs_json
+                            'type': 'object',
+                            'properties': {}
+                        },
+                        'outputs': {
+                            # outputs_json
+                            'type': 'object',
+                            'properties': {}
+                        },
+                        'exp_out': {
+                            # exp_out_json
+                            'type': 'object',
+                            'properties': {}
+                        },
+                        '_id': {
+                            'type': 'string',
+                        },
+                        'run_type': {
+                            'type': 'string',
+                        }
                     }
                 }
-            }
+
+                model_def = {
+                    model_name.capitalize() + "Inputs": definition_template_inputs,
+                    model_name.capitalize() + "Outputs": definition_template_outputs
+                }
+                for k, v in inputs.items():
+                    # Set the inputs to the input and output definition template
+                    model_def[model_name.capitalize() + "Inputs"]['properties']['inputs']['properties'][k] = \
+                        model_def[model_name.capitalize() + "Outputs"]['properties']['inputs']['properties'][k] = {
+                            "type": "object",
+                            "properties": {
+                                "0": {
+                                    # 'type' is JSON data type (e.g. 'number' is a float; 'string' is a string or binary)
+                                    "type": 'string' if str(v.dtype) == 'object' else 'number',
+                                    # 'format' is an optional modifier for primitives
+                                    "format": 'string' if str(v.dtype) == 'object' else 'float'
+                                }
+                            }
+                    }
+
+                for k, v in outputs.items():
+                    # Set the outputs to the output definition template
+                    model_def[model_name.capitalize() + "Outputs"]['properties']['outputs']['properties'][k] = {
+                        "type": "object",
+                        "properties": {
+                            "0": {
+                                "type": 'string' if str(v.dtype) == 'object' else 'number',
+                                "format": 'string' if str(v.dtype) == 'object' else 'float'
+                            }
+                        }
+                    }
+
+            if verb == 'get':
+
+
+                model_def = {}
 
         definitions.update(model_def)
 
 
         operations = {}
-        # for verb, method in methods.items():
-        #     """This is where the object parsing (introspection) occurs to generate the Swagger JSON"""
-        #     print verb, method
-        #     str(class_name)W
 
     return output

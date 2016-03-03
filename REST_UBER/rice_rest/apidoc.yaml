@@ -17,7 +17,7 @@ produces:
 
 parameters:
   -
-    description: Run Rice model
+    description: Input JSON for Rice model run
     required: true
 
 responses:

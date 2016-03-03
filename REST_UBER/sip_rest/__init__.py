@@ -2,32 +2,29 @@ from flask_restful import Resource
 from ubertool.ubertool.sip import sip
 from flask import request
 import pandas as pd
+from REST_UBER import rest_validation, rest_schema
 
 
 class SipHandler(Resource):
     def __init__(self):
         self.name = "sip"
 
-    def get(self, jobId):
+    def get(self, jobId="YYYYMMDDHHMMSSuuuuuu"):
         """
         SIP get handler.
         :param jobId:
         :return:
         """
-        return {
-            'result': {
-                'model: ' + self.name,
-                'jid: %s' % jobId
-            }
-        }
+        return rest_schema.get_schema(self.name, jobId)
 
-    def post(self, jobId):
+    def post(self, jobId="000000100000011"):
         """
         SIP post handler.
         :param jobId:
         :return:
         """
-        pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
+        inputs = rest_validation.parse_inputs(request.json)
+        pd_obj = pd.DataFrame.from_dict(inputs, dtype='float64')
         sip_obj = sip.Sip(pd_obj, None)
         sip_obj.execute_model()
         inputs_json, outputs_json, exp_out_json = sip_obj.get_dict_rep(sip_obj)

@@ -118,7 +118,7 @@ class NumPyArangeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-@app.route('/rest/therps/<jobId>', methods=['POST'])
+@app.route('/rest/therps/<jid>', methods=['POST'])
 def therps_rest(jid):
     all_result = {}
     try:
@@ -148,28 +148,7 @@ def therps_rest(jid):
         return rest_error_message(e, jid)
 
 
-# @app.route('/rest/agdrift/<jobId>', methods=['POST'])
-# def agdrift_rest(jid):
-#     all_result = {}
-#     try:
-#         for k, v in request.json.iteritems():
-#             exec '%s = v' % k
-#         all_result.setdefault(jid, {}).setdefault('status', 'none')
-#         from ubertool.ubertool.agdrift import agdrift
-#         result = agdrift.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
-#                                             application_rate, distance, aquatic_type, calculation_input,
-#                                             init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
-#                                             deposition_mgcm, nasae, y, x, express_y)
-#         if (result):
-#             # all_result[jid]['status']='done'
-#             # all_result[jid]['input']=request.json
-#             # all_result[jid]['result']=result
-#             return json.dumps({'user_id': 'admin', 'result': result.__dict__, '_id': jid})
-#     except Exception, e:
-#         return rest_error_message(e, jid)
-
-
-@app.route('/rest/kabam/<jobId>', methods=['POST'])
+@app.route('/rest/kabam/<jid>', methods=['POST'])
 def kabam_rest(jid):
     all_result = {}
     try:
@@ -254,14 +233,15 @@ def sam_rest(jid):
 # Declare endpoints for each model
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
-api.add_resource(terrplant.TerrplantHandler, '/rest/terrplant/<string:jobId>')
-api.add_resource(sip.SipHandler, '/rest/sip/<string:jobId>')
-api.add_resource(agdrift.AgdriftHandler, '/rest/agdrift/<string:jobId>')
-api.add_resource(stir.StirHandler, '/rest/stir/<string:jobId>')
-api.add_resource(iec.IecHandler, '/rest/iec/<string:jobId>')
-api.add_resource(earthworm.EarthwormHandler, '/rest/earthworm/<string:jobId>')
-api.add_resource(rice.RiceHandler, '/rest/rice/<string:jobId>')
-api.add_resource(ModelCaller, '/rest/<string:model>/<string:jobId>')  # Temporary generic route for API endpoints
+api.add_resource(terrplant.TerrplantGet, '/rest/terrplant/')
+api.add_resource(terrplant.TerrplantPost, '/rest/terrplant/<string:jobId>')
+# api.add_resource(sip.SipHandler, '/rest/sip/', '/rest/sip/<string:jobId>')
+# api.add_resource(agdrift.AgdriftHandler, '/rest/agdrift/', '/rest/agdrift/<string:jobId>')
+# api.add_resource(stir.StirHandler, '/rest/stir/', '/rest/stir/<string:jobId>')
+# api.add_resource(iec.IecHandler, '/rest/iec/', '/rest/iec/<string:jobId>')
+# api.add_resource(earthworm.EarthwormHandler, '/rest/earthworm/', '/rest/earthworm/<string:jobId>')
+# api.add_resource(rice.RiceHandler, '/rest/rice/', '/rest/rice/<string:jobId>')
+api.add_resource(ModelCaller, '/rest/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 @app.route("/api/spec/")

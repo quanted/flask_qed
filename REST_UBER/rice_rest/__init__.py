@@ -2,32 +2,29 @@ from flask_restful import Resource
 from ubertool.ubertool.rice import rice
 from flask import request
 import pandas as pd
+from REST_UBER import rest_validation, rest_schema
 
 
 class RiceHandler(Resource):
     def __init__(self):
         self.name = "rice"
 
-    def get(self, jobId):
+    def get(self, jobId="YYYYMMDDHHMMSSuuuuuu"):
         """
         RICE get handler.
         :param jobId:
         :return:
         """
-        return {
-            'result': {
-                'model: ' + self.name,
-                'jid: %s' % jobId
-            }
-        }
+        return rest_schema.get_schema(self.name, jobId)
 
-    def post(self, jobId):
+    def post(self, jobId="000000100000011"):
         """
         RICE post handler.
         :param jobId:
         :return:
         """
-        pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
+        inputs = rest_validation.parse_inputs(request.json)
+        pd_obj = pd.DataFrame.from_dict(inputs, dtype='float64')
         rice_obj = rice.Rice(pd_obj, None)
         rice_obj.execute_model()
         inputs_json, outputs_json, exp_out_json = rice_obj.get_dict_rep(rice_obj)
