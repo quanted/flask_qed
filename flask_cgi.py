@@ -218,13 +218,14 @@ def sam_rest(jid):
         outputs_json = result_json_tuple
         exp_out_json = ""
 
-        return {
+        return json.dumps({
             'user_id': 'admin',
             'inputs': inputs_json,
             'outputs': outputs_json,
             'exp_out': exp_out_json,
             '_id': jid,
-            'run_type': run_type}
+            'run_type': run_type
+        })
 
     except Exception, e:
         return rest_error_message(e, jid)
@@ -233,15 +234,21 @@ def sam_rest(jid):
 # Declare endpoints for each model
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
-api.add_resource(terrplant.TerrplantGet, '/rest/terrplant/')
-api.add_resource(terrplant.TerrplantPost, '/rest/terrplant/<string:jobId>')
-# api.add_resource(sip.SipHandler, '/rest/sip/', '/rest/sip/<string:jobId>')
-# api.add_resource(agdrift.AgdriftHandler, '/rest/agdrift/', '/rest/agdrift/<string:jobId>')
-# api.add_resource(stir.StirHandler, '/rest/stir/', '/rest/stir/<string:jobId>')
-# api.add_resource(iec.IecHandler, '/rest/iec/', '/rest/iec/<string:jobId>')
-# api.add_resource(earthworm.EarthwormHandler, '/rest/earthworm/', '/rest/earthworm/<string:jobId>')
-# api.add_resource(rice.RiceHandler, '/rest/rice/', '/rest/rice/<string:jobId>')
-api.add_resource(ModelCaller, '/rest/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
+api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
+api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
+api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
+api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
+api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
+api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
+api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
+api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
+api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
+api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
+api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 @app.route("/api/spec/")
