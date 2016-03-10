@@ -8,8 +8,6 @@ try:
     from flask.ext.cors import CORS
 except ImportError:
     cors = False
-# from flask_swagger import swagger
-from uber_swagger import swagger
 import pandas as pd
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
@@ -257,6 +255,9 @@ def spec():
     Route that returns the Swagger formatted JSON representing the Ubertool API.
     :return: Swagger formatted JSON string
     """
+    # from flask_swagger import swagger
+    from uber_swagger import swagger
+
     swag = swagger(app)
 
     # TODO: Use in production and remove 'jsonify' below
