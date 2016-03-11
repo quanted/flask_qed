@@ -19,8 +19,15 @@ def model_run(model, jobId, inputs, module):
     }
 
 
-def error(model):
+def error(model, jobId, inputs):
     return {
-        'error': 'Inputs incorrect',
-        'model': model
+        'user_id': 'admin',
+        'inputs': inputs,
+        'outputs': {
+            'error': 'Inputs incorrect',
+            'model': model
+        },
+        'exp_out': None,
+        '_id': jobId,
+        'run_type': "single"
     }

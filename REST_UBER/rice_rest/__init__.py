@@ -49,4 +49,4 @@ class RicePost(RiceHandler):
         if inputs:
             return rest_model_caller.model_run(self.name, jobId, inputs, module=rice)
         else:
-            return rest_model_caller.error(self.name)
+            return rest_model_caller.error(self.name, jobId, inputs)

@@ -14,6 +14,7 @@ class ApiSpec(object):
 
 
 class PathOperations(object):
+    # TODO: Is this class needed?
     def __init__(self):
         """
         PathOperations Object representing an endpoint.  Each PathOperations object must have at least one 'operation' object, which
@@ -23,6 +24,7 @@ class PathOperations(object):
         self.operations = {}
 
     def add_operation(self, operation):
+        # TODO: Is this needed?
         """
 
         :param operation: dict, Operation class represented as dictionary
@@ -131,6 +133,13 @@ class Operation(object):
                 if not schema_name.istitle():  # Convert string to Title Case
                     schema_name = schema_name.capitalize()
                 self.responses[code]['schema'] = {'$ref': '#/definitions/' + schema_name + 'Outputs'}
+
+    def add_operation(self, operation):
+        """
+
+        :param operation: dict, Operation class represented as dictionary
+        """
+
 
     def get_json(self):
         return dict(

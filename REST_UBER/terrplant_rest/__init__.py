@@ -50,4 +50,4 @@ class TerrplantPost(TerrplantHandler):
         if inputs:
             return rest_model_caller.model_run(self.name, jobId, inputs, module=terrplant)
         else:
-            return rest_model_caller.error(self.name)
+            return rest_model_caller.error(self.name, jobId, inputs)
