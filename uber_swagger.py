@@ -90,6 +90,13 @@ def swagger(app):
                 # Instantiate new Operation class
                 operation = Operation()
 
+                # Create Operations object from YAML
+                operation.yaml_operation_parse(
+                    os.path.join(PROJECT_ROOT, 'REST_UBER', model_name + '_rest', 'apidoc.yaml',),
+                    model_name
+                )
+                api_spec.paths.add_operation(operation)
+
                 # Append Rule parameter name to parameters list if needed
                 if rule_param:
                     param = {
@@ -102,13 +109,7 @@ def swagger(app):
                     # api_spec.parameters = [param] + api_spec.parameters
                     operation.parameters.insert(0, param)
                     # api_spec.parameters.append(param)
-
-                # Create Operations object from YAML
-                operation.yaml_operation_parse(
-                    os.path.join(PROJECT_ROOT, 'REST_UBER', model_name + '_rest', 'apidoc.yaml',),
-                    model_name
-                )
-                api_spec.paths.add_operation(operation)
+                    print "pause"
 
                 # Update the 'path' key in the Swagger JSON with the 'operation'
                 paths[rule].update({'post': operation.__dict__})
