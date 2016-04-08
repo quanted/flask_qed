@@ -1,45 +1,12 @@
 from flask_restful import Resource
 from ubertool.ubertool.earthworm import earthworm
 from flask import request
-import pandas as pd
+from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
 class EarthwormHandler(Resource):
     def __init__(self):
         self.name = "earthworm"
-
-    def get(self, jid):
-        """
-        Earthworm get handler.
-        :param jid:
-        :return:
-        """
-        return {
-            'result': {
-                'model: ' + self.name,
-                'jid: %s' % jid
-            }
-        }
-
-    def post(self, jid):
-        """
-        Earthworm post handler.
-        :param jid:
-        :return:
-        """
-        pd_obj = pd.DataFrame.from_dict(request.json["inputs"], dtype='float64')
-        earthworm_obj = earthworm.Earthworm(pd_obj, None)
-        earthworm_obj.execute_model()
-        inputs_json, outputs_json, exp_out_json = earthworm_obj.get_dict_rep(earthworm_obj)
-
-        return {
-            'user_id': 'admin',
-            'inputs': inputs_json,
-            'outputs': outputs_json,
-            'exp_out': exp_out_json,
-            '_id': jid,
-            'run_type': "single"
-        }
 
     @staticmethod
     def get_model_inputs():
@@ -56,3 +23,30 @@ class EarthwormHandler(Resource):
         :return:
         """
         return earthworm.EarthwormOutputs()
+
+
+class EarthwormGet(EarthwormHandler):
+
+    def get(self, jobId="YYYYMMDDHHMMSSuuuuuu"):
+        """
+        Earthworm get handler.
+        :param jobId:
+        :return:
+        """
+        return rest_schema.get_schema(self.name, jobId)
+
+
+class EarthwormPost(EarthwormHandler):
+
+    def post(self, jobId="000000100000011"):
+        """
+        Earthworm post handler.
+        :param jobId:
+        :return:
+        """
+        inputs = rest_validation.parse_inputs(request.json)
+
+        if inputs:
+            return rest_model_caller.model_run(self.name, jobId, inputs, module=earthworm)
+        else:
+            return rest_model_caller.error(self.name, jobId, inputs)
