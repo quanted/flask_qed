@@ -134,13 +134,6 @@ class Operation(object):
                     schema_name = schema_name.capitalize()
                 self.responses[code]['schema'] = {'$ref': '#/definitions/' + schema_name + 'Outputs'}
 
-    def add_operation(self, operation):
-        """
-
-        :param operation: dict, Operation class represented as dictionary
-        """
-
-
     def get_json(self):
         return dict(
             tags=self.tags,

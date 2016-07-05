@@ -34,9 +34,9 @@ secretkey = keys_Picloud_S3.amazon_s3_secretkey
 ##########################################################################################
 
 
-def sam(inputs_json, jid, run_type):
+def sam(args, jid, run_type):
     """
-    inputs_json; String (JSON);
+    args; dict; SAM inputs
     jid: String; SAM run jid
     run_type: String; SAM run type ('single', 'qaqc', or 'batch')
 
@@ -55,7 +55,6 @@ def sam(inputs_json, jid, run_type):
     The callback function stores the output and input file into MongoDB for later
     retrieval.
     """
-    args = json.loads(inputs_json)
     list_of_julian_days = None
 
     # Generate random name for current run
@@ -108,7 +107,6 @@ def sam(inputs_json, jid, run_type):
             sam_db.create_mongo_document(jid, run_type, args, list_of_julian_days)
 
             return jid
-
 
         except Exception, e:
             logging.exception(e)
