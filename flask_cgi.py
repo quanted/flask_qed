@@ -187,13 +187,14 @@ def kabam_rest(jid):
         return rest_error_message(e, jid)
 
 
-@app.route('/rest/sam/<jid>', methods=['POST'])
+@app.route('/rest/ubertool/sam/<jid>', methods=['POST'])
 def sam_rest(jid):
     try:
         import REST_UBER.sam_rest.sam_rest_model as sam
 
         try:
-            run_type = request.json["run_type"]
+            post_payload = json.loads(request.json)
+            run_type = post_payload["run_type"]
         except KeyError, e:
             return rest_error_message(e, jid)
 
@@ -205,7 +206,7 @@ def sam_rest(jid):
 
         else:
             logging.info('============= Single Run =============')
-            inputs_json = json.dumps(request.json["inputs"])
+            inputs_json = post_payload["inputs"]
 
             logging.info(inputs_json)
 
