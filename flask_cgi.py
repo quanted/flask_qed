@@ -1,10 +1,13 @@
 import importlib
 import json
 import logging
+import os
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
-# from flask_swagger import swagger
-from uber_swagger import swagger
+try:
+    from flask.ext.cors import CORS
+except ImportError:
+    cors = False
 import pandas as pd
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
@@ -15,8 +18,17 @@ from REST_UBER import earthworm_rest as earthworm
 from REST_UBER import rice_rest as rice
 
 
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+os.environ.update({
+    'PROJECT_ROOT': PROJECT_ROOT
+})
+
 app = Flask(__name__)
 api = Api(app)
+try:
+    CORS(app)
+except Exception, e:
+    print e
 
 
 # TODO: Generic API endpoint (TEMPORARY, remove once all endpoints are explicitly stated)
@@ -104,7 +116,7 @@ class NumPyArangeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-@app.route('/therps/<jid>', methods=['POST'])
+@app.route('/rest/therps/<jid>', methods=['POST'])
 def therps_rest(jid):
     all_result = {}
     try:
@@ -134,28 +146,7 @@ def therps_rest(jid):
         return rest_error_message(e, jid)
 
 
-# @app.route('/agdrift/<jid>', methods=['POST'])
-# def agdrift_rest(jid):
-#     all_result = {}
-#     try:
-#         for k, v in request.json.iteritems():
-#             exec '%s = v' % k
-#         all_result.setdefault(jid, {}).setdefault('status', 'none')
-#         from ubertool.ubertool.agdrift import agdrift
-#         result = agdrift.agdrift(drop_size, ecosystem_type, application_method, boom_height, orchard_type,
-#                                             application_rate, distance, aquatic_type, calculation_input,
-#                                             init_avg_dep_foa, avg_depo_gha, avg_depo_lbac, deposition_ngL,
-#                                             deposition_mgcm, nasae, y, x, express_y)
-#         if (result):
-#             # all_result[jid]['status']='done'
-#             # all_result[jid]['input']=request.json
-#             # all_result[jid]['result']=result
-#             return json.dumps({'user_id': 'admin', 'result': result.__dict__, '_id': jid})
-#     except Exception, e:
-#         return rest_error_message(e, jid)
-
-
-@app.route('/kabam/<jid>', methods=['POST'])
+@app.route('/rest/kabam/<jid>', methods=['POST'])
 def kabam_rest(jid):
     all_result = {}
     try:
@@ -196,17 +187,67 @@ def kabam_rest(jid):
         return rest_error_message(e, jid)
 
 
+@app.route('/rest/ubertool/sam/<jid>', methods=['POST'])
+def sam_rest(jid):
+    try:
+        import REST_UBER.sam_rest.sam_rest_model as sam
+
+        try:
+            post_payload = json.loads(request.json)
+            run_type = post_payload["run_type"]
+        except KeyError, e:
+            return rest_error_message(e, jid)
+
+        if run_type == "qaqc":
+            logging.info('============= QAQC Run =============')
+
+        elif run_type == "batch":
+            logging.info('============= Batch Run =============')
+
+        else:
+            logging.info('============= Single Run =============')
+            inputs_json = post_payload["inputs"]
+
+            logging.info(inputs_json)
+
+            result_json_tuple = sam.sam(inputs_json, jid, run_type)
+
+        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
+        # inputs_json = json.loads(result_json_tuple[0])
+        outputs_json = result_json_tuple
+        exp_out_json = ""
+
+        return json.dumps({
+            'user_id': 'admin',
+            'inputs': inputs_json,
+            'outputs': outputs_json,
+            'exp_out': exp_out_json,
+            '_id': jid,
+            'run_type': run_type
+        })
+
+    except Exception, e:
+        return rest_error_message(e, jid)
+
+
 # Declare endpoints for each model
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
-api.add_resource(terrplant.TerrplantHandler, '/terrplant/<string:jid>')
-api.add_resource(sip.SipHandler, '/sip/<string:jid>')
-api.add_resource(agdrift.AgdriftHandler, '/agdrift/<string:jid>')
-api.add_resource(stir.StirHandler, '/stir/<string:jid>')
-api.add_resource(iec.IecHandler, '/iec/<string:jid>')
-api.add_resource(earthworm.EarthwormHandler, '/earthworm/<string:jid>')
-api.add_resource(rice.RiceHandler, '/rice/<string:jid>')
-api.add_resource(ModelCaller, '/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
+api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
+api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
+api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
+api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
+api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
+api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
+api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
+api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
+api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
+api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
+api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 @app.route("/api/spec/")
@@ -215,6 +256,9 @@ def spec():
     Route that returns the Swagger formatted JSON representing the Ubertool API.
     :return: Swagger formatted JSON string
     """
+    # from flask_swagger import swagger
+    from uber_swagger import swagger
+
     swag = swagger(app)
 
     # TODO: Use in production and remove 'jsonify' below
@@ -234,6 +278,10 @@ def api_doc():
     """
     return render_template('index.html')
 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 
 """

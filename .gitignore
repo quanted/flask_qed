@@ -26,6 +26,7 @@ build/*
 *.mod
 fort.*
 *.pid
+REST_UBER/sam_rest/*dll
 REST_UBER/sam_rest/bin/*
 REST_UBER/sam_rest/temp.zip
 REST_UBER/sam_rest/bin/bin_mother_lode/*
