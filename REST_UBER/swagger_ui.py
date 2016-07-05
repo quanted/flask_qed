@@ -1,111 +1,149 @@
-import importlib
+import yaml
 
 
 class ApiSpec(object):
     def __init__(self, model):
         """
-        Provides the API documentation JSON for Swagger
+        Provides the API documentation JSON for Swagger UI front end.  Swagger JSON specifications can be found
+        at: http://swagger.io/specification
         """
+
         self.model = model
-        self.tag_description = None
-        self.short_description = None
-        self.consumes = None
-        self.produces = None
-        self.parameters = None
-        self.responses = None
+        self.paths = PathOperations()
+        self.tags = Tags()
 
-        doc_mod = importlib.import_module("REST_UBER." + self.model + "_rest.documentation")
 
-        for doc in dir(doc_mod):
-            if doc.isupper():
-                doc_value = getattr(doc_mod, doc)
+class PathOperations(object):
+    # TODO: Is this class needed?
+    def __init__(self):
+        """
+        PathOperations Object representing an endpoint.  Each PathOperations object must have at least one 'operation' object, which
+        represents the HTTP method associated with that path.
+        """
 
-                if type(doc_value) is dict:
-                    for key, value in doc_value.items():
-                        # TODO: Is forcing the keys to be lower case necessary?
-                        doc_value[key.lower()] = doc_value.pop(key)
-                    # TODO: Handle multiple levels of dictionaries....
+        self.operations = {}
 
-                setattr(self, doc.lower(), doc_value)  # Set each documentation variable to class attribute (lower case)
+    def add_operation(self, operation):
+        # TODO: Is this needed?
+        """
 
-        # TODO: Add validation logic
+        :param operation: dict, Operation class represented as dictionary
+        """
+        operation_dict = operation.__dict__
+        self.operations.update(operation_dict)
 
-        self.path = PathJSON(model, 'post')  # TODO: Allow for ALL HTTP methods: "for verb, method in methods.items():"
-        self.tag = TagJSON(model, self.tag_description)
 
-        self.update()
+class Operation(object):
+    def __init__(self, tags=[], summary="", description="", consumes=[], produces=[], parameters=[], responses={}):
 
-    def update(self):
+        """
+        Operation Object
+        :param method: string, HTTP method in lower case (e.g. get, post, put, delete, etc...)
+        :param model_name: string, model name in lower case
+        """
+        if type(tags) is list:
+            self.tags = tags
+        else:
+            raise TypeError
+        if type(summary) is str:
+            self.summary = summary
+        else:
+            raise TypeError
+        if type(description) is str:
+            self.description = description
+        else:
+            raise TypeError
+        if type(consumes) is list:
+            self.consumes = consumes
+        else:
+            raise TypeError
+        if type(produces) is list:
+            self.produces = produces
+        else:
+            raise TypeError
+        if type(parameters) is list:
+            self.parameters = parameters
+        else:
+            raise TypeError
+        if type(responses) is dict:
+            self.responses = responses
+        else:
+            raise TypeError
 
-        # Handle custom SCHEMA supplied in 'documentation.PARAMETERS'
+    def yaml_operation_parse(self, path_to_yaml, schema_name):
+        """
+        Parse YAML containing the Swagger information for an operation
+        :param schema_name: string, name of Schema Object in the Definitions Object representing the Operation schema
+        :param path_to_yaml: string, absolute path to YAML file containing Swagger Operation details
+        """
+
+        # TODO: Add validation logic for YAML
+
+        with open(path_to_yaml, 'r') as f:
+            api_doc = yaml.load(f)
+
+        self.tags = []
+        self.summary = api_doc['summary']
+        self.description = api_doc['description']
+        if self.valid_content_type(api_doc['consumes']):
+            self.consumes = api_doc['consumes']
+        if self.valid_content_type(api_doc['produces']):
+            self.produces = api_doc['produces']
+        self.parameters = api_doc['parameters']
+        self.responses = api_doc['responses']
+
+        # TODO: Make sure all operation parameters have been filled with valid values
+
+        self.yaml_operation_update(schema_name)
+
+    def valid_content_type(self, content_type):
+        # TODO: Add more content types
+        # http://swagger.io/specification/#mimeTypes
+        _valid_content_types = ("application/json", "application/xml")
+        if content_type in _valid_content_types:
+            return True
+
+    def yaml_operation_update(self, schema_name):
+
+        self.tags.append(schema_name)
+
+        # Iterate over 'parameters' in YAML
         for i, param in enumerate(self.parameters):
             if 'schema' in param:
-                print "SCHEMA is present"
+                # If 'parameters' in YAML contains the 'schema' key, use it
                 # TODO: Add custom schema AND validate its format
+                pass
             else:
-                print "SCHEMA is NOT present"
-                self.parameters[i]['schema'] = {'$ref': '#/definitions/' + self.model.capitalize() + 'Inputs'}
+                # If no 'schema' key present in YAML 'parameters', use default of response 'body'
+                if not schema_name.istitle():  # Convert string to Title Case
+                    schema_name = schema_name.capitalize()
+                self.parameters[i]['schema'] = {'$ref': '#/definitions/' + schema_name + 'Inputs'}
                 # TODO: Make 'in' and 'name' descriptors generic
                 self.parameters[i]['in'] = 'body'
                 self.parameters[i]['name'] = 'body'
 
-        # Handle custom SCHEMA supplied in 'documentation.RESPONSES'
+        # Iterate over 'responses' in YAML
         for code, desc in self.responses.items():
             if 'schema' in desc:
-                print "SCHEMA is present"
+                # If 'responses' in YAML contains the 'schema' key, use it
                 # TODO: Add custom schema AND validate its format
+                pass
             else:
-                print "SCHEMA is NOT present"
-                self.responses[code]['schema'] = {'$ref': '#/definitions/' + self.model.capitalize() + 'Outputs'}
+                # If no 'schema' key present in YAML 'parameters', use default of response 'body'
+                if not schema_name.istitle():  # Convert string to Title Case
+                    schema_name = schema_name.capitalize()
+                self.responses[code]['schema'] = {'$ref': '#/definitions/' + schema_name + 'Outputs'}
 
-        api_doc = dict(
-            summary=self.tag_description,
-            description=self.short_description,
+    def get_json(self):
+        return dict(
+            tags=self.tags,
+            summary=self.summary,
+            description=self.description,
             consumes=self.consumes,
             produces=self.produces,
             parameters=self.parameters,
             responses=self.responses
         )
-        self.path.operation.json.update(api_doc)
-
-
-class PathJSON(object):
-    def __init__(self, model_name, method):
-        """
-        Paths Object
-        :param model_name:
-        :param method:
-        """
-        self.operation = OperationJSON(model_name)
-        self.path_item = {
-            method: self.operation.json
-        }
-
-
-class OperationJSON(object):
-    def __init__(self, model_name):
-        """
-        Operation Object
-        :param model_name:
-        """
-        self.type = OperationContentTypes()
-        self.parameters = OperationParameters()
-        self.responses = OperationResponses()
-        self.json = dict(
-            tags=[model_name],
-            summary="",
-            description="",
-            consumes=[],
-            produces=[],
-            parameters=[],
-            responses={}
-        )
-
-
-class OperationContentTypes(object):
-    def __init__(self):
-        self.json = "application/json"
-        self.xml = "application/xml"
 
 
 # TODO: Update this for other "in"s (e.g. Form Inputs)
@@ -130,7 +168,13 @@ class OperationParameters(object):
 
 
 class OperationResponses(object):
-    def __init__(self, schema=None):
+    def __init__(self, return_code, description, schema=None, headers=None):
+
+        self.return_code = return_code
+        self.description = description
+        self.schema = schema
+        self.headers = headers
+
         # http://www.restapitutorial.com/httpstatuscodes.html - Using the Top 10 Response Codes*
         self.codes = {
             "200": "OK",
@@ -144,17 +188,49 @@ class OperationResponses(object):
             "409": "Conflict",
             "500": "Internal Server Error"
         }
-        schema = {
-            '$ref': '#/definitions/'
+
+        if not self.valid_code(str(return_code)):
+            raise ValueError('Return status code must be: %s' % self.codes.keys())
+
+        if schema is None:
+            self.schema = {
+                'type': 'object',
+                "additionalProperties": {
+                    "type": "string"
+                }
+            }
+
+    def valid_code(self, code):
+        if code in self.codes.keys():
+            return True
+
+    def get_json(self):
+        return {
+            self.return_code: {
+                'description': self.description,
+                'schema': self.schema
+            }
         }
-        self.json = dict(
-            schema=schema
-        )
 
 
-class TagJSON(object):
-    def __init__(self, model_name, description):
-        self.json = dict(
+class Tags(object):
+    # TODO: rename to Tags to represent top-level Swagger JSON (list of tags)
+    def __init__(self):
+
+        self.tags = []
+
+    def create_tag(self, model_name, description, external_docs=None):
+
+        tag = dict(
             name=model_name,
             description=description
         )
+        if external_docs:
+            tag.update(dict(
+                externalDocs=external_docs
+            ))
+
+        return tag
+
+    def get_tags(self):
+        return self.tags
