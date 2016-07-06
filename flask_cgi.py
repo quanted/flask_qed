@@ -5,7 +5,8 @@ import os
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
 try:
-    from flask.ext.cors import CORS
+    from flask_cors import CORS
+    cors = True
 except ImportError:
     cors = False
 import pandas as pd
@@ -25,10 +26,10 @@ os.environ.update({
 
 app = Flask(__name__)
 api = Api(app)
-try:
+if cors:
     CORS(app)
-except Exception, e:
-    print e
+else:
+    logging.debug("CORS not enabled")
 
 
 # TODO: Generic API endpoint (TEMPORARY, remove once all endpoints are explicitly stated)
