@@ -350,4 +350,4 @@ def ore_rest_output_query():
 
 
 if __name__ == '__main__':
-    app.run(port=7777, debug=True)
+    app.run(host='0.0.0.0', port=7777, debug=True)
