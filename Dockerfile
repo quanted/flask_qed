@@ -1,9 +1,4 @@
-FROM python:2
-
-MAINTAINER Ubertool Dev Team <ubertool-dev@googlegroups.com>
-
-COPY ./requirements.txt /tmp/requirements.txt
-RUN pip install -qr /tmp/requirements.txt
+FROM puruckertom/uber_py27
 
 COPY . /src/
 WORKDIR /src
