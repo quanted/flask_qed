@@ -194,7 +194,7 @@ def sam_rest(jid):
         import REST_UBER.sam_rest.sam_rest_model as sam
 
         try:
-            post_payload = json.loads(request.json)
+            post_payload = request.json
             run_type = post_payload["run_type"]
         except KeyError, e:
             return rest_error_message(e, jid)
@@ -351,4 +351,4 @@ def ore_rest_output_query():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=7777, debug=True)
+    app.run(port=7777, debug=True)
