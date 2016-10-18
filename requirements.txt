@@ -1,5 +1,4 @@
 boto
-bottle
 codecov
 coverage
 coveralls
@@ -11,6 +10,8 @@ nose
 nose-cov
 numpy
 pandas
+numpy
+scipy
 pylint
 pymongo==2.8.0
 python-coveralls

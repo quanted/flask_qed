@@ -5,7 +5,8 @@ import os
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
 try:
-    from flask.ext.cors import CORS
+    from flask_cors import CORS
+    cors = True
 except ImportError:
     cors = False
 import pandas as pd
@@ -25,10 +26,10 @@ os.environ.update({
 
 app = Flask(__name__)
 api = Api(app)
-try:
+if cors:
     CORS(app)
-except Exception, e:
-    print e
+else:
+    logging.debug("CORS not enabled")
 
 
 # TODO: Generic API endpoint (TEMPORARY, remove once all endpoints are explicitly stated)
@@ -193,7 +194,7 @@ def sam_rest(jid):
         import REST_UBER.sam_rest.sam_rest_model as sam
 
         try:
-            post_payload = json.loads(request.json)
+            post_payload = request.json
             run_type = post_payload["run_type"]
         except KeyError, e:
             return rest_error_message(e, jid)
@@ -350,4 +351,5 @@ def ore_rest_output_query():
 
 
 if __name__ == '__main__':
-    app.run(port=7777, debug=True)
+    # app.run(port=7777, debug=True)  # Old, pre-Docker app runner
+    app.run(host='0.0.0.0', port=7777, debug=True)  # 'host' param needed to expose server publicly w/o NGINX/uWSGI

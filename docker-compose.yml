@@ -1,0 +1,15 @@
+ version: '2'
+ services:
+  webapp:
+    build: .
+    ports:
+    - "7777:7777"
+#    volumes:
+#    - .:/code
+  nginx:
+    image: funkswing/nginx-uwsgi-python
+    ports:
+    - "80:80"
+    - "443:443"
+    links:  # Share hostname with webapp and depends_on webapp
+    - webapp
