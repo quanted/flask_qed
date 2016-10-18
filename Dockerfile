@@ -1,5 +1,11 @@
 FROM puruckertom/uber_py27
 
+# Install uWSGI
+RUN pip install uwsgi
+
+# Overwrite the uWSGI config
+COPY uwsgi.ini /etc/uwsgi/
+
 COPY . /src/
 WORKDIR /src
 EXPOSE 7777
