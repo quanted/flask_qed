@@ -1,6 +1,6 @@
 import logging
 import os
-import keys_Picloud_S3
+# import keys_Picloud_S3
 import requests
 import json
 
@@ -31,7 +31,8 @@ def create_mongo_document(jid, run_type, args, list_of_julian_days):
             # db['sam'].insert(document)  # PyMongo driver version (DEPRECATED)
 
             # Send SAM run Meatadata document to Mongo server (Motor/Tornado driver version)
-            url = 'http://localhost:8787/sam/metadata/' + jid
+            url = 'http://192.168.99.100:8787/sam/metadata/' + jid  # Docker version (Jon's work machine)
+            # url = 'http://localhost:8787/sam/metadata/' + jid
             http_headers = {'Content-Type': 'application/json'}
             requests.post(url, data=json.dumps(document), headers=http_headers, timeout=30)
         except:

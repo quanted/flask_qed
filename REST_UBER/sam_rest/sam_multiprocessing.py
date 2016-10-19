@@ -1,21 +1,30 @@
-__author__ = 'jflaisha'
-
+import multiprocessing
+import sys
+import os
+import sam_callable
 from functools import partial
 from concurrent.futures import ProcessPoolExecutor as Pool
-import multiprocessing, logging, sys, os, numpy as np
-import sam_callable
+import numpy as np
+import time
 
-try:
-    import superprzm  # Import superprzm.dll / .so
-
-    _dll_loaded = True
-except ImportError, e:
-    logging.exception(e)
-    _dll_loaded = False
 
 curr_path = os.path.abspath(os.path.dirname(__file__))
 
 mp_logger = multiprocessing.log_to_stderr()
+
+
+def timeit(method):
+
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+
+        print '%s: Time start = %s, Time end = %s: %2.2f sec' % \
+              (args[0], ts, te, te-ts)
+        return result
+
+    return timed
 
 
 def multiprocessing_setup():
@@ -25,20 +34,21 @@ def multiprocessing_setup():
     :return: ProcessPoolExecutor object reference
     """
     nproc = multiprocessing.cpu_count()  # Get number of processors available on machine
-    if nproc > 16:  # Force 'nproc' to be 16
-        nproc = 16
+    # TODO: Removed for SAM timing testing to allow for 32 processes
+    # if nproc > 16:  # Force 'nproc' to be 16
+    #     nproc = 16
     try:
         host_name = os.uname()[1]
         if host_name == 'ord-uber-vm005':  # Force Server 5 to use 16 processes to avoid the memdump error when using a process pool with less max_workers than total number of processes
             nproc = 16
-    except:
+    except AttributeError:
         pass
     print "max_workers=%s" % nproc
     return Pool(max_workers=nproc)  # Set number of workers to equal the number of processors available on machine
 
 
 class SamModelCaller(object):
-    def __init__(self, jid, name_temp, no_of_processes=16):
+    def __init__(self, jid, name_temp, no_of_processes=16, write_output=False):
         """
         Constructor for SamModelCaller class.
         :param name_temp: string
@@ -51,6 +61,7 @@ class SamModelCaller(object):
         self.jid = jid
         self.name_temp = name_temp
         self.no_of_processes = no_of_processes
+        self.write_output = write_output
 
     def sam_multiprocessing(self):
         """
@@ -71,10 +82,42 @@ class SamModelCaller(object):
         # Split master HUC CSV into sections and return a list containing the number of rows in each section (sequentially)
         try:
             self.number_of_rows_list = self.split_csv()
-        except:
-            print "Split CSV failed"
-            self.number_of_rows_list = [306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320]
+        except Exception as e:
+            print "Split CSV failed: %s \n Using defaults for %s number of processes" % (e, self.no_of_processes)
 
+            # Below are defaults for a set number of processes for Ohio River Valley (HUC12) Region only
+            if self.no_of_processes == 1:
+                self.number_of_rows_list = [
+                    4910
+                ]
+            elif self.no_of_processes == 2:
+                self.number_of_rows_list = [
+                    2455, 2455
+                ]
+            elif self.no_of_processes == 4:
+                self.number_of_rows_list = [
+                    1227, 1227, 1227, 1229
+                ]
+            elif self.no_of_processes == 8:
+                self.number_of_rows_list = [
+                    613, 613, 613, 613, 613, 613, 613, 619
+                ]
+            elif self.no_of_processes == 16:
+                self.number_of_rows_list = [
+                    306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 320
+                ]
+            elif self.no_of_processes == 24:
+                self.number_of_rows_list = [
+                    204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204, 204,
+                    204, 204, 204, 204, 204, 204, 204, 218
+                ]
+            elif self.no_of_processes == 32:
+                self.number_of_rows_list = [
+                    153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153,
+                    153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 167
+                ]
+
+        print 'Started running SAM @ %s' % time.time()
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process
             pool.submit(
                 daily_conc_callable,
@@ -84,7 +127,7 @@ class SamModelCaller(object):
                 self.two_digit(x),  # Section number, as two digits, of this set of HUCs for the SuperPRZM run
                 self.number_of_rows_list[x]  # Number of 'rows'/HUC12s for this section of HUCs for the SuperPRZM run
             ).add_done_callback(
-                partial(callback_daily, self.two_digit(x))
+                partial(callback_daily, self.two_digit(x), self.write_output, self.sam_bin_path, self.name_temp)  # TODO: Added write_output Boolean
             )
 
         # Destroy the Pool object which hosts the processes when the pending Futures objects are finished,
@@ -92,7 +135,7 @@ class SamModelCaller(object):
         # pool.shutdown(wait=False)  # Non-blocking
         pool.shutdown()  # Blocking
 
-    def split_csv(self):
+    def split_csv(self, shuffle=False):
         """
         Load master CSV for SuperPRZM run as Pandas DataFrame and slice it
         based on the number of Futures objects created to execute it.
@@ -114,6 +157,10 @@ class SamModelCaller(object):
             self.no_of_processes = 99
         if self.no_of_processes < 1:
             self.no_of_processes = 1
+
+        if shuffle:
+            # Shuffle/permutate the rows of the dataframe to randomize the order of the HUC12s
+            df = df.reindex(np.random.permutation(df.index))
 
         try:
             rows_per_sect = df.shape[0] / self.no_of_processes
@@ -180,15 +227,18 @@ def daily_conc_callable(jid, sam_bin_path, name_temp, section, array_size=320):
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
     # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
 
-    try:
-        sam_callable.run(jid, sam_bin_path, name_temp, section, int(array_size))
-    except Exception, e:
-        mp_logger.exception(e)
+    return sam_callable.run(jid, sam_bin_path, name_temp, section, int(array_size))
 
 
-def callback_daily(section, future):
+@timeit
+def callback_daily(section, write_output, sam_bin_path, name_temp, future):
     print "Section: ", section
     # print future.result()
+    if write_output:
+        # print "Writing output - Section: %s" % section
+        # np.savetxt(os.path.join(sam_bin_path, name_temp, '_' + section + '.csv'), future.result(), delimiter=',')
+        np.savez(os.path.join(sam_bin_path, name_temp, '_' + section), future.result())
+        # print "Finished writing output - Section: %s" % section
 
 
 def create_number_of_rows_list(list_string):
@@ -215,9 +265,16 @@ def main():
     if len(sys.argv) == 4:  # 'no_of_processes' is an optional command line argument that defaults to 16 if not given
         no_of_processes = int(sys.argv[3])
         sam = SamModelCaller(jid, name_temp, no_of_processes)
+    elif len(sys.argv) == 5:
+        no_of_processes = int(sys.argv[3])
+        write_output = bool(sys.argv[4])
+        sam = SamModelCaller(jid, name_temp, no_of_processes, write_output)
     else:
         sam = SamModelCaller(jid, name_temp)
 
+    print "JID = %s" % sam.jid
+    print "name_temp = %s" % sam.name_temp
+    print "no_of_processes = %s" % sam.no_of_processes
     sam.sam_multiprocessing()
 
 

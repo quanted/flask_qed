@@ -12,5 +12,5 @@
     ports:
     - "80:80"
     - "443:443"
-    links:  # Share hostname with ecorest and depends_on ecorest
-    - ecorest:uwsgi
+    links:  # Same as depends_on ecorest, but also sets the hostname at which this service can reach the linked service
+    - ecorest:uwsgi  # Nginx.conf can reference "ecorest" service with the hostname 'uwsgi' or 'ecorest'
