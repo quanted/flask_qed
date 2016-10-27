@@ -7,7 +7,7 @@ def model_run(model, jobId, inputs, module):
     model_class = getattr(module, model.capitalize())
     model_obj = model_class(pd_obj, None)
     model_obj.execute_model()
-    inputs_json, outputs_json, exp_out_json = model_obj.get_dict_rep(model_obj)
+    inputs_json, outputs_json, exp_out_json = model_obj.get_dict_rep()
 
     return {
         'user_id': 'admin',

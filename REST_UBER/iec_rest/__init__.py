@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from ubertool.ubertool.iec import iec
+from iec import iec_exe as iec
 from flask import request
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 

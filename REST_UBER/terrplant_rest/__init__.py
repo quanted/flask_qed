@@ -1,6 +1,6 @@
 from flask_restful import Resource
-from ubertool.ubertool.terrplant import terrplant
-from flask import request
+from terrplant import terrplant_exe as terrplant
+from flask import request, jsonify
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
@@ -48,6 +48,7 @@ class TerrplantPost(TerrplantHandler):
         inputs = rest_validation.parse_inputs(request.json)
 
         if inputs:
-            return rest_model_caller.model_run(self.name, jobId, inputs, module=terrplant)
+            data = rest_model_caller.model_run(self.name, jobId, inputs, module=terrplant)
+            return jsonify(**data)
         else:
             return rest_model_caller.error(self.name, jobId, inputs)
