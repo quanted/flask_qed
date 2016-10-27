@@ -4,8 +4,6 @@
     build: .
     expose:
     - "7777"
-#    volumes:
-#    - .:/code
   nginx:
 #    restart: always
     image: funkswing/nginx-uwsgi-python
