@@ -1,6 +1,7 @@
 import json
 
 
+# TODO: Remove method, not used anymore. Choose to create "parse" method for use in UberModels base class
 def _json_key_int(x):
     """
     This attempts to cast the JSON key to an Integer assuming the JSON schema is similar to:
@@ -34,7 +35,8 @@ def parse_inputs(request):
     # Ensure a request body was POSTed
     if request is not None:
         try:
-            request = json.loads(request, object_hook=_json_key_int)
+            # request = json.loads(request, object_hook=_json_key_int)  # Try to convert keys to Integers
+            request = json.loads(request)
         except TypeError:
             if type(request) is dict:
                 pass
