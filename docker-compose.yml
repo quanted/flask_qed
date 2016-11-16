@@ -3,7 +3,7 @@
   ecorest:
     build: .
     expose:
-    - "7777"
+    - "8080"
   nginx:
 #    restart: always
     image: funkswing/nginx-uwsgi-python
