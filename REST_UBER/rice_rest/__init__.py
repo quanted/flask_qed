@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from rice import rice_exe as rice
+from ubertool.ubertool.rice import rice_exe as rice
 from flask import request
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 

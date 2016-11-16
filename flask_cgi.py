@@ -12,10 +12,6 @@ except ImportError:
     cors = False
 import pandas as pd
 
-# Set up Python PATH environment to handle "ubertool" submodule
-sys.path.insert(0, os.path.join(os.getcwd(), "ubertool", "ubertool"))  # '/var/www/ubertool/ubertool_ecorest/REST_UBER')
-# sys.path.insert(0, os.path.join(curr_wd, "REST_UBER"))  # '/var/www/ubertool/ubertool_ecorest/REST_UBER')
-
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
 from REST_UBER import agdrift_rest as agdrift

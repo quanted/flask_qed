@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from sip import sip_exe as sip
+from ubertool.ubertool.sip import sip_exe as sip
 from flask import request
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 

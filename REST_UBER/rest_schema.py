@@ -3,7 +3,7 @@ import importlib
 
 def get_schema(model, job_id):
 
-    module = importlib.import_module('ubertool.ubertool.' + model + '.' + model)
+    module = importlib.import_module("{}.{}_exe".format(model, model))
 
     inputs = getattr(module, model.capitalize() + 'Inputs')().__dict__    # e.g. TerrplantInputs()
     outputs = getattr(module, model.capitalize() + 'Outputs')().__dict__  # e.g. TerrplantOutputs()
