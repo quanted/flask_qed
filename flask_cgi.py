@@ -20,6 +20,7 @@ from REST_UBER import trex_rest as trex
 from REST_UBER import iec_rest as iec
 from REST_UBER import earthworm_rest as earthworm
 from REST_UBER import rice_rest as rice
+from REST_UBER import kabam_rest as kabam
 
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -34,6 +35,7 @@ if cors:
 else:
     logging.debug("CORS not enabled")
 
+# TODO: Remove this and Generic model handler below... (not used with refactored models)
 _ACTIVE_MODELS = (
     'terrplant',
     'sip',
@@ -43,7 +45,8 @@ _ACTIVE_MODELS = (
     'iec',
     'eathworm',
     'rice',
-    'sam'
+    'sam',
+    'kabam'
 )
 _NO_MODEL_ERROR = "{} model is not available through the REST API"
 
@@ -268,6 +271,8 @@ api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
 api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
 api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
 api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
+api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
+api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
 api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
