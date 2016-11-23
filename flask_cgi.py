@@ -17,6 +17,7 @@ from REST_UBER import sip_rest as sip
 from REST_UBER import agdrift_rest as agdrift
 from REST_UBER import stir_rest as stir
 from REST_UBER import trex_rest as trex
+from REST_UBER import therps_rest as therps
 from REST_UBER import iec_rest as iec
 from REST_UBER import earthworm_rest as earthworm
 from REST_UBER import rice_rest as rice
@@ -41,7 +42,7 @@ _ACTIVE_MODELS = (
     'sip',
     'stir',
     'trex',
-    # 'therps',
+    'therps',
     'iec',
     'eathworm',
     'rice',
@@ -265,6 +266,8 @@ api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
 api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
 api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
 api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
+api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
+api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
 api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
 api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
 api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
