@@ -250,7 +250,7 @@ api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobI
 api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
 api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
 api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
-api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobID>')
+api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
 api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
