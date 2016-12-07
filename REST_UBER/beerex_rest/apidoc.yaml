@@ -1,0 +1,19 @@
+summary: Bee-REX Model
+
+description: |
+  The Bee-REX model is designed to calculate risk quotients as a part of a Tier I assessment of pesticide risks to honeybees
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+parameters:
+  -
+    description: Input JSON for Bee-REX model run
+    required: true
+
+responses:
+  200:
+    description: Successful Operation

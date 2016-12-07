@@ -17,6 +17,7 @@ from REST_UBER import stir_rest as stir
 from REST_UBER import iec_rest as iec
 from REST_UBER import earthworm_rest as earthworm
 from REST_UBER import rice_rest as rice
+from REST_UBER import beerex_rest as beerex
 
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -248,6 +249,8 @@ api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
 api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
 api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
 api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
+api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
+api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobID>')
 api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
