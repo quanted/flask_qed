@@ -1,4 +1,8 @@
-FROM puruckertom/uber_py27
+FROM python:2
+
+# Install Python Dependencies
+COPY requirements.txt /tmp/
+RUN pip install --requirement /tmp/requirements.txt
 
 # Install uWSGI
 RUN pip install uwsgi
