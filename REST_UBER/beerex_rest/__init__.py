@@ -1,12 +1,12 @@
 from flask_restful import Resource
-from ubertool.ubertool.beerex import beerex
+from ubertool.ubertool.beerex import beerex_exe
 from flask import request
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
 class BeerexHandler(Resource):
     def __init__(self):
-        self.name = "Bee-REX"
+        self.name = "beerex"
 
     @staticmethod
     def get_model_inputs():
@@ -47,6 +47,6 @@ class BeerexPost(BeerexHandler):
         inputs = rest_validation.parse_inputs(request.json)
 
         if inputs:
-            return rest_model_caller.model_run(self.name, jobId, inputs, module=beerex)
+            return rest_model_caller.model_run(self.name, jobId, inputs, module=beerex_exe)
         else:
             return rest_model_caller.error(self.name, jobId, inputs)
