@@ -1,0 +1,4 @@
+create a pycharm configuration called
+flask ubertool_ecorest
++ Python
+point script to the flask_cgi.py file
