@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from ubertool.ubertool.agdrift import agdrift_exe
+from ubertool.ubertool.agdrift import agdrift_exe as agdrift
 from flask import request
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
