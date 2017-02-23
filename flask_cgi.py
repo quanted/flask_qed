@@ -47,6 +47,8 @@ _ACTIVE_MODELS = (
     'eathworm',
     'rice',
     'sam',
+    'agdrift',
+    'beerex',
     'kabam'
 )
 _NO_MODEL_ERROR = "{} model is not available through the REST API"
