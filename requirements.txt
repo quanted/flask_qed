@@ -12,6 +12,7 @@ numpy
 pandas
 numpy
 scipy
+psutil
 pylint
 pymongo==2.8.0
 python-coveralls
