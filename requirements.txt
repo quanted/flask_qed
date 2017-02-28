@@ -19,5 +19,6 @@ pytz
 requests
 snakefood
 sqlalchemy
+sqlalchemy_utils
 tabulate
 twine

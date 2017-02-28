@@ -14,7 +14,7 @@ class BeerexHandler(Resource):
         Return model's input class.
         :return:
         """
-        return beerex.BeerexInputs()
+        return beerex_exe.BeerexInputs()
 
     @staticmethod
     def get_model_outputs():
@@ -22,7 +22,7 @@ class BeerexHandler(Resource):
         Return model's output class.
         :return:
         """
-        return beerex.BeerexOutputs()
+        return beerex_exe.BeerexOutputs()
 
 
 class BeerexGet(BeerexHandler):

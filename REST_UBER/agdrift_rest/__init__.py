@@ -1,6 +1,6 @@
 from flask_restful import Resource
-from ubertool.ubertool.agdrift import agdrift_exe
-from flask import request
+from ubertool.ubertool.agdrift import agdrift_exe as agdrift
+from flask import request, jsonify
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
@@ -48,6 +48,7 @@ class AgdriftPost(AgdriftHandler):
         inputs = rest_validation.parse_inputs(request.json)
 
         if inputs:
-            return rest_model_caller.model_run(self.name, jobId, inputs, module=agdrift)
+            data = rest_model_caller.model_run(self.name, jobId, inputs, module=agdrift)
+            return jsonify(**data)
         else:
             return rest_model_caller.error(self.name, jobId, inputs)
