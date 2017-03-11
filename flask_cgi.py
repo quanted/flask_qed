@@ -57,7 +57,7 @@ _NO_MODEL_ERROR = "{} model is not available through the REST API"
 # TODO: Generic API endpoint (TEMPORARY, remove once all endpoints are explicitly stated)
 class ModelCaller(Resource):
     def get(self, model, jid):
-        return {'result': 'model=%s, jid=%s' % (model, jid)}
+        return {'result': 'model={0!s}, jid={1!s}'.format(model, jid)}
 
     def post(self, model, jid):
         # TODO: Remove the YAML part of this docstring
@@ -146,7 +146,7 @@ def therps_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '%s = v' % k
+            exec '{0!s} = v'.format(k)
         all_result.setdefault(jid, {}).setdefault('status', 'none')
         from therps import therps
         result = therps.therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
@@ -176,7 +176,7 @@ def kabam_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '%s = v' % k
+            exec '{0!s} = v'.format(k)
         all_result.setdefault(jid, {}).setdefault('status', 'none')
         from kabam import kabam
         result = kabam.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
@@ -349,7 +349,7 @@ def ore_rest_category_query():
 
     query = {}
     for k, v in request.json.iteritems():
-        exec "query['%s'] = v" % k
+        exec "query['{0!s}'] = v".format(k)
         # print k, v
 
     result = ore_db.oreWorkerActivities(query)
