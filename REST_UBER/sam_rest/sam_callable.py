@@ -50,7 +50,7 @@ def mongo_motor_insert(jid, huc_ids, np_array, name_temp, section):
     except Exception as e:
         # Ignore mongo not working for now
         # TODO: Add proper identification of Mongo DB issues
-        print "MongoDB not connected for Section %s: %s" % (section, e)
+        print "MongoDB not connected for Section {0!s}: {1!s}".format(section, e)
 
 
 def create_huc_ids_list(np_array_huc_ids):

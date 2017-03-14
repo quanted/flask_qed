@@ -20,8 +20,7 @@ def timeit(method):
         result = method(*args, **kw)
         te = time.time()
 
-        print '%s: Time start = %s, Time end = %s: %2.2f sec' % \
-              (args[0], ts, te, te-ts)
+        print '{0!s}: Time start = {1!s}, Time end = {2!s}: {3:2.2f} sec'.format(args[0], ts, te, te-ts)
         return result
 
     return timed
@@ -43,7 +42,7 @@ def multiprocessing_setup():
             nproc = 16
     except AttributeError:
         pass
-    print "max_workers=%s" % nproc
+    print "max_workers={0!s}".format(nproc)
     return Pool(max_workers=nproc)  # Set number of workers to equal the number of processors available on machine
 
 
@@ -83,7 +82,7 @@ class SamModelCaller(object):
         try:
             self.number_of_rows_list = self.split_csv()
         except Exception as e:
-            print "Split CSV failed: %s \n Using defaults for %s number of processes" % (e, self.no_of_processes)
+            print "Split CSV failed: {0!s} \n Using defaults for {1!s} number of processes".format(e, self.no_of_processes)
 
             # Below are defaults for a set number of processes for Ohio River Valley (HUC12) Region only
             if self.no_of_processes == 1:
@@ -117,7 +116,7 @@ class SamModelCaller(object):
                     153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 167
                 ]
 
-        print 'Started running SAM @ %s' % time.time()
+        print 'Started running SAM @ {0!s}'.format(time.time())
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process
             pool.submit(
                 daily_conc_callable,
@@ -272,9 +271,9 @@ def main():
     else:
         sam = SamModelCaller(jid, name_temp)
 
-    print "JID = %s" % sam.jid
-    print "name_temp = %s" % sam.name_temp
-    print "no_of_processes = %s" % sam.no_of_processes
+    print "JID = {0!s}".format(sam.jid)
+    print "name_temp = {0!s}".format(sam.name_temp)
+    print "no_of_processes = {0!s}".format(sam.no_of_processes)
     sam.sam_multiprocessing()
 
 
