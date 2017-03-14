@@ -447,146 +447,146 @@ def generate_sam_input_file(args, sam_input_file_path):
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Simulation Start Day Index \n" % inputs['sim_date_start_index'])
+        myfile.write("{0!s} !Simulation Start Day Index \n".format(inputs['sim_date_start_index']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Start Julian Day \n" % inputs['sim_date_start_since1900'])
+        myfile.write("{0!s} !Start Julian Day \n".format(inputs['sim_date_start_since1900']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !End Julian Day \n" % inputs['sim_date_end_since1900'])
+        myfile.write("{0!s} !End Julian Day \n".format(inputs['sim_date_end_since1900']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !First year \n" % inputs['sim_date_1st_year'])
+        myfile.write("{0!s} !First year \n".format(inputs['sim_date_1st_year']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !First mth \n" % inputs['sim_date_1st_month'])
+        myfile.write("{0!s} !First mth \n".format(inputs['sim_date_1st_month']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !First day \n" % inputs['sim_date_1st_day'])
+        myfile.write("{0!s} !First day \n".format(inputs['sim_date_1st_day']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Last yr \n" % inputs['sim_date_last_year'])
+        myfile.write("{0!s} !Last yr \n".format(inputs['sim_date_last_year']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !num years \n" % inputs['sim_no_of_years'])
+        myfile.write("{0!s} !num years \n".format(inputs['sim_no_of_years']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Total Number of Simulation Days \n" % inputs['sim_no_of_days'])
+        myfile.write("{0!s} !Total Number of Simulation Days \n".format(inputs['sim_no_of_days']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s \n" % ' '.join(map(str, inputs[
-            'sim_day_index_list'])))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
+        myfile.write("{0!s} \n".format(' '.join(map(str, inputs[
+            'sim_day_index_list']))))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s \n" % ' '.join(map(str, inputs[
-            'sim_day_date_list'])))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
+        myfile.write("{0!s} \n".format(' '.join(map(str, inputs[
+            'sim_day_date_list']))))  # Map the list items to strings and join them together with " " (space); this prints list of strings without quotes around each list item
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Chemical \n" % inputs['chemical_name'])
+        myfile.write("{0!s} !Chemical \n".format(inputs['chemical_name']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Number of Crops \n" % inputs['crop_number'])
+        myfile.write("{0!s} !Number of Crops \n".format(inputs['crop_number']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Crop IDs \n" % ' '.join(map(str, inputs['crop_list_no'])))
+        myfile.write("{0!s} !Crop IDs \n".format(' '.join(map(str, inputs['crop_list_no']))))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s. !Koc or Kd \n" % inputs['koc'])
+        myfile.write("{0!s}. !Koc or Kd \n".format(inputs['koc']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !1=Koc,2=Kd \n" % inputs['coefficient'])
+        myfile.write("{0!s} !1=Koc,2=Kd \n".format(inputs['coefficient']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s. !Soil Half Life \n" % inputs['soil_metabolism_hl'])
+        myfile.write("{0!s}. !Soil Half Life \n".format(inputs['soil_metabolism_hl']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Total Number of Apps \n" % inputs['total_no_of_apps'])
-    except Exception, e:
-        print str(e)
-        myfile.write(' ---ERROR--- \n')
-
-    try:
-        myfile.write("%s !Application num_record \n" % ' '.join(map(str, inputs['app_num_record'])))
-    except Exception, e:
-        print str(e)
-        myfile.write(' ---ERROR--- \n')
-    try:
-        myfile.write("%s !Application Julian dates \n" % ' '.join(map(str, inputs['app_record_day_since_1900'])))
-    except Exception, e:
-        print str(e)
-        myfile.write(' ---ERROR--- \n')
-    try:
-        myfile.write("%s !App mass kg/ha \n" % ' '.join(map(str, inputs['app_rate'])))
-    except Exception, e:
-        print str(e)
-        myfile.write(' ---ERROR--- \n')
-    try:
-        myfile.write("%s !App Method \n" % ' '.join(map(str, inputs['app_method'])))
+        myfile.write("{0!s} !Total Number of Apps \n".format(inputs['total_no_of_apps']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
 
     try:
-        myfile.write("%s !Output type (1=Daily,2=TimeAvg) \n" % inputs['output_type'])
+        myfile.write("{0!s} !Application num_record \n".format(' '.join(map(str, inputs['app_num_record']))))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Averaging period (days) \n" % inputs['output_avg_days'])
+        myfile.write("{0!s} !Application Julian dates \n".format(' '.join(map(str, inputs['app_record_day_since_1900']))))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Time-Avg Output Type (1=AvgConcs, 2=ToxExceed) \n" % inputs['output_time_avg_option'])
+        myfile.write("{0!s} !App mass kg/ha \n".format(' '.join(map(str, inputs['app_rate']))))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Time-Avg Conc Options Selected \n" % inputs['output_time_avg_conc'])
+        myfile.write("{0!s} !App Method \n".format(' '.join(map(str, inputs['app_method']))))
+    except Exception, e:
+        print str(e)
+        myfile.write(' ---ERROR--- \n')
+
+    try:
+        myfile.write("{0!s} !Output type (1=Daily,2=TimeAvg) \n".format(inputs['output_type']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Threshold(ug/L) \n" % inputs['output_tox_value'])
+        myfile.write("{0!s} !Averaging period (days) \n".format(inputs['output_avg_days']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')
     try:
-        myfile.write("%s !Threshold Options Selected \n" % inputs['output_tox_thres_exceed'])
+        myfile.write("{0!s} !Time-Avg Output Type (1=AvgConcs, 2=ToxExceed) \n".format(inputs['output_time_avg_option']))
+    except Exception, e:
+        print str(e)
+        myfile.write(' ---ERROR--- \n')
+    try:
+        myfile.write("{0!s} !Time-Avg Conc Options Selected \n".format(inputs['output_time_avg_conc']))
+    except Exception, e:
+        print str(e)
+        myfile.write(' ---ERROR--- \n')
+    try:
+        myfile.write("{0!s} !Threshold(ug/L) \n".format(inputs['output_tox_value']))
+    except Exception, e:
+        print str(e)
+        myfile.write(' ---ERROR--- \n')
+    try:
+        myfile.write("{0!s} !Threshold Options Selected \n".format(inputs['output_tox_thres_exceed']))
     except Exception, e:
         print str(e)
         myfile.write(' ---ERROR--- \n')

@@ -255,8 +255,8 @@ def callback_avg(temp_sam_run_path, jid, run_type, no_of_processes, args, sectio
 
             sam_db.update_mongo(temp_sam_run_path, jid, run_type, args, section, huc_output)
 
-            logging.info("jid = %s" % jid)
-            logging.info("run_type = %s" % run_type)
+            logging.info("jid = {0!s}".format(jid))
+            logging.info("run_type = {0!s}".format(run_type))
             logging.info("Last SuperPRZMpesticide process completed")
 
             # Remove temporary SAM run directory upon completion

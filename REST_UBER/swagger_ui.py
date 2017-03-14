@@ -190,7 +190,7 @@ class OperationResponses(object):
         }
 
         if not self.valid_code(str(return_code)):
-            raise ValueError('Return status code must be: %s' % self.codes.keys())
+            raise ValueError('Return status code must be: {0!s}'.format(self.codes.keys()))
 
         if schema is None:
             self.schema = {

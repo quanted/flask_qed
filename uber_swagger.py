@@ -80,7 +80,7 @@ def swagger(app):
         # Rule = endpoint URL relative to hostname; needs to have special characters escaped to be defaultdict key
         rule = str(rule)
         for arg in re.findall('(<(.*?\:)?(.*?)>)', rule):
-            rule = rule.replace(arg[0], '{%s}' % arg[2])
+            rule = rule.replace(arg[0], '{{{0!s}}}'.format(arg[2]))
 
         # For each Rule (endpoint) iterate over its HTTP methods (e.g. POST, GET, PUT, etc...)
         for http_method, handler_method in methods.items():
