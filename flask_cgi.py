@@ -385,7 +385,7 @@ def ore_rest_output_query():
 # -------------------- HMS REST API ----------------- #
 
 
-@app.route('/rest/hms/', methods=['POST'])
+@app.route('/hms/rest/', methods=['POST'])
 def hms_rest():
     # url = 'http://134.67.114.8/HMSWS/api/WSHMS/'
     url = os.environ.get('HMS_BACKEND_SERVER')
@@ -393,7 +393,7 @@ def hms_rest():
     result = requests.post(str(url) + '/HMSWS/api/WSHMS/', data=data, timeout=10000)
     return result.content
 
-@app.route('/rest/hms/<submodel>/', methods=['POST'])
+@app.route('/hms/rest/<submodel>/', methods=['POST'])
 def post_hms_submodel_rest(submodel):
     # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel
     url = os.environ.get('HMS_BACKEND_SERVER')
@@ -401,7 +401,7 @@ def post_hms_submodel_rest(submodel):
     result = requests.post(str(url) + '/HMSWS/api/WS' + submodel, data=data, timeout=10000)
     return result.content
 
-@app.route('/rest/hms/<submodel>/<parameters>', methods=['GET'])
+@app.route('/hms/rest/<submodel>/<parameters>', methods=['GET'])
 def get_hms_submodel_rest(submodel, parameters):
     # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel + '/' + parameters
     url = os.environ.get('HMS_BACKEND_SERVER')
