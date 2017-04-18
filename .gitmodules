@@ -1,9 +1,3 @@
 [submodule "ubertool"]
 	path = ubertool
-	url = https://github.com/puruckertom/ubertool.git
-[submodule "untertool"]
-	path = untertool
-	url = https://github.com/puruckertom/untertool.git
-[submodule "poptox"]
-	path = poptox
-	url = https://github.com/puruckertom/poptox.git
+	url = https://github.com/quanted/ubertool.git

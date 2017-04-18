@@ -11,6 +11,7 @@ try:
 except ImportError:
     cors = False
 import pandas as pd
+import requests
 
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
@@ -381,7 +382,39 @@ def ore_rest_output_query():
         }
     })
 
+# -------------------- HMS REST API ----------------- #
+
+
+@app.route('/rest/hms/', methods=['POST'])
+def hms_rest():
+    # url = 'http://134.67.114.8/HMSWS/api/WSHMS/'
+    url = os.environ.get('HMS_BACKEND_SERVER')
+    url += '/HMSWS/api/WSHMS/'
+    data = request.form
+    result = requests.post(url, data=data, timeout=10000)
+    return result.content
+
+@app.route('/rest/hms/<submodel>/', methods=['POST'])
+def post_hms_submodel_rest(submodel):
+    # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel
+    url = os.environ.get('HMS_BACKEND_SERVER')
+    url += '/HMSWS/api/WS' + submodel
+    data = request.form
+    result = requests.post(url, data=data, timeout=10000)
+    return result.content
+
+@app.route('/rest/hms/<submodel>/<parameters>', methods=['GET'])
+def get_hms_submodel_rest(submodel, parameters):
+    # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel + '/' + parameters
+    url = os.environ.get('HMS_BACKEND_SERVER')
+    url += '/HMSWS/api/WS' + submodel + '/' + parameters
+    result = requests.get(url, timeout=10000)
+    return result.content
+
+
+# ---------------------------------------------------- #
 
 if __name__ == '__main__':
     app.run(port=7777, debug=True)  # To run on locahost
     # app.run(host='0.0.0.0', port=7777, debug=True)  # 'host' param needed to expose server publicly w/o NGINX/uWSGI
+
