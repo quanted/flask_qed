@@ -15,11 +15,8 @@ nlcd_landcover = ee.Image('USGS/NLCD/NLCD2011').select("landcover")
 # NLCD landcover legend
 nlcd_legend = ee.FeatureCollection('ft:1Ji3CTnGa3rRy5Te3mXdFmLusmbKBR6tWeaCXpBW1')
 
-# STATSGO component table
-statsgo_component = ee.FeatureCollection('ft:1i4TiQBHdVsljfx2ysBhtGUMhtKPFEz3eg4uFzmXO')
-
-# STATSGO mapunit table
-statsgo_mapunit = ee.FeatureCollection('ft:1euUSuzSUPmEt7mPWdMLa-YSYffEsqXV_PUgpjS-C')
+# STATSGO soil details table
+statsgo_soil_details = ee.FeatureCollection('ft:18lBl-j1mfqDlgAJe_hUP9XVRUYTXojvUeVZJAS_l')
 
 # STATSGO region boundary outlines
 statsgo_outline = ee.FeatureCollection('ft:1IihDoAf456zaFqKe3HwSs3iWjbhzRCCkEp0bIH7V', 'geometry')
@@ -42,20 +39,13 @@ def get_statsgo_region(point):
 
 
 def get_hydrologic_group(musym):
-    mapunit = statsgo_mapunit.filter(ee.Filter.eq("Mapunit Symbol", musym))
-    name = ee.String(mapunit.first().get("Mapunit Name")).split('-|')
-    soil_component = statsgo_component.filter(
-        ee.Filter.eq("Mapunit Key", mapunit.first().get("Mapunit Key"))).filter(
-        ee.Filter.stringContains("Component Name", name.get(0)))
-    return soil_component.first()
+    return statsgo_soil_details.filter(ee.Filter.eq("musym", musym)).first()
 
 
 def get_cn(latitude, longitude):
     def get_region_cn(soil):
-        def is_water(soil):
-            soil = soil.set({"CN": 100})
-            return ee.Feature(soil)
-        def not_water(soil):
+
+        def calculate_region_cn(soil):
             type_keys = ee.Dictionary(type_count.get("landcover"))
             values = ee.Dictionary(type_keys).map(adjusted_cn)
             summed = ee.Number(values.values().reduce(ee.Reducer.sum()))
@@ -72,9 +62,8 @@ def get_cn(latitude, longitude):
         count = nlcd_region.reduceRegion(reducer=ee.Reducer.count(), geometry=point, scale=30)
         musym = soil.get("MUSYM")
         soil_group = get_hydrologic_group(musym)
-        hsg = soil_group.get("Hydrologic Group")
-        cname = ee.String(soil_group.get("Component Name"))
-        cn = ee.Algorithms.If(ee.Algorithms.IsEqual(cname, "Water"), is_water(soil), not_water(soil))
+        hsg = soil_group.get("hydgrpdcd")
+        cn = calculate_region_cn(soil)
         return cn
 
     point = ee.Geometry.Point(ee.List([float(longitude), float(latitude)])).buffer(500)
