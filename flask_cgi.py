@@ -147,10 +147,11 @@ def therps_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '{0!s} = v'.format(k)
+            exec('{0!s} = v'.format(k))
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from therps import therps
-        result = therps.therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
+        # from therps import therps
+        from REST_UBER.therps_rest import therps
+        result = therps.Therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
                                  avian_lc50,
                                  avian_NOAEC, avian_NOAEL,
                                  Species_of_the_tested_bird_avian_ld50,
@@ -177,9 +178,10 @@ def kabam_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '{0!s} = v'.format(k)
+            exec('{0!s} = v'.format(k))
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from kabam import kabam
+        # from kabam import kabam
+        from REST_UBER.therps_rest import kabam
         result = kabam.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
                                 mineau_scaling_factor, x_poc, x_doc, c_ox, w_t, c_ss, oc, k_ow,
                                 Species_of_the_tested_bird, bw_quail, bw_duck, bwb_other, avian_ld50,
@@ -350,7 +352,7 @@ def ore_rest_category_query():
 
     query = {}
     for k, v in request.json.iteritems():
-        exec "query['{0!s}'] = v".format(k)
+        exec("query['{0!s}'] = v".format(k))
         # print k, v
 
     result = ore_db.oreWorkerActivities(query)
@@ -382,34 +384,133 @@ def ore_rest_output_query():
         }
     })
 
-# -------------------- HMS REST API ----------------- #
+"""
+=============================================================================================
+                              HMS REST API
+=============================================================================================
+"""
 
 
 @app.route('/hms/rest/', methods=['POST'])
 def hms_rest():
+    """
+    HMS POST request, generic. Forwarded to HMS backend for data retrieval.
+    :return: json object of the requested dataset.
+    """
     # url = 'http://134.67.114.8/HMSWS/api/WSHMS/'
     url = os.environ.get('HMS_BACKEND_SERVER')
     data = request.form
     result = requests.post(str(url) + '/HMSWS/api/WSHMS/', data=data, timeout=10000)
     return result.content
 
+
 @app.route('/hms/rest/<submodel>/', methods=['POST'])
 def post_hms_submodel_rest(submodel):
+    """
+    HMS POST request, submodel specified. Forwarded to HMS backend for data retrieval.
+    :param submodel: Dataset for requested data.
+    :return: json object of the requested dataset.
+    """
     # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel
     url = os.environ.get('HMS_BACKEND_SERVER')
     data = request.form
     result = requests.post(str(url) + '/HMSWS/api/WS' + submodel, data=data, timeout=10000)
     return result.content
 
+
 @app.route('/hms/rest/<submodel>/<parameters>', methods=['GET'])
 def get_hms_submodel_rest(submodel, parameters):
+    """
+    HMS GET request, submodel specified. Forwarded to HMS backend for data retrieval.
+    :param submodel: Dataset for requested data.
+    :param parameters: Query string containing the required parameters described the in the API.
+    :return: json object of the requested dataset.
+    """
     # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel + '/' + parameters
     url = os.environ.get('HMS_BACKEND_SERVER')
     result = requests.get(str(url) + '/HMSWS/api/WS' + submodel + '/' + parameters, timeout=10000)
     return result.content
 
 
-# ---------------------------------------------------- #
+"""
+=============================================================================================
+                              HMS PYTHON REST API
+=============================================================================================
+"""
+
+
+@app.route('/hms/rest/sim/', methods=['POST'])
+def post_hms_flask_rest():
+    """
+    POST request for hms simulation data.
+    :return: json of simulation data for the specified location and time period.
+    """
+    from modules.hms_flask import surface_runoff_curve_number as cn
+    parameters = request.form
+    if parameters["dataset"] == "curvenumber":
+        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+        return data
+    else:
+        print("ERROR: dataset not curvenumber")
+        return
+
+
+@app.route('/hms/rest/runoff/', methods=['POST'])
+def post_hms_runoff_flask_rest():
+    """
+    POST request for hms runoff data.
+    :return: json of runoff data for the specified location and time period.
+    """
+    from modules.hms_flask import surface_runoff_curve_number as cn
+    parameters = request.form
+    if parameters["dataset"] == "curvenumber":
+        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+        return data
+    else:
+        print("ERROR: dataset not curvenumber")
+        return
+
+
+@app.route('/hms/rest/runoff/<parameters>', methods=['GET'])
+def get_hms_runoff_flask_rest(parameters):
+    """
+    GET request for hms runoff data.
+    :param parameters: query string, requiring: startdate, enddate, latitude and longitude
+    :return: json of runoff data for the specified location and time period.
+    """
+    from modules.hms_flask import surface_runoff_curve_number as cn
+    if parameters["dataset"] == "curvenumber":
+        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+        return data
+    else:
+        print("ERROR: dataset not curvenumber")
+        return
+
+
+@app.route('/hms/rest/timezone/', methods=['POST'])
+def post_hms_timezone():
+    """
+    POST request for timezone data from latitude/longitude values.
+    :return: json of timezone details.
+    """
+    from modules.hms_flask import locate_timezone as timezones
+    parameters = request.form
+    return timezones.get_timezone(parameters["latitude"], parameters["longitude"])
+
+
+@app.route('/hms/rest/timezone/<latitude>&<longitude>', methods=['GET'])
+def get_hms_timezone(latitude, longitude):
+    """
+    GET request for timezone data from latitude/longitude values.
+    :param latitude: Latitude of requested location.
+    :param longitude: Longitude of requested location.
+    :return: json of timezone details.
+    """
+    from modules.hms_flask import locate_timezone as timezones
+    lat = latitude.split('=')
+    lon = longitude.split('=')
+    return timezones.get_timezone(lat[1], lon[1])
+
 
 if __name__ == '__main__':
     app.run(port=7777, debug=True)  # To run on locahost
