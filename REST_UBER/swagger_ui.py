@@ -34,13 +34,23 @@ class PathOperations(object):
 
 
 class Operation(object):
-    def __init__(self, tags=[], summary="", description="", consumes=[], produces=[], parameters=[], responses={}):
+    def __init__(self, tags=None, summary="", description="", consumes=None, produces=None, parameters=None, responses=None):
 
         """
         Operation Object
         :param method: string, HTTP method in lower case (e.g. get, post, put, delete, etc...)
         :param model_name: string, model name in lower case
         """
+        if tags is None:
+            tags = []
+        if consumes is None:
+            consumes = []
+        if produces is None:
+            produces = []
+        if parameters is None:
+            parameters = []
+        if responses is None:
+            responses = {}
         if type(tags) is list:
             self.tags = tags
         else:
