@@ -382,34 +382,142 @@ def ore_rest_output_query():
         }
     })
 
-# -------------------- HMS REST API ----------------- #
+
+"""
+=============================================================================================
+                              HMS REST API
+=============================================================================================
+"""
 
 
 @app.route('/hms/rest/', methods=['POST'])
 def hms_rest():
+    """
+    HMS POST request, generic. Forwarded to HMS backend for data retrieval.
+    :return: json object of the requested dataset.
+    """
     # url = 'http://134.67.114.8/HMSWS/api/WSHMS/'
     url = os.environ.get('HMS_BACKEND_SERVER')
     data = request.form
     result = requests.post(str(url) + '/HMSWS/api/WSHMS/', data=data, timeout=10000)
     return result.content
 
+
 @app.route('/hms/rest/<submodel>/', methods=['POST'])
 def post_hms_submodel_rest(submodel):
+    """
+    HMS POST request, submodel specified. Forwarded to HMS backend for data retrieval.
+    :param submodel: Dataset for requested data.
+    :return: json object of the requested dataset.
+    """
     # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel
     url = os.environ.get('HMS_BACKEND_SERVER')
     data = request.form
     result = requests.post(str(url) + '/HMSWS/api/WS' + submodel, data=data, timeout=10000)
     return result.content
 
+
 @app.route('/hms/rest/<submodel>/<parameters>', methods=['GET'])
 def get_hms_submodel_rest(submodel, parameters):
+    """
+    HMS GET request, submodel specified. Forwarded to HMS backend for data retrieval.
+    :param submodel: Dataset for requested data.
+    :param parameters: Query string containing the required parameters described the in the API.
+    :return: json object of the requested dataset.
+    """
     # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel + '/' + parameters
     url = os.environ.get('HMS_BACKEND_SERVER')
     result = requests.get(str(url) + '/HMSWS/api/WS' + submodel + '/' + parameters, timeout=10000)
     return result.content
 
 
-# ---------------------------------------------------- #
+"""
+=============================================================================================
+                              HMS PYTHON REST API
+=============================================================================================
+"""
+
+#TODO: CurveNumber dates required yyyy-MM-dd format, need to convert any provided date into this format prior to data request
+
+
+@app.route('/hms/rest/sim/', methods=['POST'])
+def post_hms_flask_rest():
+    """
+    POST request for hms simulation data.
+    :return: json of simulation data for the specified location and time period.
+    """
+    from modules.hms_flask import surface_runoff_curve_number as cn
+    parameters = request.form
+    if parameters["dataset"] == "curvenumber":
+        # Date format restriction yyyy-MM-dd
+        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+        return data
+    else:
+        print("ERROR: dataset not curvenumber")
+        return
+
+
+@app.route('/hms/rest/runoff/', methods=['POST'])
+def post_hms_runoff_flask_rest():
+    """
+    POST request for hms runoff data.
+    :return: json of runoff data for the specified location and time period.
+    """
+    from modules.hms_flask import surface_runoff_curve_number as cn
+    parameters = request.form
+    if parameters["dataset"] == "curvenumber":
+        # Date format restriction yyyy-MM-dd
+        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+        return data
+    else:
+        print("ERROR: dataset not curvenumber")
+        return
+
+
+@app.route('/hms/rest/runoff/<parameters>', methods=['GET'])
+def get_hms_runoff_flask_rest(parameters):
+    """
+    GET request for hms runoff data.
+    :param parameters: query string, requiring: startdate, enddate, latitude and longitude
+    :return: json of runoff data for the specified location and time period.
+    """
+    from modules.hms_flask import surface_runoff_curve_number as cn
+    if parameters["dataset"] == "curvenumber":
+        # Date format restriction yyyy-MM-dd
+        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+        return data
+    else:
+        print("ERROR: dataset not curvenumber")
+        return
+
+
+@app.route('/hms/rest/timezone/', methods=['POST'])
+def post_hms_timezone():
+    """
+    POST request for timezone data from latitude/longitude values.
+    :return: json of timezone details.
+    """
+    from modules.hms_flask import locate_timezone as timezones
+    parameters = request.form
+    return timezones.get_timezone(parameters["latitude"], parameters["longitude"])
+
+
+@app.route('/hms/rest/timezone/<latitude>&<longitude>', methods=['GET'])
+def get_hms_timezone(latitude, longitude):
+    """
+    GET request for timezone data from latitude/longitude values.
+    :param latitude: Latitude of requested location.
+    :param longitude: Longitude of requested location.
+    :return: json of timezone details.
+    """
+    from modules.hms_flask import locate_timezone as timezones
+    lat = latitude.split('=')
+    lon = longitude.split('=')
+    return timezones.get_timezone(lat[1], lon[1])
+
+
+
+
 
 if __name__ == '__main__':
     app.run(port=7777, debug=True)  # To run on locahost
