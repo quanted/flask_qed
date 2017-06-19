@@ -60,7 +60,7 @@ def sam(args, jid, run_type):
     # Generate random name for current run
     name_temp = id_generator()
     # name_temp = "B0SNI8"
-    print name_temp
+
 
     # Custom or pre-canned run?
     if args['scenario_selection'] == '0':
@@ -127,10 +127,10 @@ def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
     :return: list, list containing the number of 'rows'/HUC12s for each worker/process, which is passed to SuperPRZM
     """
     if not os.path.exists(temp_sam_run_path):
-        print "Creating SAM run temporary directory: ", \
+
             str(temp_sam_run_path)
         os.makedirs(temp_sam_run_path)
-        print "Creating SAM run temporary sub-directory: ", \
+
             str(os.path.join(temp_sam_run_path, 'output'))
         os.makedirs(os.path.join(temp_sam_run_path, 'output'))
 
@@ -190,11 +190,11 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
 
     # Set "SuperPRZMpesticide.exe" based on OS
     if os.name == 'posix':
-        print "Linux OS"
+
         # Linux / UNIX based OS
         exe = "SuperPRZMpesticide.exe"
     else:
-        print "Windows (really NOT Linux/POSIX) OS"
+
         # Assuming Windows here, could be other tho and this will break
         exe = "SuperPRZMpesticide_win.exe"
 
@@ -203,13 +203,13 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
     pool = Pool(max_workers=no_of_workers)
 
     sam_path = os.path.join(sam_bin_path, 'ubertool_superprzm_src', 'Debug', exe)
-    print sam_path
+
     # Define SuperPRZMpesticide.exe command line arguments
     sam_arg1 = sam_bin_path  # Absolute path to "root" of SAM model
     sam_arg2 = name_temp  # Temp directory name for SAM run
 
     for x in range(no_of_processes):
-        print [sam_path, sam_arg1, sam_arg2, two_digit(x)]
+
         pool.submit(
             subprocess.call,
             [sam_path, sam_arg1, sam_arg2, two_digit(x)]
@@ -223,8 +223,8 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
 
 
 def callback_daily(jid, future):
-    print jid
-    print future.exception()
+
+
 
 
 def callback_avg(temp_sam_run_path, jid, run_type, no_of_processes, args, section, future):
@@ -280,7 +280,7 @@ def sam_daily_results_parser(temp_sam_run_path, jid, run_type, args, section, hu
             jdate = f.read(4)  # Read next 4 bytes (the next Julian Date)
         f.close()
         # Connect to Tornado server to return results
-        # print sam_db.update_mongo_tornado(temp_sam_run_path, jid, run_type, args, section, huc_output)
+        #
 
 
 ##########################################################################################
@@ -336,7 +336,7 @@ def split_csv(number, name_temp):
     :return: None
     """
 
-    print "number = ", number
+
     import pandas as pd
     df = pd.read_csv(os.path.join(
         sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'),
@@ -350,8 +350,8 @@ def split_csv(number, name_temp):
 
     try:
         rows_per_sect = df.shape[0] / number
-        print rows_per_sect
-        print type(rows_per_sect)
+
+
     except:
         number = 1
         rows_per_sect = df.shape[0] / number
@@ -362,15 +362,15 @@ def split_csv(number, name_temp):
     i = 1
     while i <= number:
         if i == 1:
-            print 1
+
             # First slice
             df_slice = df[:rows_per_sect]
         elif i == number:
-            print str(i) + " (last)"
+
             # End slice: slice to the end of the DataFrame
             df_slice = df[((i - 1) * rows_per_sect):]
         else:
-            print i
+
             # Middle slices (not first or last)
             df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
@@ -389,18 +389,18 @@ def empty_global_output_holders():
     # Empty output dictionary if needed
     global huc_output
     if len(huc_output.keys()) is not 0:
-        print "huc_output contains keys....it should not, removing them"
+
         huc_output = {}
     else:
-        print "huc_output is an empty dictionary....proceed normally"
+
 
     # Empty done_list holder if needed
     global done_list
     if len(done_list) is not 0:
-        print "done_list is not empty....it should be, making empty now"
+
         done_list = []
     else:
-        print "done_list is an empty list....proceed normally"
+
 
 
 def update_global_output_holder(temp_sam_run_path, args, section):
@@ -417,7 +417,7 @@ def update_global_output_holder(temp_sam_run_path, args, section):
         )
         output_files = os.listdir(output_file_path)
 
-        print len(output_files)
+
 
         for file in output_files:
             # Read each file in the output directory
@@ -485,4 +485,4 @@ def update_global_output_holder(temp_sam_run_path, args, section):
             except IOError, e:
                 logging.exception(e)
 
-    print len(huc_output.keys())
+

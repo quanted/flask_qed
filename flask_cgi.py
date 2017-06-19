@@ -333,7 +333,7 @@ def ore_rest_load_query(query):
     :return:
     """
     from REST_UBER.ore_rest import ore_db
-    # print query
+    #
 
     result = ore_db.loadChoices(query)
 
@@ -351,7 +351,7 @@ def ore_rest_category_query():
     query = {}
     for k, v in request.json.iteritems():
         exec "query['{0!s}'] = v".format(k)
-        # print k, v
+        #
 
     result = ore_db.oreWorkerActivities(query)
 
@@ -370,7 +370,7 @@ def ore_rest_output_query():
     # query = {}
     # for k, v in request.json.iteritems():
     #     exec "query['%s'] = v" % k
-    #     # print k, v
+    #     #
 
     query_result_list = ore_db.oreOutputQuery(inputs)
     output = ore_rest_model.ore(inputs, query_result_list)

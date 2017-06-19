@@ -20,7 +20,7 @@ def timeit(method):
         result = method(*args, **kw)
         te = time.time()
 
-        print '{0!s}: Time start = {1!s}, Time end = {2!s}: {3:2.2f} sec'.format(args[0], ts, te, te-ts)
+
         return result
 
     return timed
@@ -42,7 +42,7 @@ def multiprocessing_setup():
             nproc = 16
     except AttributeError:
         pass
-    print "max_workers={0!s}".format(nproc)
+
     return Pool(max_workers=nproc)  # Set number of workers to equal the number of processors available on machine
 
 
@@ -56,7 +56,7 @@ class SamModelCaller(object):
         """
 
         self.sam_bin_path = os.path.join(curr_path, 'bin')
-        print self.sam_bin_path
+
         self.jid = jid
         self.name_temp = name_temp
         self.no_of_processes = no_of_processes
@@ -82,7 +82,7 @@ class SamModelCaller(object):
         try:
             self.number_of_rows_list = self.split_csv()
         except Exception as e:
-            print "Split CSV failed: {0!s} \n Using defaults for {1!s} number of processes".format(e, self.no_of_processes)
+
 
             # Below are defaults for a set number of processes for Ohio River Valley (HUC12) Region only
             if self.no_of_processes == 1:
@@ -116,7 +116,7 @@ class SamModelCaller(object):
                     153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 153, 167
                 ]
 
-        print 'Started running SAM @ {0!s}'.format(time.time())
+
         for x in range(self.no_of_processes):  # Loop over all the 'no_of_processes' to fill the process
             pool.submit(
                 daily_conc_callable,
@@ -145,7 +145,7 @@ class SamModelCaller(object):
         :return: list; list with length equal number of csv sections, where each index is number of rows in section
         """
 
-        print "number = ", self.no_of_processes
+
         import pandas as pd
         df = pd.read_csv(os.path.join(
             self.sam_bin_path, 'EcoRecipes_huc12', 'recipe_combos2012', 'huc12_outlets_metric.csv'),
@@ -163,8 +163,8 @@ class SamModelCaller(object):
 
         try:
             rows_per_sect = df.shape[0] / self.no_of_processes
-            print rows_per_sect
-            print type(rows_per_sect)
+
+
         except:
             self.no_of_processes = 1
             rows_per_sect = df.shape[0] / self.no_of_processes
@@ -175,15 +175,15 @@ class SamModelCaller(object):
         i = 1
         while i <= self.no_of_processes:
             if i == 1:
-                print 1
+
                 # First slice
                 df_slice = df[:rows_per_sect]
             elif i == self.no_of_processes:
-                print str(i) + " (last)"
+
                 # End slice: slice to the end of the DataFrame
                 df_slice = df[((i - 1) * rows_per_sect):]
             else:
-                print i
+
                 # Middle slices (not first or last)
                 df_slice = df[((i - 1) * rows_per_sect):i * rows_per_sect]
 
@@ -224,20 +224,20 @@ def daily_conc_callable(jid, sam_bin_path, name_temp, section, array_size=320):
 
     # TODO: Remove these; left to show how it was previously done while testing callable
     # return subprocess.Popen(args).wait()  # Identical to subprocess.call()
-    # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  # Print FORTRAN output to STDOUT...not used anymore; terrible performance
+    # return subprocess.Popen(args, stdout=subprocess.PIPE).communicate()  #
 
     return sam_callable.run(jid, sam_bin_path, name_temp, section, int(array_size))
 
 
 @timeit
 def callback_daily(section, write_output, sam_bin_path, name_temp, future):
-    print "Section: ", section
-    # print future.result()
+
+    #
     if write_output:
-        # print "Writing output - Section: %s" % section
+        #
         # np.savetxt(os.path.join(sam_bin_path, name_temp, '_' + section + '.csv'), future.result(), delimiter=',')
         np.savez(os.path.join(sam_bin_path, name_temp, '_' + section), future.result())
-        # print "Finished writing output - Section: %s" % section
+        #
 
 
 def create_number_of_rows_list(list_string):
@@ -271,9 +271,9 @@ def main():
     else:
         sam = SamModelCaller(jid, name_temp)
 
-    print "JID = {0!s}".format(sam.jid)
-    print "name_temp = {0!s}".format(sam.name_temp)
-    print "no_of_processes = {0!s}".format(sam.no_of_processes)
+
+
+
     sam.sam_multiprocessing()
 
 
