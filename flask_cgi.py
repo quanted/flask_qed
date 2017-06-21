@@ -352,14 +352,8 @@ def ore_rest_category_query():
 
     query = {}
     for k, v in request.json.iteritems():
-<<<<<<< HEAD
-        exec "query['{0!s}'] = v".format(k)
-        #
-=======
         exec("query['{0!s}'] = v".format(k))
         # print k, v
->>>>>>> dev
-
     result = ore_db.oreWorkerActivities(query)
 
     return json.dumps({"result": result})
