@@ -159,4 +159,3 @@ def get_cn_runoff(startdate, enddate, latitude, longitude):
     result = '{"source": "Weighted Curve Number", "dataset": "Surface Runoff", "metadata": ' + \
              json.dumps(result_metadata) + ', "data": ' + json.dumps(result_runoff) + '}'
     return result
-
