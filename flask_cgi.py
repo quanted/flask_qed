@@ -147,10 +147,11 @@ def therps_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '{0!s} = v'.format(k)
+            exec('{0!s} = v'.format(k))
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from therps import therps
-        result = therps.therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
+        # from therps import therps
+        from REST_UBER.therps_rest import therps
+        result = therps.Therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
                                  avian_lc50,
                                  avian_NOAEC, avian_NOAEL,
                                  Species_of_the_tested_bird_avian_ld50,
@@ -177,9 +178,10 @@ def kabam_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '{0!s} = v'.format(k)
+            exec('{0!s} = v'.format(k))
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from kabam import kabam
+        # from kabam import kabam
+        from REST_UBER.therps_rest import kabam
         result = kabam.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
                                 mineau_scaling_factor, x_poc, x_doc, c_ox, w_t, c_ss, oc, k_ow,
                                 Species_of_the_tested_bird, bw_quail, bw_duck, bwb_other, avian_ld50,
@@ -350,9 +352,8 @@ def ore_rest_category_query():
 
     query = {}
     for k, v in request.json.iteritems():
-        exec "query['{0!s}'] = v".format(k)
-        #
-
+        exec("query['{0!s}'] = v".format(k))
+        # print k, v
     result = ore_db.oreWorkerActivities(query)
 
     return json.dumps({"result": result})
@@ -381,7 +382,6 @@ def ore_rest_output_query():
                 "output": output
         }
     })
-
 
 """
 =============================================================================================
@@ -438,8 +438,6 @@ def get_hms_submodel_rest(submodel, parameters):
 """
 
 #TODO: CurveNumber dates required yyyy-MM-dd format, need to convert any provided date into this format prior to data request
-
-
 @app.route('/hms/rest/sim/', methods=['POST'])
 def post_hms_flask_rest():
     """
@@ -514,9 +512,6 @@ def get_hms_timezone(latitude, longitude):
     lat = latitude.split('=')
     lon = longitude.split('=')
     return timezones.get_timezone(lat[1], lon[1])
-
-
-
 
 
 if __name__ == '__main__':
