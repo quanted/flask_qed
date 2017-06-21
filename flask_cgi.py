@@ -438,7 +438,7 @@ def get_hms_submodel_rest(submodel, parameters):
 =============================================================================================
 """
 
-
+#TODO: CurveNumber dates required yyyy-MM-dd format, need to convert any provided date into this format prior to data request
 @app.route('/hms/rest/sim/', methods=['POST'])
 def post_hms_flask_rest():
     """
@@ -448,6 +448,7 @@ def post_hms_flask_rest():
     from modules.hms_flask import surface_runoff_curve_number as cn
     parameters = request.form
     if parameters["dataset"] == "curvenumber":
+        # Date format restriction yyyy-MM-dd
         data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
         return data
     else:
@@ -464,6 +465,7 @@ def post_hms_runoff_flask_rest():
     from modules.hms_flask import surface_runoff_curve_number as cn
     parameters = request.form
     if parameters["dataset"] == "curvenumber":
+        # Date format restriction yyyy-MM-dd
         data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
         return data
     else:
@@ -480,6 +482,7 @@ def get_hms_runoff_flask_rest(parameters):
     """
     from modules.hms_flask import surface_runoff_curve_number as cn
     if parameters["dataset"] == "curvenumber":
+        # Date format restriction yyyy-MM-dd
         data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
         return data
     else:

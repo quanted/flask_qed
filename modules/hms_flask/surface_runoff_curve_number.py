@@ -1,6 +1,6 @@
 """
 HMS Curve Number Runoff module
-
+Google Earth Engine Script
 - all fusion tables have been made public.
 """
 
@@ -19,30 +19,60 @@ nlcd_legend = ee.FeatureCollection('ft:1Ji3CTnGa3rRy5Te3mXdFmLusmbKBR6tWeaCXpBW1
 statsgo_soil_details = ee.FeatureCollection('ft:18lBl-j1mfqDlgAJe_hUP9XVRUYTXojvUeVZJAS_l')
 
 # STATSGO region boundary outlines
-statsgo_outline = ee.FeatureCollection('ft:1IihDoAf456zaFqKe3HwSs3iWjbhzRCCkEp0bIH7V', 'geometry')
+# OBSOLETE with updated get_statsgo_region function
+# statsgo_outline = ee.FeatureCollection('ft:1IihDoAf456zaFqKe3HwSs3iWjbhzRCCkEp0bIH7V', 'geometry')
 
 
-def get_statsgo_region(point):
-    region = statsgo_outline.filterBounds(point).first().get('name').getInfo()
-    if (region == "East"):
-        return ee.FeatureCollection('ft:1oP38-oNfwi63LGT6zmLRIzdYNrKXlehCh72PUrxp', 'geometry').filterBounds(point)
-    elif (region == "MidEast"):
-        return ee.FeatureCollection('ft:12pF1gr-Emrv2pbu0-0NLpCvCB0ubgFD2oz_OETqx', 'geometry').filterBounds(point)
-    elif (region == "Mid"):
-        return ee.FeatureCollection('ft:1p16uUd4oPisU-wcJMG5beBaHQUcbQ4i7vOkgAGrH', 'geometry').filterBounds(point)
-    elif (region == "MidWest"):
-        return ee.FeatureCollection('ft:1FsTaBtg8Xig38Y6Hcp7gbe2KFAT0kD0JRLNSnI7C', 'geometry').filterBounds(point)
-    elif (region == "West"):
-        return ee.FeatureCollection('ft:1BilByJX_OWOy0X1OqSAOwKfRlUpioVumKbSs8jRM', 'geometry').filterBounds(point)
-    else:
-        return
+def get_statsgo_region(geometry):
+    """
+    Gets the statsgo geometries that intersect with the provided geometry.
+    :param geometry: Input geometry.
+    :return: FeatureCollection containing all intersecting geomteries.
+    """
+    # region = statsgo_outline.filterBounds(point).first().get('name').getInfo()
+    # if (region == "East"):
+    #     return ee.FeatureCollection('ft:1oP38-oNfwi63LGT6zmLRIzdYNrKXlehCh72PUrxp', 'geometry').filterBounds(point)
+    # elif (region == "MidEast"):
+    #     return ee.FeatureCollection('ft:12pF1gr-Emrv2pbu0-0NLpCvCB0ubgFD2oz_OETqx', 'geometry').filterBounds(point)
+    # elif (region == "Mid"):
+    #     return ee.FeatureCollection('ft:1p16uUd4oPisU-wcJMG5beBaHQUcbQ4i7vOkgAGrH', 'geometry').filterBounds(point)
+    # elif (region == "MidWest"):
+    #     return ee.FeatureCollection('ft:1FsTaBtg8Xig38Y6Hcp7gbe2KFAT0kD0JRLNSnI7C', 'geometry').filterBounds(point)
+    # elif (region == "West"):
+    #     return ee.FeatureCollection('ft:1BilByJX_OWOy0X1OqSAOwKfRlUpioVumKbSs8jRM', 'geometry').filterBounds(point)
+    # else:
+    #     return
+
+    # Checks all statsgo regions if they contain any intersecting geometries with the given geometry.
+    # Resolves possible boundary errors.
+    statsgo_east = ee.FeatureCollection("ft:1oP38-oNfwi63LGT6zmLRIzdYNrKXlehCh72PUrxp", 'geometry').filterBounds(geometry)
+    statsgo_mideast = ee.FeatureCollection("ft:12pF1gr-Emrv2pbu0-0NLpCvCB0ubgFD2oz_OETqx", 'geometry').filterBounds(geometry)
+    statsgo_mid = ee.FeatureCollection('ft:1p16uUd4oPisU-wcJMG5beBaHQUcbQ4i7vOkgAGrH', 'geometry').filterBounds(geometry)
+    statsgo_midwest = ee.FeatureCollection('ft:1FsTaBtg8Xig38Y6Hcp7gbe2KFAT0kD0JRLNSnI7C', 'geometry').filterBounds(geometry)
+    statsgo_west = ee.FeatureCollection('ft:1BilByJX_OWOy0X1OqSAOwKfRlUpioVumKbSs8jRM', 'geometry').filterBounds(geometry)
+
+    # Merges all the FeatureCollections of statsgo geometries into a single FeatureCollection.
+    return statsgo_east.merge(statsgo_mideast).merge(statsgo_mid).merge(statsgo_midwest).merge(statsgo_west)
 
 
 def get_hydrologic_group(musym):
+    """
+    Gets the Hydrologic Soil Group details.
+    :param musym: Map unit symbol.
+    :return: Feature containing the HSG details.
+    """
+    # Filter returns a FeatureCollection of one element, first() gets that single feature element.
     return statsgo_soil_details.filter(ee.Filter.eq("musym", musym)).first()
 
 
 def get_cn(latitude, longitude):
+    """
+    Finds the curve number for a given latitude/longitude coordinate.
+    TODO: Change functions to accept geometry, define geometry prior to function to allow for HUC and custom defined geometries.
+    :param latitude: Requested latitude coordinate.
+    :param longitude: Requested longitude coordinate.
+    :return: Curve Number value
+    """
     def get_region_cn(soil):
 
         def calculate_region_cn(soil):
@@ -58,12 +88,16 @@ def get_cn(latitude, longitude):
             a = ee.Dictionary(ee.Dictionary(type_count).get("landcover")).get(key)
             acn = ee.Number(a).multiply(ee.Number(cn))
             return acn
+        def water_area(soil):
+            soil = soil.set({"CN": 100})
+            return ee.Feature(soil)
         type_count = nlcd_region.reduceRegion(reducer=ee.Reducer.frequencyHistogram(), geometry=point, scale=30)
         count = nlcd_region.reduceRegion(reducer=ee.Reducer.count(), geometry=point, scale=30)
         musym = soil.get("MUSYM")
         soil_group = get_hydrologic_group(musym)
         hsg = soil_group.get("hydgrpdcd")
-        cn = calculate_region_cn(soil)
+        cn = ee.Algorithms.If(ee.Algorithms.IsEqual(musym, "s8369"), water_area(soil), calculate_region_cn(soil))
+        # cn = calculate_region_cn(soil)
         return cn
 
     point = ee.Geometry.Point(ee.List([float(longitude), float(latitude)])).buffer(500)
@@ -125,4 +159,3 @@ def get_cn_runoff(startdate, enddate, latitude, longitude):
     result = '{"source": "Weighted Curve Number", "dataset": "Surface Runoff", "metadata": ' + \
              json.dumps(result_metadata) + ', "data": ' + json.dumps(result_runoff) + '}'
     return result
-

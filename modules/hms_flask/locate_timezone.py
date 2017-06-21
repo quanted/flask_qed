@@ -1,5 +1,10 @@
 """
+<<<<<<< HEAD
 HMS Locate Timezone from lat/lon coordinates using GEE
+=======
+HMS Locate Timezone from lat/lon coordinates
+Google Earth Engine Script
+>>>>>>> dev
 """
 
 import ee, json
