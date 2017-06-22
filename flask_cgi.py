@@ -15,6 +15,7 @@ import requests
 
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
+from REST_UBER import sam_rest as sam
 from REST_UBER import agdrift_rest as agdrift
 from REST_UBER import stir_rest as stir
 from REST_UBER import trex_rest as trex
@@ -47,7 +48,7 @@ _ACTIVE_MODELS = (
     'iec',
     'eathworm',
     'rice',
-    'sam',
+    'sam_new',
     'agdrift',
     'beerex',
     'kabam'
@@ -68,7 +69,7 @@ class ModelCaller(Resource):
         if model in _ACTIVE_MODELS:
             try:
                 # Dynamically import the model Python module
-                model_module = importlib.import_module('.' + model, model)
+                model_module = importlib.import_module('ubertool_ecorest.ubertool.ubertool.' + model)
                 logging.info('============= ' + model)
                 # Set the model Object to a local variable (class name = model)
                 model_cap = model.capitalize()
@@ -214,11 +215,11 @@ def kabam_rest(jid):
     except Exception as e:
         return rest_error_message(e, jid)
 
-
-@app.route('/rest/ubertool/sam/<jid>', methods=['POST'])
+"""
+@app.route('/rest/ubertool/sam_new/<jid>', methods=['POST'])
 def sam_rest(jid):
     try:
-        import REST_UBER.sam_rest.sam_rest_model as sam
+        import REST_UBER.sam_rest.sam_rest_model as sam_new
 
         try:
             post_payload = request.json
@@ -238,7 +239,7 @@ def sam_rest(jid):
 
             logging.info(inputs_json)
 
-            result_json_tuple = sam.sam(inputs_json, jid, run_type)
+            result_json_tuple = sam_new.sam_new(inputs_json, jid, run_type)
 
         # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
         # inputs_json = json.loads(result_json_tuple[0])
@@ -256,13 +257,15 @@ def sam_rest(jid):
 
     except Exception as e:
         return rest_error_message(e, jid)
-
+    """
 
 # Declare endpoints for each model
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
 api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
+api.add_resource(sam.SamGet, '/rest/ubertool/sam_new/')
+api.add_resource(sam.SamPost, '/rest/ubertool/sam_new/<string:jobId>')
 api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
 api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
 api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
@@ -283,7 +286,7 @@ api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
 api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
 api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
 api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
-api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 @app.route("/api/spec/")

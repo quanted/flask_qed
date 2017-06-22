@@ -93,7 +93,7 @@ def sam(args, jid, run_type):
                     split_csv(no_of_processes, name_temp)
                     sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type)
 
-            except ImportError, e:
+            except ImportError as e:
                 logging.exception(e)
 
                 """
@@ -108,7 +108,7 @@ def sam(args, jid, run_type):
 
             return jid
 
-        except Exception, e:
+        except Exception as e:
             logging.exception(e)
             return {'user_id': 'admin', 'result': {'error': str(e)}, '_id': jid}
     else:
@@ -128,16 +128,16 @@ def sam_input_prep(no_of_processes, name_temp, temp_sam_run_path, args):
     """
     if not os.path.exists(temp_sam_run_path):
 
-            str(temp_sam_run_path)
+        str(temp_sam_run_path)
         os.makedirs(temp_sam_run_path)
 
-            str(os.path.join(temp_sam_run_path, 'output'))
+        str(os.path.join(temp_sam_run_path, 'output'))
         os.makedirs(os.path.join(temp_sam_run_path, 'output'))
 
-    sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
+        sam_input_file_path = os.path.join(temp_sam_run_path, 'SAM.inp')
 
-    # Generate "SAM.inp" file and return list of 'Julian' days for the simulation
-    list_of_julian_days = sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
+        # Generate "SAM.inp" file and return list of 'Julian' days for the simulation
+        list_of_julian_days = sam_input_generator.generate_sam_input_file(args, sam_input_file_path)
 
     for x in range(no_of_processes):
         shutil.copyfile(sam_input_file_path, os.path.join(temp_sam_run_path, 'SAM' + two_digit(x) + '.inp'))
@@ -171,8 +171,8 @@ def sam_daily_conc(jid, no_of_processes, name_temp):
     pool.shutdown(wait=False)
 
     # import sam_multiprocessing as mp
-    # sam = mp.SamModelCaller(name_temp, number_of_rows_list)
-    # sam.sam_multiprocessing()
+    # sam_new = mp.SamModelCaller(name_temp, number_of_rows_list)
+    # sam_new.sam_multiprocessing()
 
 
 def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, args, jid, run_type):
@@ -222,7 +222,7 @@ def sam_avg_conc(no_of_processes, no_of_workers, name_temp, temp_sam_run_path, a
     pool.shutdown(wait=False)
 
 
-def callback_daily(jid, future):
+#def callback_daily(jid, future):
 
 
 
@@ -392,7 +392,7 @@ def empty_global_output_holders():
 
         huc_output = {}
     else:
-
+        pass
 
     # Empty done_list holder if needed
     global done_list
@@ -400,7 +400,7 @@ def empty_global_output_holders():
 
         done_list = []
     else:
-
+        pass
 
 
 def update_global_output_holder(temp_sam_run_path, args, section):
@@ -476,13 +476,13 @@ def update_global_output_holder(temp_sam_run_path, args, section):
                     try:
                         huc_output[line_list[0]] = line_list[1:]
 
-                    except IndexError, e:
+                    except IndexError as e:
                         logging.info(line_list)
                         logging.exception(e)
 
                 f_out.close()
 
-            except IOError, e:
+            except IOError as e:
                 logging.exception(e)
 
 

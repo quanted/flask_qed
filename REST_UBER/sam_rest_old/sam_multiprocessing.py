@@ -54,7 +54,7 @@ class SamModelCaller(object):
         :param number_of_rows_list: list
         :param no_of_processes: int
         """
-
+        print("fack")
         self.sam_bin_path = os.path.join(curr_path, 'bin')
 
         self.jid = jid
