@@ -48,7 +48,7 @@ _ACTIVE_MODELS = (
     'iec',
     'eathworm',
     'rice',
-    'sam_new',
+    'sam',
     'agdrift',
     'beerex',
     'kabam'
@@ -216,10 +216,10 @@ def kabam_rest(jid):
         return rest_error_message(e, jid)
 
 """
-@app.route('/rest/ubertool/sam_new/<jid>', methods=['POST'])
+@app.route('/rest/ubertool/sam/<jid>', methods=['POST'])
 def sam_rest(jid):
     try:
-        import REST_UBER.sam_rest.sam_rest_model as sam_new
+        import REST_UBER.sam_rest.sam_rest_model as sam
 
         try:
             post_payload = request.json
@@ -239,7 +239,7 @@ def sam_rest(jid):
 
             logging.info(inputs_json)
 
-            result_json_tuple = sam_new.sam_new(inputs_json, jid, run_type)
+            result_json_tuple = sam.sam(inputs_json, jid, run_type)
 
         # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
         # inputs_json = json.loads(result_json_tuple[0])
@@ -264,8 +264,8 @@ def sam_rest(jid):
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
 api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
-api.add_resource(sam.SamGet, '/rest/ubertool/sam_new/')
-api.add_resource(sam.SamPost, '/rest/ubertool/sam_new/<string:jobId>')
+api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
+api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
 api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
 api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
 api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')

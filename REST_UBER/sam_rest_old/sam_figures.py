@@ -39,7 +39,7 @@ def sam_figures_callable(jid, output_type, time_avg_option, tox_exceed_option, h
 
 ## Average streak by month boxplot
 def GenerateSAM_MonthStreakBoxplot(jobid, huc_output):
-    # get sam_new monthly data array of streaks
+    # get sam monthly data array of streaks
     # sam_vector = sam_dataqueries.GetSAM_MonthlyArrayStreakOutput(jobid)
 
     # convert dictionary to numpy array using pandas dataframe
@@ -91,7 +91,7 @@ def GenerateSAM_MonthStreakBoxplot(jobid, huc_output):
 
 ## Average streak by year boxplot
 def GenerateSAM_AnnualStreakBoxplot(jobid):
-    # get sam_new annual data array of streaks
+    # get sam annual data array of streaks
     sam_vector = sam_dataqueries.GetSAM_AnnualArrayStreakOutput(jobid)
 
     # Create a figure instance
@@ -145,7 +145,7 @@ def GenerateSAM_AnnualStreakBoxplot(jobid):
 
 ## Average streak by month boxplot
 def GenerateSAM_MonthFreqofExceedBoxplot(jobid):
-    # get sam_new monthly data array of streaks
+    # get sam monthly data array of streaks
     sam_vector = sam_dataqueries.GetSAM_MonthlyArrayFreqofExceedOutput(jobid)
 
     # Create a figure instance
@@ -190,7 +190,7 @@ def GenerateSAM_MonthFreqofExceedBoxplot(jobid):
 
 ## Average streak by year boxplot
 def GenerateSAM_AnnualFreqofExceedBoxplot(jobid):
-    # get sam_new annual data array of streaks
+    # get sam annual data array of streaks
     sam_vector = sam_dataqueries.GetSAM_AnnualArrayFreqofExceedOutput(jobid)
 
     # Create a figure instance
@@ -248,7 +248,7 @@ def GenerateSAM_AnnualFreqofExceedBoxplot(jobid):
 
 ## Histogram of monthly streaks
 def GenerateSAM_MonthStreakHistogram(jobid):
-    # get sam_new data vector of streaks
+    # get sam data vector of streaks
     sam_vector = sam_dataqueries.GetSAM_MonthlyVectorStreakOutput(jobid)
 
     # Create a second figure instance
@@ -284,7 +284,7 @@ def GenerateSAM_MonthStreakHistogram(jobid):
 
 ## Histogram of annual streaks
 def GenerateSAM_AnnualStreakHistogram(jobid):
-    # get sam_new data vector of streaks
+    # get sam data vector of streaks
     sam_vector = sam_dataqueries.GetSAM_AnnualVectorStreakOutput(jobid)
 
     # Create a second figure instance
@@ -320,7 +320,7 @@ def GenerateSAM_AnnualStreakHistogram(jobid):
 
 ## Histogram of monthly frequency of exceedances
 def GenerateSAM_MonthFreqofExceedHistogram(jobid):
-    # get sam_new data vector of streaks
+    # get sam data vector of streaks
     sam_vector = sam_dataqueries.GetSAM_MonthlyVectorFreqofExceedOutput(jobid)
 
     # Create a second figure instance
@@ -356,7 +356,7 @@ def GenerateSAM_MonthFreqofExceedHistogram(jobid):
 
 ## Histogram of annual frequency of exceedances
 def GenerateSAM_AnnualFreqofExceedHistogram(jobid):
-    # get sam_new data vector of streaks
+    # get sam data vector of streaks
     sam_vector = sam_dataqueries.GetSAM_AnnualVectorFreqofExceedOutput(jobid)
 
     # Create a second figure instance
@@ -395,7 +395,7 @@ def GenerateSAM_AnnualFreqofExceedHistogram(jobid):
 ##########################################################
 ## huc time series for monthly average streak
 def GenerateSAM_MonthStreakHUCPlot(jobid, hucid):
-    # get sam_new streak data for a particular huc
+    # get sam streak data for a particular huc
     sam_huc = sam_dataqueries.GetSAM_MonthlyHUCStreakOutput(jobid, hucid)
 
     # month info
@@ -440,7 +440,7 @@ def GenerateSAM_MonthStreakHUCPlot(jobid, hucid):
 
 ## huc time series for annual average streak
 def GenerateSAM_AnnualStreakHUCPlot(jobid, hucid):
-    # get sam_new streak data for a particular huc
+    # get sam streak data for a particular huc
     sam_huc = sam_dataqueries.GetSAM_AnnualHUCStreakOutput(jobid, hucid)
 
     # month info
@@ -491,7 +491,7 @@ def GenerateSAM_AnnualStreakHUCPlot(jobid, hucid):
 
 ## huc time series for monthly average streak
 def GenerateSAM_MonthFreqofExceedHUCPlot(jobid, hucid):
-    # get sam_new streak data for a particular huc
+    # get sam streak data for a particular huc
     sam_huc = sam_dataqueries.GetSAM_MonthlyHUCFreqofExceedOutput(jobid, hucid)
 
     # month info
@@ -536,7 +536,7 @@ def GenerateSAM_MonthFreqofExceedHUCPlot(jobid, hucid):
 
 ## huc time series for annual average streak
 def GenerateSAM_AnnualFreqofExceedHUCPlot(jobid, hucid):
-    # get sam_new streak data for a particular huc
+    # get sam streak data for a particular huc
     sam_huc = sam_dataqueries.GetSAM_AnnualHUCFreqofExceedOutput(jobid, hucid)
 
     # month info

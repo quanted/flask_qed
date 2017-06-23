@@ -6,7 +6,7 @@ from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 class SamHandler(Resource):
     def __init__(self):
-        self.name = "sam_new"
+        self.name = "sam"
 
     @staticmethod
     def get_model_inputs():
