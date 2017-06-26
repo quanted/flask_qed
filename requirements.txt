@@ -15,7 +15,7 @@ pandas
 scipy
 psutil
 pylint
-pymongo==2.8.0
+pymongo
 python-coveralls
 pytz
 requests

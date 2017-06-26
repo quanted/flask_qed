@@ -45,7 +45,7 @@ class SipPost(SipHandler):
         :return:
         """
         inputs = rest_validation.parse_inputs(request.json)
-
+        print("SipPost")
         if inputs:
             return rest_model_caller.model_run(self.name, jobId, inputs, module=sip)
         else:
