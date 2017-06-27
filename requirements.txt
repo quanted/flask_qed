@@ -20,6 +20,6 @@ python-coveralls
 pytz
 requests
 sqlalchemy
-sqlalchemy_utils
+# sqlalchemy_utils
 tabulate
 twine
