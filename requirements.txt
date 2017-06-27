@@ -3,7 +3,7 @@ codecov==2.0.9
 coverage==4.4.1
 coveralls==1.1
 flask==0.12.2
-flask_restful
+flask-restful==0.3.6
 flask_swagger
 futures
 nose
