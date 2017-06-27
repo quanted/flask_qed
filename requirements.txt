@@ -19,7 +19,7 @@ python-coveralls==2.9.1
 pytz==2017.2
 requests==2.18.1
 snakefood==1.4
-sqlalchemy
+sqlalchemy==1.1.11
 sqlalchemy_utils
 tabulate
 twine
