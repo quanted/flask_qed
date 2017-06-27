@@ -1,5 +1,5 @@
 boto==2.47.0
-codecov
+codecov==2.0.9
 coverage
 coveralls
 flask
