@@ -1,4 +1,4 @@
-boto
+boto==2.47.0
 codecov
 coverage
 coveralls
