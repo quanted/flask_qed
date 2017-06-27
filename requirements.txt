@@ -22,4 +22,4 @@ snakefood==1.4
 sqlalchemy==1.1.11
 sqlalchemy-utils==0.32.14
 tabulate==0.7.7
-twine
+twine==1.9.1
