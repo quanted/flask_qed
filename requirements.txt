@@ -20,6 +20,6 @@ pytz==2017.2
 requests==2.18.1
 snakefood==1.4
 sqlalchemy==1.1.11
-sqlalchemy_utils
+sqlalchemy-utils==0.32.14
 tabulate
 twine
