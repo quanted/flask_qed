@@ -3,8 +3,10 @@ import json
 import logging
 import os
 import sys
+import tabulate
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
+#import flask_restful
 try:
     from flask_cors import CORS
     cors = True
