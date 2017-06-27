@@ -18,7 +18,7 @@ pymongo==3.4.0
 python-coveralls==2.9.1
 pytz==2017.2
 requests==2.18.1
-snakefood
+snakefood==1.4
 sqlalchemy
 sqlalchemy_utils
 tabulate
