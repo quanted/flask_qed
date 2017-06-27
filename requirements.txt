@@ -12,7 +12,7 @@ numpy==1.13.0
 pandas==0.20.2
 numpy==1.13.0
 scipy==0.19.1
-psutil
+psutil==5.2.2
 pylint
 pymongo==2.8.0
 python-coveralls
