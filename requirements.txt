@@ -1,6 +1,6 @@
 boto==2.47.0
 codecov==2.0.9
-coverage
+coverage==4.4.1
 coveralls
 flask
 flask_restful
