@@ -30,14 +30,14 @@ def sam():
     curr_dir = os.path.dirname(os.path.realpath(__file__))
     exe = "SuperPRZMpesticide_win.exe"
     sam_path = os.path.join(curr_dir, 'bin', 'ubertool_superprzm_src', 'Debug', exe)
-    print sam_path
+
     sam_args = os.path.join(curr_dir, 'bin')
     a = subprocess.Popen(sam_path + " " + sam_args, shell=1)
     a.wait()
-    print "Done"
+
 
     name_temp = id_generator()
-    print name_temp
+
 
     ##zip the output files
     zout = zipfile.ZipFile("temp.zip", "w", zipfile.ZIP_DEFLATED)
@@ -46,7 +46,7 @@ def sam():
     #         zout.write(name)
     superPRZM_ouput = os.path.join(curr_dir, 'bin', 'dwPestOut_all', 'dwPestOut_SoilGrps', 'Reservoirs',
                                    '1838_pestAvgConc_distrib.out')
-    print superPRZM_ouput
+
     zout.write(superPRZM_ouput, os.path.basename(superPRZM_ouput))
     zout.close()
 
@@ -59,11 +59,11 @@ def sam():
     name1 = 'SAM_' + name_temp + '.zip'
     k.key = name1
     link = 'https://s3.amazonaws.com/super_przm/' + name1
-    print link
+
 
     ##Upload zip file to S3
     k.set_contents_from_filename('temp.zip')
     k.set_acl('public-read-write')
-    print 'upload finished'
+
 
     return link, "Done!"

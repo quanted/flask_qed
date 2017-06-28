@@ -15,7 +15,7 @@ def run(jid, sam_bin_path, name_temp, section, array_size):
     # np_array_out = np.random.rand(50,3)  # Dummy NumPy data
 
     # Run SuperPRZM as DLL
-    print "sam_bin_path: ", sam_bin_path
+
 
     if _dll_loaded:
         np_array_huc_ids, np_array_out = superprzm.runmain.run(sam_bin_path, name_temp, section, array_size)
@@ -46,11 +46,11 @@ def mongo_motor_insert(jid, huc_ids, np_array, name_temp, section):
         # Send data to Mongo server
         requests.post(url, data=data, headers=http_headers)
     except requests.exceptions.RequestException as req_e:
-        print str(req_e)
+
     except Exception as e:
         # Ignore mongo not working for now
         # TODO: Add proper identification of Mongo DB issues
-        print "MongoDB not connected for Section {0!s}: {1!s}".format(section, e)
+
 
 
 def create_huc_ids_list(np_array_huc_ids):

@@ -17,7 +17,7 @@ static_path = os.path.join(os.environ['PROJECT_ROOT'], '..', 'static')
 #################################################
 # generate boxplots
 #################################################
-# from sam_rest import sam_dataqueries
+# from sam_rest_old import sam_dataqueries
 
 
 def sam_figures_callable(jid, output_type, time_avg_option, tox_exceed_option, huc_output):

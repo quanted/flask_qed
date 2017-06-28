@@ -177,7 +177,7 @@ def update_postgres(jid, args, huc_output):
             user=keys_Picloud_S3.postgres_user,
             password=keys_Picloud_S3.postgres_pwd
         )
-    except pg.OperationalError, e:
+    except pg.OperationalError as e:
         logging.exception(e)
         return None
 
@@ -195,8 +195,8 @@ def update_postgres(jid, args, huc_output):
         for item in data_list:  # Concatenate list items into 1 single tuple = (k, v1, v2, v3, etc..)
             tup_1 = (item[0],)
             data_list[i] = tup_1 + tuple(item[1])
-            # print data_list[i]
-            # print len(data_list[i])
+            #
+            #
             i += 1
 
         if args['output_tox_thres_exceed'] in ('1', '3'):  # By year

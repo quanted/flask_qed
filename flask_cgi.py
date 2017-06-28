@@ -3,8 +3,10 @@ import json
 import logging
 import os
 import sys
+import tabulate
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
+#import flask_restful
 try:
     from flask_cors import CORS
     cors = True
@@ -15,6 +17,7 @@ import requests
 
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import sip_rest as sip
+from REST_UBER import sam_rest as sam
 from REST_UBER import agdrift_rest as agdrift
 from REST_UBER import stir_rest as stir
 from REST_UBER import trex_rest as trex
@@ -68,7 +71,7 @@ class ModelCaller(Resource):
         if model in _ACTIVE_MODELS:
             try:
                 # Dynamically import the model Python module
-                model_module = importlib.import_module('.' + model, model)
+                model_module = importlib.import_module('ubertool_ecorest.ubertool.ubertool.' + model)
                 logging.info('============= ' + model)
                 # Set the model Object to a local variable (class name = model)
                 model_cap = model.capitalize()
@@ -147,10 +150,11 @@ def therps_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '{0!s} = v'.format(k)
+            exec('{0!s} = v'.format(k))
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from therps import therps
-        result = therps.therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
+        # from therps import therps
+        from REST_UBER.therps_rest import therps
+        result = therps.Therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
                                  avian_lc50,
                                  avian_NOAEC, avian_NOAEL,
                                  Species_of_the_tested_bird_avian_ld50,
@@ -177,9 +181,10 @@ def kabam_rest(jid):
     all_result = {}
     try:
         for k, v in request.json.iteritems():
-            exec '{0!s} = v'.format(k)
+            exec('{0!s} = v'.format(k))
         all_result.setdefault(jid, {}).setdefault('status', 'none')
-        from kabam import kabam
+        # from kabam import kabam
+        from REST_UBER.therps_rest import kabam
         result = kabam.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
                                 mineau_scaling_factor, x_poc, x_doc, c_ox, w_t, c_ss, oc, k_ow,
                                 Species_of_the_tested_bird, bw_quail, bw_duck, bwb_other, avian_ld50,
@@ -212,7 +217,7 @@ def kabam_rest(jid):
     except Exception as e:
         return rest_error_message(e, jid)
 
-
+"""
 @app.route('/rest/ubertool/sam/<jid>', methods=['POST'])
 def sam_rest(jid):
     try:
@@ -254,13 +259,15 @@ def sam_rest(jid):
 
     except Exception as e:
         return rest_error_message(e, jid)
-
+    """
 
 # Declare endpoints for each model
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
 api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
 api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
+api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
+api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
 api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
 api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
 api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
@@ -281,7 +288,7 @@ api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
 api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
 api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
 api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
-api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 @app.route("/api/spec/")
@@ -333,7 +340,7 @@ def ore_rest_load_query(query):
     :return:
     """
     from REST_UBER.ore_rest import ore_db
-    # print query
+    #
 
     result = ore_db.loadChoices(query)
 
@@ -350,9 +357,8 @@ def ore_rest_category_query():
 
     query = {}
     for k, v in request.json.iteritems():
-        exec "query['{0!s}'] = v".format(k)
+        exec("query['{0!s}'] = v".format(k))
         # print k, v
-
     result = ore_db.oreWorkerActivities(query)
 
     return json.dumps({"result": result})
@@ -370,7 +376,7 @@ def ore_rest_output_query():
     # query = {}
     # for k, v in request.json.iteritems():
     #     exec "query['%s'] = v" % k
-    #     # print k, v
+    #     #
 
     query_result_list = ore_db.oreOutputQuery(inputs)
     output = ore_rest_model.ore(inputs, query_result_list)
@@ -381,7 +387,6 @@ def ore_rest_output_query():
                 "output": output
         }
     })
-
 
 """
 =============================================================================================
@@ -438,8 +443,6 @@ def get_hms_submodel_rest(submodel, parameters):
 """
 
 #TODO: CurveNumber dates required yyyy-MM-dd format, need to convert any provided date into this format prior to data request
-
-
 @app.route('/hms/rest/sim/', methods=['POST'])
 def post_hms_flask_rest():
     """
@@ -514,9 +517,6 @@ def get_hms_timezone(latitude, longitude):
     lat = latitude.split('=')
     lon = longitude.split('=')
     return timezones.get_timezone(lat[1], lon[1])
-
-
-
 
 
 if __name__ == '__main__':

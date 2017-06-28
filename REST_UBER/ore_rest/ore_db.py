@@ -18,12 +18,12 @@ def loadChoices(query):
         choices = cropQuery()
     elif query == 'oreDb':
         choices = oreDbQuery()
-    # print choices
+    #
 
     # choices = c.fetchone()
-    # print choices.keys()
+    #
 
-    # print choices['Crop']
+    #
     return choices
 
 
@@ -71,8 +71,8 @@ def generateSQLFilter(sql_filter, es_type, category):
         i += 1
 
     query_string += ")"
-    # print query_string
-    # print insertion_list
+    #
+    #
 
     return query_string, insertion_list
 
@@ -95,7 +95,7 @@ def oreWorkerActivities(query):
         """
 
         query_string = generateSQLFilter(sql_filter, es_type, category)
-        print _query_root + query_string[0] + ', ' + str(query_string[1])
+
 
         crop_category = tuple(query_string[1])
         c.execute(_query_root + query_string[0],
@@ -109,7 +109,7 @@ def oreWorkerActivities(query):
              AND Formulation NOT IN (SELECT Formulation FROM OccHandlerNC WHERE Formulation LIKE 'Spray%'));
         """
         crop_category = (category,)  # Must be a tuple
-        print _query_root + "(Category=? AND Formulation NOT IN "\
+
                             "(SELECT Formulation FROM OccHandlerNC WHERE Formulation LIKE 'Spray%'))"
         c.execute(_query_root +
                   "(Category=? AND Formulation NOT IN "
@@ -123,7 +123,7 @@ def oreWorkerActivities(query):
     apptype = []
     activity = []
 
-    # print query
+    #
 
     for result in query:
 
@@ -136,10 +136,10 @@ def oreWorkerActivities(query):
         if result[3] not in formulation:
             formulation.append(result[3])
 
-    # print activity
-    # print apptype
-    # print appequip
-    # print formulation
+    #
+    #
+    #
+    #
 
     return {'Activity': activity,
             'AppType': apptype,
@@ -186,8 +186,8 @@ def oreOutputQuery(inputs):
                 'AND (' + query_generator('Formulation', formulations) +')'
 
     # TreatedVal, TreatedUnit, DUESLNoG, DUESLG, DUEDLG, DUESLGCRH, DUEDLGCRH, IUENoR, IUEPF5R, IUEPF10R, IUEEC
-    print sql_query
-    print params
+
+
 
     c.execute(sql_query, tuple(params))
 

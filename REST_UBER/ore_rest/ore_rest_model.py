@@ -13,7 +13,7 @@ def ore(inputs, query_result_list):
         Loop over each "row" of the spreadsheet; this is determined by the SQLite query
         from user's inputs on the Exposure Scenario tab.
         """
-        # print query.keys()  #  SQLite query (row_factory.Row)
+        #
 
         # NonCancerInputs
         activity = query['Activity']
@@ -93,7 +93,7 @@ def ore(inputs, query_result_list):
 
     ore_output = OreOutputFormatter(ore_class_list)
     output_dict = ore_output.get_output_dict()
-    # print output_dict
+    #
 
     return output_dict
 
@@ -111,13 +111,13 @@ def exp_duration_handler(inputs):
     class_inputs = {'dermal': {}, 'inhal': {}}
     type = '_st'
     if inputs['expDurationType_st']:
-        print "Short term"
+
         type = '_st'
     if inputs['expDurationType_it']:
-        print "Intermediate term"
+
         type = '_it'
     if inputs['expDurationType_lt']:
-        print "Long term"
+
         type = '_lt'
 
     class_inputs['dermal']['abs_frac'] = float(inputs['dermal_abs_frac' + type]) / 100.
@@ -233,7 +233,7 @@ class OreOutputFormatter(object):
         for exp_scenario in self.dermal_class_list:  # Could be either class instances list, these are the shared inputs
 
             attr_dict = exp_scenario.ordered_dict(exp_scenario.get_ppe_increasing_order())
-            # print attr_dict.items()
+            #
 
             dermal_dict = {}
 
@@ -245,13 +245,13 @@ class OreOutputFormatter(object):
 
                 if isinstance(attr_dict[k], OreCalculator.OreCalculator):
                     # Attributes have been ordered by PPE to match the logic of the calculator
-                    # print k, attr_dict[k], attr_dict[k].moe
+                    #
                     dermal_unit_exp.append(str(attr_dict[k].unit_exp) + " [" + k.upper() + "]")
                     dermal_exp.append(str(attr_dict[k].exposure_conc))
                     dermal_dose.append(str(attr_dict[k].dose_conc))
                     dermal_moe.append(str(attr_dict[k].moe))
                 elif attr_dict[k] != None and attr_dict[k] != "No Data":
-                    # print k, attr_dict[k]
+                    #
                     dermal_dict[k] = attr_dict[k]
 
             dermal_dict['dermal_unit_exp'] = dermal_unit_exp
@@ -270,7 +270,7 @@ class OreOutputFormatter(object):
         for exp_scenario in self.inhal_class_list:
 
             attr_dict = exp_scenario.ordered_dict(exp_scenario.get_ppe_increasing_order())
-            # print attr_dict.items()
+            #
 
             inhal_dict = {}
 
@@ -281,7 +281,7 @@ class OreOutputFormatter(object):
             for k, v in attr_dict.items():
                 if isinstance(attr_dict[k], OreCalculator.OreCalculator):
                     # Attributes have been ordered by PPE to match the logic of the calculator
-                    # print k, attr_dict[k], attr_dict[k].moe
+                    #
                     inhal_unit_exp.append(str(attr_dict[k].unit_exp) + " [" + k.upper() + "]")
                     inhal_exp.append(str(attr_dict[k].exposure_conc))
                     inhal_dose.append(str(attr_dict[k].dose_conc))
@@ -299,7 +299,7 @@ class OreOutputFormatter(object):
     def combined_formatter(self):
         i = 1
         for combined in self.combined_list:
-            print combined
+
 
             self.output_dict[str(i)].update(combined)
             i += 1
