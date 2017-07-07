@@ -14,20 +14,21 @@ try:
     cors = True
 except ImportError:
     cors = False
-from .modules.hms_flask import surface_runoff_curve_number as cn
-from .modules.hms_flask import locate_timezone as timezones
-from .REST_UBER import terrplant_rest as terrplant
-from .REST_UBER import sip_rest as sip
-from .REST_UBER import sam_rest as sam
-from .REST_UBER import agdrift_rest as agdrift
-from .REST_UBER import stir_rest as stir
-from .REST_UBER import trex_rest as trex
-from .REST_UBER import therps_rest as therps
-from .REST_UBER import iec_rest as iec
-from .REST_UBER import earthworm_rest as earthworm
-from .REST_UBER import rice_rest as rice
-from .REST_UBER import kabam_rest as kabam
-from .REST_UBER import beerex_rest as beerex
+from modules.hms_flask import surface_runoff_curve_number as cn
+from modules.hms_flask import locate_timezone as timezones
+from REST_UBER import agdrift_rest as agdrift
+from REST_UBER import beerex_rest as beerex
+from REST_UBER import earthworm_rest as earthworm
+from REST_UBER import iec_rest as iec
+from REST_UBER import kabam_rest as kabam
+from REST_UBER import rice_rest as rice
+from REST_UBER import sam_rest as sam
+from REST_UBER import sip_rest as sip
+from REST_UBER import stir_rest as stir
+from REST_UBER import terrplant_rest as terrplant
+from REST_UBER import therps_rest as therps
+from REST_UBER import trex_rest as trex
+
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
@@ -84,7 +85,7 @@ class ModelCaller(Resource):
         if model in _ACTIVE_MODELS:
             try:
                 # Dynamically import the model Python module
-                model_module = importlib.import_module('.ubertool.ubertool.' + model)
+                model_module = importlib.import_module('ubertool.ubertool.' + model)
                 logging.info('============= ' + model)
                 # Set the model Object to a local variable (class name = model)
                 model_cap = model.capitalize()
