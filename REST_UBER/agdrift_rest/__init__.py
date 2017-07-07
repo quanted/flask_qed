@@ -1,7 +1,7 @@
-from flask_restful import Resource
-from ubertool.ubertool.agdrift import agdrift_exe as agdrift
 from flask import request, jsonify
-from REST_UBER import rest_validation, rest_schema, rest_model_caller
+from flask_restful import Resource
+from ...ubertool.ubertool.agdrift import agdrift_exe as agdrift
+from ...REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
 class AgdriftHandler(Resource):
