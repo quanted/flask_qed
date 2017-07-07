@@ -1,4 +1,4 @@
-boto==2.47.0
+boto==2.48.0
 codecov==2.0.9
 coverage==4.4.1
 coveralls==1.1
