@@ -4,7 +4,8 @@ Google Earth Engine Script
 - all fusion tables have been made public.
 """
 
-import ee, json
+import ee
+import json
 
 result_metadata = {}
 ee.Initialize()
