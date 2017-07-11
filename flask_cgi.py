@@ -154,46 +154,6 @@ def rest_error_message(error, jid):
     return json.dumps({'user_id': 'admin', 'result': {'error': e}, '_id': jid})
 
 
-# Declare endpoints for each model
-# These are the endpoints that will be introspected by the swagger() method & shown on API spec page
-# TODO: Add model endpoints here once they are refactored
-print('http://localhost:7777/rest/ubertool/agdrift/')
-api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
-api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/beerex/')
-api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
-api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/earthworm/')
-api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
-api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/iec/')
-api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
-api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/kabam/')
-api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
-api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/rice/')
-api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
-api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/sam/')
-api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
-api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/sip/')
-api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
-api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/stir/')
-api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
-api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/terrplant/')
-api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
-api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/therps/')
-api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
-api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/trex/')
-api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
-api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
-#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 @app.route("/ubertool/api/spec/")
@@ -352,6 +312,50 @@ def get_hms_timezone(latitude, longitude):
     lat = latitude.split('=')
     lon = longitude.split('=')
     return timezones.get_timezone(lat[1], lon[1])
+
+
+# Declare endpoints for each model
+# These are the endpoints that will be introspected by the swagger() method & shown on API spec page
+# TODO: Add model endpoints here once they are refactored
+print('http://localhost:7777/rest/ubertool/rice/')
+print('http://localhost:7777/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/beerex/')
+api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
+api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/iec/')
+api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
+api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/kabam/')
+api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
+api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/rice/')
+api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
+api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/sam/')
+api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
+api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/sip/')
+api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
+api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/stir/')
+api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
+api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/therps/')
+api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
+api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/trex/')
+api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
+api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
+#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+
 
 
 if __name__ == '__main__':
