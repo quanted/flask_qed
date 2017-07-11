@@ -1,5 +1,3 @@
-from flask import Flask, request, jsonify, render_template
-from flask_restful import Resource, Api
 import importlib
 import json
 import logging
@@ -13,9 +11,12 @@ try:
     cors = True
 except ImportError:
     cors = False
+from flask import Flask, request, jsonify, render_template
+from flask_restful import Resource, Api
 
-#from modules.hms_flask import surface_runoff_curve_number as cn
-#from modules.hms_flask import locate_timezone as timezones
+
+from modules.hms_flask import surface_runoff_curve_number as cn
+from modules.hms_flask import locate_timezone as timezones
 from REST_UBER import agdrift_rest as agdrift
 from REST_UBER import beerex_rest as beerex
 from REST_UBER import earthworm_rest as earthworm
@@ -34,6 +35,9 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
     'PROJECT_ROOT': PROJECT_ROOT
 })
+
+#needs to be after project root is set
+import uber_swagger
 
 app = Flask(__name__)
 api = Api(app)
@@ -192,16 +196,14 @@ api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
 #api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
-@app.route("/api/spec/")
+@app.route("/ubertool/api/spec/")
 def spec():
     """
     Route that returns the Swagger formatted JSON representing the Ubertool API.
     :return: Swagger formatted JSON string
     """
-    # from flask_swagger import swagger
-    from .uber_swagger import swagger
 
-    swag = swagger(app)
+    swag = uber_swagger.swagger(app)
 
     # TODO: Use in production and remove 'jsonify' below
     # return json.dumps(
