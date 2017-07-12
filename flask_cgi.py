@@ -2,36 +2,42 @@ import importlib
 import json
 import logging
 import os
+import pandas as pd
+import requests
 import sys
 import tabulate
-from flask import Flask, request, jsonify, render_template
-from flask_restful import Resource, Api
-#import flask_restful
 try:
     from flask_cors import CORS
     cors = True
 except ImportError:
     cors = False
-import pandas as pd
-import requests
+from flask import Flask, request, jsonify, render_template
+from flask_restful import Resource, Api
 
-from REST_UBER import terrplant_rest as terrplant
-from REST_UBER import sip_rest as sip
-from REST_UBER import sam_rest as sam
+
+from modules.hms_flask import surface_runoff_curve_number as cn
+from modules.hms_flask import locate_timezone as timezones
 from REST_UBER import agdrift_rest as agdrift
-from REST_UBER import stir_rest as stir
-from REST_UBER import trex_rest as trex
-from REST_UBER import therps_rest as therps
-from REST_UBER import iec_rest as iec
-from REST_UBER import earthworm_rest as earthworm
-from REST_UBER import rice_rest as rice
-from REST_UBER import kabam_rest as kabam
 from REST_UBER import beerex_rest as beerex
+from REST_UBER import earthworm_rest as earthworm
+from REST_UBER import iec_rest as iec
+from REST_UBER import kabam_rest as kabam
+from REST_UBER import rice_rest as rice
+from REST_UBER import sam_rest as sam
+from REST_UBER import sip_rest as sip
+from REST_UBER import stir_rest as stir
+from REST_UBER import terrplant_rest as terrplant
+from REST_UBER import therps_rest as therps
+from REST_UBER import trex_rest as trex
+
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
     'PROJECT_ROOT': PROJECT_ROOT
 })
+
+#needs to be after project root is set
+import uber_swagger
 
 app = Flask(__name__)
 api = Api(app)
@@ -42,18 +48,30 @@ else:
 
 # TODO: Remove this and Generic model handler below... (not used with refactored models)
 _ACTIVE_MODELS = (
-    'terrplant',
-    'sip',
-    'stir',
-    'trex',
-    'therps',
-    'iec',
-    'eathworm',
-    'rice',
-    'sam',
     'agdrift',
     'beerex',
-    'kabam'
+    'earthworm',
+    'exponential',
+    'fellerarley',
+    'foxsurplus',
+    'gompertz',
+    'iec',
+    'kabam',
+    'leslie',
+    'leslie_logistic',
+    'leslie_probit',
+    'logistic',
+    'loons',
+    'maxsus',
+    'rice',
+    'sam',
+    'sip',
+    'stir',
+    'swc',
+    'terrplant',
+    'therps',
+    'trex',
+    'yulefurry',
 )
 _NO_MODEL_ERROR = "{} model is not available through the REST API"
 
@@ -71,7 +89,7 @@ class ModelCaller(Resource):
         if model in _ACTIVE_MODELS:
             try:
                 # Dynamically import the model Python module
-                model_module = importlib.import_module('ubertool_ecorest.ubertool.ubertool.' + model)
+                model_module = importlib.import_module('ubertool.ubertool.' + model)
                 logging.info('============= ' + model)
                 # Set the model Object to a local variable (class name = model)
                 model_cap = model.capitalize()
@@ -136,171 +154,16 @@ def rest_error_message(error, jid):
     return json.dumps({'user_id': 'admin', 'result': {'error': e}, '_id': jid})
 
 
-# TODO: Used for THERPS, is this needed???
-class NumPyArangeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        import numpy as np
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()  # or map(int, obj)
-        return json.JSONEncoder.default(self, obj)
 
 
-@app.route('/rest/therps/<jid>', methods=['POST'])
-def therps_rest(jid):
-    all_result = {}
-    try:
-        for k, v in request.json.iteritems():
-            exec('{0!s} = v'.format(k))
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        # from therps import therps
-        from REST_UBER.therps_rest import therps
-        result = therps.Therps(chem_name, use, formu_name, a_i, h_l, n_a, i_a, a_r, avian_ld50,
-                                 avian_lc50,
-                                 avian_NOAEC, avian_NOAEL,
-                                 Species_of_the_tested_bird_avian_ld50,
-                                 Species_of_the_tested_bird_avian_lc50,
-                                 Species_of_the_tested_bird_avian_NOAEC,
-                                 Species_of_the_tested_bird_avian_NOAEL,
-                                 bw_avian_ld50, bw_avian_lc50, bw_avian_NOAEC, bw_avian_NOAEL,
-                                 mineau_scaling_factor, bw_herp_a_sm, bw_herp_a_md, bw_herp_a_lg,
-                                 wp_herp_a_sm,
-                                 wp_herp_a_md,
-                                 wp_herp_a_lg, c_mamm_a, c_herp_a)
-        if (result):
-            result_json = json.dumps(result.__dict__, cls=NumPyArangeEncoder)
-            # all_result[jid]['status']='done'
-            # all_result[jid]['input']=request.json
-            # all_result[jid]['result']=result
-        return json.dumps({'user_id': 'admin', 'result': result_json, '_id': jid})
-    except Exception as e:
-        return rest_error_message(e, jid)
-
-
-@app.route('/rest/kabam/<jid>', methods=['POST'])
-def kabam_rest(jid):
-    all_result = {}
-    try:
-        for k, v in request.json.iteritems():
-            exec('{0!s} = v'.format(k))
-        all_result.setdefault(jid, {}).setdefault('status', 'none')
-        # from kabam import kabam
-        from REST_UBER.therps_rest import kabam
-        result = kabam.kabam(chemical_name, l_kow, k_oc, c_wdp, water_column_EEC, c_wto,
-                                mineau_scaling_factor, x_poc, x_doc, c_ox, w_t, c_ss, oc, k_ow,
-                                Species_of_the_tested_bird, bw_quail, bw_duck, bwb_other, avian_ld50,
-                                avian_lc50, avian_noaec, m_species, bw_rat, bwm_other, mammalian_ld50,
-                                mammalian_lc50, mammalian_chronic_endpoint, lf_p_sediment, lf_p_phytoplankton,
-                                lf_p_zooplankton, lf_p_benthic_invertebrates, lf_p_filter_feeders,
-                                lf_p_small_fish, lf_p_medium_fish, mf_p_sediment, mf_p_phytoplankton,
-                                mf_p_zooplankton, mf_p_benthic_invertebrates, mf_p_filter_feeders,
-                                mf_p_small_fish, sf_p_sediment, sf_p_phytoplankton, sf_p_zooplankton,
-                                sf_p_benthic_invertebrates, sf_p_filter_feeders, ff_p_sediment,
-                                ff_p_phytoplankton, ff_p_zooplankton, ff_p_benthic_invertebrates,
-                                beninv_p_sediment, beninv_p_phytoplankton, beninv_p_zooplankton, zoo_p_sediment,
-                                zoo_p_phyto, s_lipid, s_NLOM, s_water, v_lb_phytoplankton, v_nb_phytoplankton,
-                                v_wb_phytoplankton, wb_zoo, v_lb_zoo, v_nb_zoo, v_wb_zoo, wb_beninv,
-                                v_lb_beninv, v_nb_beninv, v_wb_beninv, wb_ff, v_lb_ff, v_nb_ff, v_wb_ff, wb_sf,
-                                v_lb_sf, v_nb_sf, v_wb_sf, wb_mf, v_lb_mf, v_nb_mf, v_wb_mf, wb_lf, v_lb_lf,
-                                v_nb_lf, v_wb_lf, kg_phytoplankton, kd_phytoplankton, ke_phytoplankton,
-                                mo_phytoplankton, mp_phytoplankton, km_phytoplankton, km_zoo, k1_phytoplankton,
-                                k2_phytoplankton, k1_zoo, k2_zoo, kd_zoo, ke_zoo, k1_beninv, k2_beninv,
-                                kd_beninv, ke_beninv, km_beninv, k1_ff, k2_ff, kd_ff, ke_ff, km_ff, k1_sf,
-                                k2_sf, kd_sf, ke_sf, km_sf, k1_mf, k2_mf, kd_mf, ke_mf, km_mf, k1_lf, k2_lf,
-                                kd_lf, ke_lf, km_lf, rate_constants, s_respire, phyto_respire, zoo_respire,
-                                beninv_respire, ff_respire, sfish_respire, mfish_respire, lfish_respire)
-        if (result):
-            result_json = json.dumps(result.__dict__, cls=NumPyArangeEncoder)
-            # all_result[jid]['status']='done'
-            # all_result[jid]['input']=request.json
-            # all_result[jid]['result']=result
-            return json.dumps({'user_id': 'admin', 'result': result_json, '_id': jid})
-    except Exception as e:
-        return rest_error_message(e, jid)
-
-"""
-@app.route('/rest/ubertool/sam/<jid>', methods=['POST'])
-def sam_rest(jid):
-    try:
-        import REST_UBER.sam_rest.sam_rest_model as sam
-
-        try:
-            post_payload = request.json
-            run_type = post_payload["run_type"]
-        except KeyError as e:
-            return rest_error_message(e, jid)
-
-        if run_type == "qaqc":
-            logging.info('============= QAQC Run =============')
-
-        elif run_type == "batch":
-            logging.info('============= Batch Run =============')
-
-        else:
-            logging.info('============= Single Run =============')
-            inputs_json = post_payload["inputs"]
-
-            logging.info(inputs_json)
-
-            result_json_tuple = sam.sam(inputs_json, jid, run_type)
-
-        # Values returned from model run: inputs, outputs, and expected outputs (if QAQC run)
-        # inputs_json = json.loads(result_json_tuple[0])
-        outputs_json = result_json_tuple
-        exp_out_json = ""
-
-        return json.dumps({
-            'user_id': 'admin',
-            'inputs': inputs_json,
-            'outputs': outputs_json,
-            'exp_out': exp_out_json,
-            '_id': jid,
-            'run_type': run_type
-        })
-
-    except Exception as e:
-        return rest_error_message(e, jid)
-    """
-
-# Declare endpoints for each model
-# These are the endpoints that will be introspected by the swagger() method & shown on API spec page
-# TODO: Add model endpoints here once they are refactored
-api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
-api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
-api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
-api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
-api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
-api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
-api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
-api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
-api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
-api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
-api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
-api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
-api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
-api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
-api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
-api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
-api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
-api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
-api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
-api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
-api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
-api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
-api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
-api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
-#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
-
-
-@app.route("/api/spec/")
+@app.route("/ubertool/api/spec/")
 def spec():
     """
     Route that returns the Swagger formatted JSON representing the Ubertool API.
     :return: Swagger formatted JSON string
     """
-    # from flask_swagger import swagger
-    from uber_swagger import swagger
 
-    swag = swagger(app)
+    swag = uber_swagger.swagger(app)
 
     # TODO: Use in production and remove 'jsonify' below
     # return json.dumps(
@@ -324,69 +187,6 @@ def api_doc():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-
-"""
-=============================================================================================
-                              O R E  T E S T I N G
-=============================================================================================
-"""
-
-
-@app.route('/ore/load/<query>', methods=['GET'])
-def ore_rest_load_query(query):
-    """
-    Endpoint returns the list of Crops to populate the Crop-Target Category Lookup tab
-    :param query:
-    :return:
-    """
-    from REST_UBER.ore_rest import ore_db
-    #
-
-    result = ore_db.loadChoices(query)
-
-    return json.dumps({"result": result})
-
-
-@app.route('/ore/category', methods=['POST'])
-def ore_rest_category_query():
-    """
-    Endpoint for populating the exposure scenario tab. OnPageLoad: based on the default crop target category.
-    :return: JSON string
-    """
-    from REST_UBER.ore_rest import ore_db
-
-    query = {}
-    for k, v in request.json.iteritems():
-        exec("query['{0!s}'] = v".format(k))
-        # print k, v
-    result = ore_db.oreWorkerActivities(query)
-
-    return json.dumps({"result": result})
-
-
-@app.route('/ore/output', methods=['POST'])
-def ore_rest_output_query():
-    """
-    Endpoint for running the ORCA calculations on a user-set exposure scenario and returning the model output
-    :return: JSON string
-    """
-    from REST_UBER.ore_rest import ore_db, ore_rest_model
-    inputs = request.json
-
-    # query = {}
-    # for k, v in request.json.iteritems():
-    #     exec "query['%s'] = v" % k
-    #     #
-
-    query_result_list = ore_db.oreOutputQuery(inputs)
-    output = ore_rest_model.ore(inputs, query_result_list)
-
-    return json.dumps({
-        "result": {
-                "input": inputs,
-                "output": output
-        }
-    })
 
 """
 =============================================================================================
@@ -449,7 +249,6 @@ def post_hms_flask_rest():
     POST request for hms simulation data.
     :return: json of simulation data for the specified location and time period.
     """
-    from modules.hms_flask import surface_runoff_curve_number as cn
     parameters = request.form
     if parameters["dataset"] == "curvenumber":
         # Date format restriction yyyy-MM-dd
@@ -466,7 +265,6 @@ def post_hms_runoff_flask_rest():
     POST request for hms runoff data.
     :return: json of runoff data for the specified location and time period.
     """
-    from modules.hms_flask import surface_runoff_curve_number as cn
     parameters = request.form
     if parameters["dataset"] == "curvenumber":
         # Date format restriction yyyy-MM-dd
@@ -484,7 +282,6 @@ def get_hms_runoff_flask_rest(parameters):
     :param parameters: query string, requiring: startdate, enddate, latitude and longitude
     :return: json of runoff data for the specified location and time period.
     """
-    from modules.hms_flask import surface_runoff_curve_number as cn
     if parameters["dataset"] == "curvenumber":
         # Date format restriction yyyy-MM-dd
         data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
@@ -500,7 +297,6 @@ def post_hms_timezone():
     POST request for timezone data from latitude/longitude values.
     :return: json of timezone details.
     """
-    from modules.hms_flask import locate_timezone as timezones
     parameters = request.form
     return timezones.get_timezone(parameters["latitude"], parameters["longitude"])
 
@@ -513,10 +309,53 @@ def get_hms_timezone(latitude, longitude):
     :param longitude: Longitude of requested location.
     :return: json of timezone details.
     """
-    from modules.hms_flask import locate_timezone as timezones
     lat = latitude.split('=')
     lon = longitude.split('=')
     return timezones.get_timezone(lat[1], lon[1])
+
+
+# Declare endpoints for each model
+# These are the endpoints that will be introspected by the swagger() method & shown on API spec page
+# TODO: Add model endpoints here once they are refactored
+print('http://localhost:7777/rest/ubertool/rice/')
+print('http://localhost:7777/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/beerex/')
+api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
+api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/iec/')
+api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
+api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/kabam/')
+api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
+api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/rice/')
+api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
+api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/sam/')
+api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
+api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/sip/')
+api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
+api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/stir/')
+api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
+api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/therps/')
+api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
+api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/trex/')
+api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
+api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
+#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+
 
 
 if __name__ == '__main__':
