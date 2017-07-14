@@ -24,7 +24,7 @@ from REST_UBER import iec_rest as iec
 from REST_UBER import kabam_rest as kabam
 from REST_UBER import rice_rest as rice
 from REST_UBER import sam_rest as sam
-from REST_UBER import sip_rest as screenip
+from REST_UBER import screenip_rest as screenip
 from REST_UBER import stir_rest as stir
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import therps_rest as therps
@@ -88,6 +88,8 @@ class ModelCaller(Resource):
         Execute model
         """
         if model in _ACTIVE_MODELS:
+            if model == 'sip':
+                model = 'screenip'
             try:
                 # Dynamically import the model Python module
                 model_module = importlib.import_module('ubertool.ubertool.' + model)
@@ -157,7 +159,7 @@ def rest_error_message(error, jid):
 
 
 
-@app.route("/ubertool/api/spec/")
+@app.route("/api/ubertool/spec/")
 def spec():
     """
     Route that returns the Swagger formatted JSON representing the Ubertool API.
@@ -175,7 +177,7 @@ def spec():
     return jsonify(swag)  # This produces a 'pretty printed' JSON output
 
 
-@app.route("/api/")
+@app.route("/api/ubertool/")
 def api_doc():
     """
     Route to serve the API documentation (Swagger UI) static page being served by the backend.
@@ -318,7 +320,9 @@ def get_hms_timezone(latitude, longitude):
 # Declare endpoints for each model
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
-print('http://localhost:7777/rest/ubertool/rice/')
+
+print('http://localhost:7777/api/ubertool/')
+print('http://localhost:7777/api/ubertool/spec/')
 print('http://localhost:7777/rest/ubertool/agdrift/')
 api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
 api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
