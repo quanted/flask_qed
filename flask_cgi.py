@@ -24,7 +24,7 @@ from REST_UBER import iec_rest as iec
 from REST_UBER import kabam_rest as kabam
 from REST_UBER import rice_rest as rice
 from REST_UBER import sam_rest as sam
-from REST_UBER import sip_rest as sip
+from REST_UBER import sip_rest as screenip
 from REST_UBER import stir_rest as stir
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import therps_rest as therps
@@ -66,6 +66,7 @@ _ACTIVE_MODELS = (
     'rice',
     'sam',
     'sip',
+    'screenip',
     'stir',
     'swc',
     'terrplant',
@@ -339,9 +340,10 @@ api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/sam/')
 api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
 api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
+#importing screenip instead of sip because of conda problems
 print('http://localhost:7777/rest/ubertool/sip/')
-api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
-api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
+api.add_resource(screenip.ScreenipGet, '/rest/ubertool/sip/')
+api.add_resource(screenip.ScreenipPost, '/rest/ubertool/sip/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/stir/')
 api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
 api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
@@ -361,4 +363,3 @@ api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
 if __name__ == '__main__':
     app.run(port=7777, debug=True)  # To run on locahost
     # app.run(host='0.0.0.0', port=7777, debug=True)  # 'host' param needed to expose server publicly w/o NGINX/uWSGI
-
