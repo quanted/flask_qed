@@ -38,7 +38,7 @@ class FlaskApiDocsTests(unittest.TestCase):
     def test_apidocs_version(self):
         # sends HTTP GET request to the application
         # on the specified path
-        result = self.app.get('/api/spec/')
+        result = self.app.get('/api/utool/spec/')
 
         api_json = result.data
         api_dict = json.loads(api_json)
