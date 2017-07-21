@@ -6,14 +6,15 @@ import pandas as pd
 import requests
 import sys
 import tabulate
-from flask import Flask, request, jsonify, render_template
-from flask_restful import Resource, Api
-#import flask_restful
 try:
     from flask_cors import CORS
     cors = True
 except ImportError:
     cors = False
+from flask import Flask, request, jsonify, render_template
+from flask_restful import Resource, Api
+
+
 from modules.hms_flask import surface_runoff_curve_number as cn
 from modules.hms_flask import locate_timezone as timezones
 from REST_UBER import agdrift_rest as agdrift
@@ -23,7 +24,7 @@ from REST_UBER import iec_rest as iec
 from REST_UBER import kabam_rest as kabam
 from REST_UBER import rice_rest as rice
 from REST_UBER import sam_rest as sam
-from REST_UBER import sip_rest as sip
+from REST_UBER import screenip_rest as screenip
 from REST_UBER import stir_rest as stir
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import therps_rest as therps
@@ -34,6 +35,9 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
     'PROJECT_ROOT': PROJECT_ROOT
 })
+
+#needs to be after project root is set
+import uber_swagger
 
 app = Flask(__name__)
 api = Api(app)
@@ -62,6 +66,7 @@ _ACTIVE_MODELS = (
     'rice',
     'sam',
     'sip',
+    'screenip',
     'stir',
     'swc',
     'terrplant',
@@ -83,6 +88,8 @@ class ModelCaller(Resource):
         Execute model
         """
         if model in _ACTIVE_MODELS:
+            if model == 'sip':
+                model = 'screenip'
             try:
                 # Dynamically import the model Python module
                 model_module = importlib.import_module('ubertool.ubertool.' + model)
@@ -150,46 +157,16 @@ def rest_error_message(error, jid):
     return json.dumps({'user_id': 'admin', 'result': {'error': e}, '_id': jid})
 
 
-# Declare endpoints for each model
-# These are the endpoints that will be introspected by the swagger() method & shown on API spec page
-# TODO: Add model endpoints here once they are refactored
-api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
-api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
-api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
-api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
-api.add_resource(sip.SipGet, '/rest/ubertool/sip/')
-api.add_resource(sip.SipPost, '/rest/ubertool/sip/<string:jobId>')
-api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
-api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
-api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
-api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
-api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
-api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
-api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
-api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
-api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
-api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
-api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
-api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
-api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
-api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
-api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
-api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
-api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
-api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
-#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
-@app.route("/api/spec/")
+@app.route("/api/ubertool/spec/")
 def spec():
     """
     Route that returns the Swagger formatted JSON representing the Ubertool API.
     :return: Swagger formatted JSON string
     """
-    # from flask_swagger import swagger
-    from .uber_swagger import swagger
 
-    swag = swagger(app)
+    swag = uber_swagger.swagger(app)
 
     # TODO: Use in production and remove 'jsonify' below
     # return json.dumps(
@@ -200,7 +177,7 @@ def spec():
     return jsonify(swag)  # This produces a 'pretty printed' JSON output
 
 
-@app.route("/api/")
+@app.route("/api/ubertool/")
 def api_doc():
     """
     Route to serve the API documentation (Swagger UI) static page being served by the backend.
@@ -340,7 +317,53 @@ def get_hms_timezone(latitude, longitude):
     return timezones.get_timezone(lat[1], lon[1])
 
 
+# Declare endpoints for each model
+# These are the endpoints that will be introspected by the swagger() method & shown on API spec page
+# TODO: Add model endpoints here once they are refactored
+
+print('http://localhost:7777/api/ubertool/')
+print('http://localhost:7777/api/ubertool/spec/')
+print('http://localhost:7777/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
+api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/beerex/')
+api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
+api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
+api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/iec/')
+api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
+api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/kabam/')
+api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
+api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/rice/')
+api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
+api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/sam/')
+api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
+api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
+#importing screenip instead of sip because of conda problems
+print('http://localhost:7777/rest/ubertool/sip/')
+api.add_resource(screenip.ScreenipGet, '/rest/ubertool/sip/')
+api.add_resource(screenip.ScreenipPost, '/rest/ubertool/sip/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/stir/')
+api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
+api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
+api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/therps/')
+api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
+api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/trex/')
+api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
+api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
+#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+
+
+
 if __name__ == '__main__':
     app.run(port=7777, debug=True)  # To run on locahost
     # app.run(host='0.0.0.0', port=7777, debug=True)  # 'host' param needed to expose server publicly w/o NGINX/uWSGI
-
