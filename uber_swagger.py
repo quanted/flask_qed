@@ -16,11 +16,11 @@ def swagger(app):
             "title": u"\u00FCtool API Documentation",
             "description": "Welcome to the EPA's utool interactive RESTful API documentation.",
             # "termsOfService": "",
-            "contact": {
-                "name": u"\u00FCbertool Development Team",
-                # "url": "",
-                "email": "purucker.tom@epa.gov",
-            },
+            #"contact": {
+            #    "name": u"\u00FCbertool Development Team",
+            #    # "url": "",
+            #    "email": "purucker.tom@epa.gov",
+            #},
             # "license": {
             #     "name": "",
             #     "url": ""
@@ -44,6 +44,7 @@ def swagger(app):
     # Loop over the Flask-RESTful endpoints being served (called "rules"...e.g. /terrplant/)
     for rule in app.url_map.iter_rules():
         endpoint = app.view_functions[rule.endpoint]
+        print(endpoint)
         try:
             class_name = endpoint.view_class()
         except AttributeError:
