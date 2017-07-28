@@ -1,12 +1,12 @@
 from flask_restful import Resource
-from ubertool.ubertool.sip import sip_exe as sip
+from ubertool.ubertool.screenip import screenip_exe as screenip
 from flask import request
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
-class SipHandler(Resource):
+class ScreenipHandler(Resource):
     def __init__(self):
-        self.name = "sip"
+        self.name = "screenip"
 
     @staticmethod
     def get_model_inputs():
@@ -14,7 +14,7 @@ class SipHandler(Resource):
         Return model's input class.
         :return:
         """
-        return sip.SipInputs()
+        return screenip.ScreenipInputs()
 
     @staticmethod
     def get_model_outputs():
@@ -22,10 +22,10 @@ class SipHandler(Resource):
         Return model's output class.
         :return:
         """
-        return sip.SipOutputs()
+        return screenip.ScreenipOutputs()
 
 
-class SipGet(SipHandler):
+class ScreenipGet(ScreenipHandler):
 
     def get(self, jobId="YYYYMMDDHHMMSSuuuuuu"):
         """
@@ -36,7 +36,7 @@ class SipGet(SipHandler):
         return rest_schema.get_schema(self.name, jobId)
 
 
-class SipPost(SipHandler):
+class ScreenipPost(ScreenipHandler):
 
     def post(self, jobId="000000100000011"):
         """
@@ -45,8 +45,8 @@ class SipPost(SipHandler):
         :return:
         """
         inputs = rest_validation.parse_inputs(request.json)
-        print("SipPost")
+        print("ScreenipPost")
         if inputs:
-            return rest_model_caller.model_run(self.name, jobId, inputs, module=sip)
+            return rest_model_caller.model_run(self.name, jobId, inputs, module=screenip)
         else:
             return rest_model_caller.error(self.name, jobId, inputs)
