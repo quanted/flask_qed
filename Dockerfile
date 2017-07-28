@@ -1,5 +1,5 @@
-#FROM python:2.7
-FROM puruckertom/qed_py3
+#FROM python:3
+FROM quanted/qed_py3
 
 # Install Python Dependencies
 COPY requirements.txt /tmp/

@@ -20,8 +20,10 @@ from modules.hms_flask import locate_timezone as timezones
 from REST_UBER import agdrift_rest as agdrift
 from REST_UBER import beerex_rest as beerex
 from REST_UBER import earthworm_rest as earthworm
+from REST_UBER import exponential_rest as exponential
 from REST_UBER import iec_rest as iec
 from REST_UBER import kabam_rest as kabam
+from REST_UBER import leslie_probit_rest as leslie_probit
 from REST_UBER import rice_rest as rice
 from REST_UBER import sam_rest as sam
 from REST_UBER import screenip_rest as screenip
@@ -332,12 +334,18 @@ api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/earthworm/')
 api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
 api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/exponential/')
+api.add_resource(exponential.ExponentialGet, '/rest/ubertool/exponential/')
+api.add_resource(exponential.ExponentialPost, '/rest/ubertool/exponential/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/iec/')
 api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
 api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/kabam/')
 api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
 api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
+print('http://localhost:7777/rest/ubertool/leslie_probit/')
+api.add_resource(leslie_probit.LeslieProbitGet, '/rest/ubertool/leslie_probit/')
+api.add_resource(leslie_probit.LeslieProbitPost, '/rest/ubertool/leslie_probit/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/rice/')
 api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
 api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
