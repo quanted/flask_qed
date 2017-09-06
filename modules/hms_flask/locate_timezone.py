@@ -3,7 +3,8 @@ HMS Locate Timezone from lat/lon coordinates
 Google Earth Engine Script
 """
 
-import ee, json
+# import ee
+import json
 
 def get_timezone(latitude, longitude):
     ee.Initialize()
