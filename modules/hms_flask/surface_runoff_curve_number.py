@@ -4,7 +4,7 @@ Google Earth Engine Script
 - all fusion tables have been made public.
 """
 
-import ee
+# import ee
 import json
 
 result_metadata = {}
