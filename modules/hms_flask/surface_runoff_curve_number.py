@@ -8,7 +8,7 @@ Google Earth Engine Script
 import json
 
 result_metadata = {}
-ee.Initialize()
+# ee.Initialize()
 
 # NLCD landcover image
 nlcd_landcover = ee.Image('USGS/NLCD/NLCD2011').select("landcover")
