@@ -15,8 +15,8 @@ from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
 
 
-from modules.hms_flask import surface_runoff_curve_number as cn
-from modules.hms_flask import locate_timezone as timezones
+#from modules.hms_flask import surface_runoff_curve_number as cn
+#from modules.hms_flask import locate_timezone as timezones
 from REST_UBER import agdrift_rest as agdrift
 from REST_UBER import beerex_rest as beerex
 from REST_UBER import earthworm_rest as earthworm
@@ -247,76 +247,76 @@ def get_hms_submodel_rest(submodel, parameters):
 =============================================================================================
 """
 
-#TODO: CurveNumber dates required yyyy-MM-dd format, need to convert any provided date into this format prior to data request
-@app.route('/hms/rest/sim/', methods=['POST'])
-def post_hms_flask_rest():
-    """
-    POST request for hms simulation data.
-    :return: json of simulation data for the specified location and time period.
-    """
-    parameters = request.form
-    if parameters["dataset"] == "curvenumber":
-        # Date format restriction yyyy-MM-dd
-        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
-        return data
-    else:
-        print("ERROR: dataset not curvenumber")
-        return
-
-
-@app.route('/hms/rest/runoff/', methods=['POST'])
-def post_hms_runoff_flask_rest():
-    """
-    POST request for hms runoff data.
-    :return: json of runoff data for the specified location and time period.
-    """
-    parameters = request.form
-    if parameters["dataset"] == "curvenumber":
-        # Date format restriction yyyy-MM-dd
-        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
-        return data
-    else:
-        print("ERROR: dataset not curvenumber")
-        return
-
-
-@app.route('/hms/rest/runoff/<parameters>', methods=['GET'])
-def get_hms_runoff_flask_rest(parameters):
-    """
-    GET request for hms runoff data.
-    :param parameters: query string, requiring: startdate, enddate, latitude and longitude
-    :return: json of runoff data for the specified location and time period.
-    """
-    if parameters["dataset"] == "curvenumber":
-        # Date format restriction yyyy-MM-dd
-        data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
-        return data
-    else:
-        print("ERROR: dataset not curvenumber")
-        return
-
-
-@app.route('/hms/rest/timezone/', methods=['POST'])
-def post_hms_timezone():
-    """
-    POST request for timezone data from latitude/longitude values.
-    :return: json of timezone details.
-    """
-    parameters = request.form
-    return timezones.get_timezone(parameters["latitude"], parameters["longitude"])
-
-
-@app.route('/hms/rest/timezone/<latitude>&<longitude>', methods=['GET'])
-def get_hms_timezone(latitude, longitude):
-    """
-    GET request for timezone data from latitude/longitude values.
-    :param latitude: Latitude of requested location.
-    :param longitude: Longitude of requested location.
-    :return: json of timezone details.
-    """
-    lat = latitude.split('=')
-    lon = longitude.split('=')
-    return timezones.get_timezone(lat[1], lon[1])
+# #TODO: CurveNumber dates required yyyy-MM-dd format, need to convert any provided date into this format prior to data request
+# @app.route('/hms/rest/sim/', methods=['POST'])
+# def post_hms_flask_rest():
+#     """
+#     POST request for hms simulation data.
+#     :return: json of simulation data for the specified location and time period.
+#     """
+#     parameters = request.form
+#     if parameters["dataset"] == "curvenumber":
+#         # Date format restriction yyyy-MM-dd
+#         data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+#         return data
+#     else:
+#         print("ERROR: dataset not curvenumber")
+#         return
+#
+#
+# @app.route('/hms/rest/runoff/', methods=['POST'])
+# def post_hms_runoff_flask_rest():
+#     """
+#     POST request for hms runoff data.
+#     :return: json of runoff data for the specified location and time period.
+#     """
+#     parameters = request.form
+#     if parameters["dataset"] == "curvenumber":
+#         # Date format restriction yyyy-MM-dd
+#         data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+#         return data
+#     else:
+#         print("ERROR: dataset not curvenumber")
+#         return
+#
+#
+# @app.route('/hms/rest/runoff/<parameters>', methods=['GET'])
+# def get_hms_runoff_flask_rest(parameters):
+#     """
+#     GET request for hms runoff data.
+#     :param parameters: query string, requiring: startdate, enddate, latitude and longitude
+#     :return: json of runoff data for the specified location and time period.
+#     """
+#     if parameters["dataset"] == "curvenumber":
+#         # Date format restriction yyyy-MM-dd
+#         data = cn.get_cn_runoff(parameters["startdate"], parameters["enddate"], parameters["latitude"], parameters["longitude"])
+#         return data
+#     else:
+#         print("ERROR: dataset not curvenumber")
+#         return
+#
+#
+# @app.route('/hms/rest/timezone/', methods=['POST'])
+# def post_hms_timezone():
+#     """
+#     POST request for timezone data from latitude/longitude values.
+#     :return: json of timezone details.
+#     """
+#     parameters = request.form
+#     return timezones.get_timezone(parameters["latitude"], parameters["longitude"])
+#
+#
+# @app.route('/hms/rest/timezone/<latitude>&<longitude>', methods=['GET'])
+# def get_hms_timezone(latitude, longitude):
+#     """
+#     GET request for timezone data from latitude/longitude values.
+#     :param latitude: Latitude of requested location.
+#     :param longitude: Longitude of requested location.
+#     :return: json of timezone details.
+#     """
+#     lat = latitude.split('=')
+#     lon = longitude.split('=')
+#     return timezones.get_timezone(lat[1], lon[1])
 
 
 # Declare endpoints for each model
