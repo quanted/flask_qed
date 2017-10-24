@@ -352,6 +352,7 @@ api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/sam/')
 api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
 api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
+api.add_resource(sam.SamStatus, '/rest/ubertool/sam/status/<string:jobId>')
 #importing screenip instead of sip because of conda problems
 print('http://localhost:7777/rest/ubertool/sip/')
 api.add_resource(screenip.ScreenipGet, '/rest/ubertool/sip/')
