@@ -25,13 +25,14 @@ from REST_UBER import iec_rest as iec
 from REST_UBER import kabam_rest as kabam
 from REST_UBER import leslie_probit_rest as leslie_probit
 from REST_UBER import rice_rest as rice
-from REST_UBER import sam_rest as sam
+# from REST_UBER import sam_rest as sam
 from REST_UBER import screenip_rest as screenip
 from REST_UBER import stir_rest as stir
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import therps_rest as therps
 from REST_UBER import trex_rest as trex
 
+from celery_qed import tasks
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
@@ -350,9 +351,12 @@ print('http://localhost:7777/rest/ubertool/rice/')
 api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
 api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
 print('http://localhost:7777/rest/ubertool/sam/')
-api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
-api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
-api.add_resource(sam.SamStatus, '/rest/ubertool/sam/status/<string:jobId>')
+# api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
+api.add_resource(tasks.SamRun, '/rest/ubertool/sam/')
+api.add_resource(tasks.SamStatus, '/rest/ubertool/sam/status/<string:task_id>')
+api.add_resource(tasks.SamData, '/rest/ubertool/sam/data/<string:task_id>')
+# api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
+# api.add_resource(sam.SamStatus, '/rest/ubertool/sam/status/<string:jobId>')
 #importing screenip instead of sip because of conda problems
 print('http://localhost:7777/rest/ubertool/sip/')
 api.add_resource(screenip.ScreenipGet, '/rest/ubertool/sip/')

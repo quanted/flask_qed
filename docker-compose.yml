@@ -17,9 +17,9 @@
 
   # Update for Celery: celery_worker and redis
   celery_worker:
-    build: ../celery_qed
+    build: ./celery_qed
     image: stack-celery
-    command: # celery worker -A tasks -Q testing -l info
+    command: celery worker -A tasks -Q testing -l info
     links:
       - redis
       - ecorest

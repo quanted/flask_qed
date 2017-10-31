@@ -2,7 +2,7 @@ from flask_restful import Resource
 from ubertool.ubertool.sam import sam_exe as sam
 from flask import request
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
-from celery_qed import tasks
+from ubertool_ecorest.celery_qed import tasks
 
 class SamHandler(Resource):
     def __init__(self):
@@ -61,7 +61,7 @@ class SamPost(SamHandler):
 
         if inputs:
             # return rest_model_caller.model_run(self.name, jobId, inputs, module=sam)
-            tasks.sam_run(jobId, inputs)
+            tasks.sam_run(jobId, request.json)
             return
         else:
             return rest_model_caller.error(self.name, jobId, inputs)
