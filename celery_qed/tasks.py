@@ -42,8 +42,8 @@ app.conf.update(
 # ------ SAM ------ #
 # from .models import rest_model_caller, rest_validation
 # from .models.sam import sam_exe as sam
-from models import rest_model_caller, rest_validation
-from models.sam import sam_exe as sam
+from .models import rest_model_caller, rest_validation
+from ubertool.ubertool.sam import sam_exe as sam
 
 
 class SamStatus(Resource):
