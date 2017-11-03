@@ -15,6 +15,18 @@ from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
 
 
+app = Flask(__name__) # , instance_relative_config=False
+app.config.update(
+    DEBUG=True,
+)
+
+api = Api(app)
+if cors:
+    CORS(app)
+else:
+    logging.debug("CORS not enabled")
+
+
 #from modules.hms_flask import surface_runoff_curve_number as cn
 #from modules.hms_flask import locate_timezone as timezones
 from REST_UBER import agdrift_rest as agdrift
@@ -41,13 +53,6 @@ os.environ.update({
 
 #needs to be after project root is set
 import uber_swagger
-
-app = Flask(__name__)
-api = Api(app)
-if cors:
-    CORS(app)
-else:
-    logging.debug("CORS not enabled")
 
 # TODO: Remove this and Generic model handler below... (not used with refactored models)
 _ACTIVE_MODELS = (

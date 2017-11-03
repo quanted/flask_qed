@@ -4,6 +4,7 @@ from ubertool.ubertool.agdrift import agdrift_exe as agdrift
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 from mongo_io import MongoIO
 
+
 class AgdriftHandler(MongoIO):
     def __init__(self):
         self.name = "agdrift"
