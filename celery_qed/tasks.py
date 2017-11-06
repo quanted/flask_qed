@@ -40,8 +40,15 @@ app.conf.update(
 )
 
 # ------ SAM ------ #
+<<<<<<< HEAD
 from ubertool_ecorest.ubertool.ubertool.sam import sam_exe as sam
 from ubertool_ecorest.REST_UBER import rest_model_caller, rest_validation
+=======
+# from .models import rest_model_caller, rest_validation
+# from .models.sam import sam_exe as sam
+from .models import rest_model_caller, rest_validation
+from ubertool.ubertool.sam import sam_exe as sam
+>>>>>>> dev
 
 
 class SamStatus(Resource):
