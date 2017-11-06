@@ -1,6 +1,6 @@
 boto==2.48.0
 codecov==2.0.9
-coverage==4.4.1
+coverage==4.4.2
 coveralls==1.2.0
 flask==0.12.2
 flask-restful==0.3.6
