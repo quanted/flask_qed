@@ -7,7 +7,7 @@ import os
 import logging
 import redis
 import json
-import csv
+import sys
 from celery import Celery
 from flask import request, Response
 from flask_restful import Resource
@@ -40,10 +40,8 @@ app.conf.update(
 )
 
 # ------ SAM ------ #
-# from .models import rest_model_caller, rest_validation
-# from .models.sam import sam_exe as sam
-from models import rest_model_caller, rest_validation
-from models.sam import sam_exe as sam
+from ubertool_ecorest.ubertool.ubertool.sam import sam_exe as sam
+from ubertool_ecorest.REST_UBER import rest_model_caller, rest_validation
 
 
 class SamStatus(Resource):
@@ -84,13 +82,14 @@ class SamRun(Resource):
         response = Response(resp_body, mimetype='application/json')
         return response
 
+
 class SamData(Resource):
     def get(self, task_id):
         data_json = ""
         dir_path = os.getcwd()
         try:
             # TODO: NOT CORRECT OUTPUT FILE.
-            with open(dir_path + '\\celery_qed\\models\\sam\\bin\\Results\\' + str(task_id) + '\\Custom_json.csv', 'rb') as data:
+            with open(dir_path + '\\ubertool\\ubertool\\sam\\bin\\Results\\' + str(task_id) + '\\Custom_json.csv', 'rb') as data:
                 data_json = data.read()
             data_json = json.dumps(json.loads(data_json))
         except FileNotFoundError as er:
@@ -103,6 +102,7 @@ def sam_run(self, jobID, inputs):
     task_id = sam_run.request.id
     logging.info("celery_qed session id: {}".format(task_id))
     logging.info("sam starting...")
+    inputs["csrfmiddlewaretoken"] = {"0": task_id}
     rest_model_caller.model_run("sam", task_id, inputs, module=sam)
 
 
