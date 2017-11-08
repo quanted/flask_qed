@@ -8,11 +8,15 @@ import logging
 import redis
 import json
 import sys
+sys.path.append("..")
+
 from celery import Celery
 from flask import request, Response
 from flask_restful import Resource
-from ubertool_ecorest.ubertool.ubertool.sam import sam_exe as sam
-from ubertool_ecorest.REST_UBER import rest_model_caller, rest_validation
+# from ubertool_ecorest.ubertool.ubertool.sam import sam_exe as sam
+# from ubertool_ecorest.REST_UBER import rest_model_caller, rest_validation
+from ubertool.ubertool.sam import sam_exe as sam
+from REST_UBER import rest_model_caller, rest_validation
 # from .models import rest_model_caller, rest_validation
 # from .models.sam import sam_exe as sam
 #from .models import rest_model_caller, rest_validation
