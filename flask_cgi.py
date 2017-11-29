@@ -213,8 +213,8 @@ def hms_rest(model, submodel):
     :return: json object of the requested dataset.
     """
     # url = 'http://134.67.114.8/HMSWS/api/WSHMS/'
-    # url = 'http://localhost:60049/api/' + model + '/' + submodel
-    url = os.environ.get('HMS_BACKEND_SERVER') + '/HMSWS/api/' + model + '/' + submodel
+    url = 'http://localhost:60049/api/' + model + '/' + submodel
+    # url = os.environ.get('HMS_BACKEND_SERVER') + '/HMSWS/api/' + model + '/' + submodel
     try:
         if len(request.form) == 0:
             data = json.loads(bytes(request.data).decode('utf-8', 'ignore'))
@@ -223,7 +223,7 @@ def hms_rest(model, submodel):
     except Exception as ex:
         return json.dumps({"ERROR": ex})
     result = requests.post(str(url), json=data, timeout=10000)
-    return result.content
+    return result.text
 
 
 @app.route('/hms/api/<model>/<submodel>/<version>', methods=['POST'])
@@ -234,8 +234,8 @@ def post_hms_submodel_rest(model, submodel, version):
     :return: json object of the requested dataset.
     """
     # url = 'http://134.67.114.8/HMSWS/api/WS' + submodel
-    # url = 'http://localhost:60049/api/' + model + '/' + submodel + '/' + version
-    url = os.environ.get('HMS_BACKEND_SERVER') + '/HMSWS/api/' + model + '/' + submodel + '/' + version
+    url = 'http://localhost:60049/api/' + model + '/' + submodel + '/' + version
+    # url = os.environ.get('HMS_BACKEND_SERVER') + '/HMSWS/api/' + model + '/' + submodel + '/' + version
     try:
         if len(request.form) == 0:
             data = json.loads(bytes(request.data).decode('utf-8', 'ignore'))
@@ -244,7 +244,7 @@ def post_hms_submodel_rest(model, submodel, version):
     except Exception as ex:
         return json.dumps({"ERROR": ex})
     result = requests.post(str(url), json=data, timeout=10000)
-    return result.content
+    return result.text
 
 
 # @app.route('/hms/rest/<submodel>/<parameters>', methods=['GET'])
