@@ -2,8 +2,8 @@
 FROM quanted/qed_py3
 
 # Install Python Dependencies
-COPY requirements.txt /tmp/
-RUN pip install --requirement /tmp/requirements.txt
+# COPY requirements.txt /tmp/
+# RUN pip install --requirement /tmp/requirements.txt
 
 # Install uWSGI
 RUN pip install uwsgi
