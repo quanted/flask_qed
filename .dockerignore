@@ -1,5 +1,5 @@
 .gitignore
 */sam_rest
 /env
-*/*/*/bin/Preprocessed*
-*/*/*/bin/Results*
+ubertool/ubertool/sam/bin/Preprocessed/*
+ubertool/ubertool/sam/bin/Results/*
