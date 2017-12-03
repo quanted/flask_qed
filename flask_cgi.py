@@ -6,6 +6,8 @@ import pandas as pd
 import requests
 import sys
 import tabulate
+from . import tasks
+
 try:
     from flask_cors import CORS
     cors = True
@@ -43,8 +45,6 @@ from REST_UBER import stir_rest as stir
 from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import therps_rest as therps
 from REST_UBER import trex_rest as trex
-
-from . import tasks
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({

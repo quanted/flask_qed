@@ -46,8 +46,8 @@ logging.info("REDIS HOSTNAME: {}".format(REDIS_HOSTNAME))
 redis_conn = redis.StrictRedis(host=REDIS_HOSTNAME, port=6379, db=0)
 
 app = Celery('tasks',
-             broker='redis://{}:6379/0'.format(REDIS_HOSTNAME),
-             backend='redis://{}:6379/0'.format(REDIS_HOSTNAME),)
+             broker='redis://redis:6379/0',
+             backend='redis://redis:6379/0',)
 
 app.conf.update(
     CELERY_ACCEPT_CONTENT=['json'],
