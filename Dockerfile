@@ -16,3 +16,4 @@ WORKDIR /src
 EXPOSE 7777
 
 CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
+RUN celery -A tasks worker -Q sam -c 1 --loglevel=DEBUG -n sam_worker

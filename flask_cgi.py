@@ -44,7 +44,7 @@ from REST_UBER import terrplant_rest as terrplant
 from REST_UBER import therps_rest as therps
 from REST_UBER import trex_rest as trex
 
-from celery_qed import tasks
+from . import tasks
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({

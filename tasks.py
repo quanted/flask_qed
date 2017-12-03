@@ -17,17 +17,17 @@ from celery import Celery
 from flask import request, Response
 from flask_restful import Resource
 
-# try:
-# from ubertool_ecorest.ubertool.ubertool.sam import sam_exe as sam
-# from ubertool_ecorest.REST_UBER import rest_model_caller, rest_validation
-# except:
-#     from ..ubertool.ubertool.sam import sam_exe as sam
-#     from ..REST_UBER import rest_model_caller, rest_validation
+try:
+    from ubertool_ecorest.ubertool.ubertool.sam import sam_exe as sam
+    from ubertool_ecorest.REST_UBER import rest_model_caller, rest_validation
+except:
+    from ubertool.ubertool.sam import sam_exe as sam
+    from REST_UBER import rest_model_caller, rest_validation
 
 # import ubertool_ecorest.ubertool.ubertool.sam.sam_exe as sam
 # import REST_UBER.rest_model_caller as rest_model_caller
-from .ubertool.sam import sam_exe as sam
-from .REST_UBER import rest_model_caller
+# from .ubertool.ubertool.sam import sam_exe as sam
+# from .REST_UBER import rest_model_caller
 
 
 logging.getLogger('celery.task.default').setLevel(logging.DEBUG)
