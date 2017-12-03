@@ -110,7 +110,7 @@ class SamData(Resource):
         return Response(data_json, mimetype='application/json')
 
 
-@app.task(name='celery_qed.tasks.sam_run', bind=True, ignore_result=False)
+@app.task(name='tasks.sam_run', bind=True, ignore_result=False)
 def sam_run(self, jobID, inputs):
     task_id = sam_run.request.id
     logging.info("celery_qed session id: {}".format(task_id))
