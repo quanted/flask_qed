@@ -89,7 +89,7 @@ class SamRun(Resource):
         for k, v in request.form.items():
             indexed_inputs[k] = {"0": v}
         valid_input = {"inputs": indexed_inputs, "run_type": "single"}
-        task_id = sam_run.apply_async(args=(jobId, valid_input["inputs"]), queue='sam', taskset_id=jobId)
+        task_id = sam_run.apply_async(args=(jobId, valid_input["inputs"]), queue='sam_worker', taskset_id=jobId)
         #task_id = sam_run(jobId, valid_input["inputs"]) #run tasks in flask thread (does not use celery)
         resp_body = json.dumps({'task_id': str(task_id.id)})
         response = Response(resp_body, mimetype='application/json')
