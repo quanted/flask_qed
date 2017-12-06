@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 import sys
 import tabulate
-from . import tasks
+import tasks
 
 try:
     from flask_cors import CORS
