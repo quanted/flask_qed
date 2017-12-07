@@ -83,14 +83,15 @@ class SamRun(Resource):
         :param jobId:
         :return:
         """
-        logging.info("celery_qed initated with session id: {}".format(jobId))
+        logging.info("celery_qed task start request with inputs: {}".format(str(request.form))
         indexed_inputs = {}
         # index the input dictionary
         for k, v in request.form.items():
             indexed_inputs[k] = {"0": v}
         valid_input = {"inputs": indexed_inputs, "run_type": "single"}
-        task_id = sam_run.apply_async(args=(jobId, valid_input["inputs"]), queue='sam_worker', taskset_id=jobId)
+        task_id = sam_run.apply_async(args=(jobId, valid_input["inputs"]), taskset_id=jobId)
         #task_id = sam_run(jobId, valid_input["inputs"]) #run tasks in flask thread (does not use celery)
+        logging.info("celery_qed initiated with session id:" {}.format(task_id)
         resp_body = json.dumps({'task_id': str(task_id.id)})
         response = Response(resp_body, mimetype='application/json')
         return response
