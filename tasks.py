@@ -7,11 +7,7 @@ import os
 import logging
 import redis
 import json
-import sys
-# sys.path.append("..")
-# sys.path.remove(os.path.dirname(__file__))
-# add your path to the sys path
-# sys.path.append(os.getcwd())
+import uuid
 
 from celery import Celery
 from flask import request, Response
@@ -23,11 +19,6 @@ try:
 except:
     from ubertool.ubertool.sam import sam_exe as sam
     from REST_UBER import rest_model_caller, rest_validation
-
-# import ubertool_ecorest.ubertool.ubertool.sam.sam_exe as sam
-# import REST_UBER.rest_model_caller as rest_model_caller
-# from .ubertool.ubertool.sam import sam_exe as sam
-# from .REST_UBER import rest_model_caller
 
 
 logging.getLogger('celery.task.default').setLevel(logging.DEBUG)
@@ -45,8 +36,8 @@ logging.info("REDIS HOSTNAME: {}".format(REDIS_HOSTNAME))
 
 redis_conn = redis.StrictRedis(host=REDIS_HOSTNAME, port=6379, db=0)
 
-app = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0',)
-# app = Celery('tasks', broker='redis://redis:6379/0', backend='redis://redis:6379/0',)
+#app = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0',)
+app = Celery('tasks', broker='redis://redis:6379/0', backend='redis://redis:6379/0',)
 
 app.conf.update(
     CELERY_ACCEPT_CONTENT=['json'],
@@ -63,14 +54,15 @@ class SamStatus(Resource):
         :param jobId:
         :return:
         """
-        logging.info("celery_qed received request for sam status")
+        logging.info("SAM task status request received for task: {}".format(str(task_id)))
         task = {}
         try:
             task = sam_status(task_id)
+            logging.info("SAM task id: " + task_id + " status: " + task['status'])
         except Exception as ex:
             task['status'] = str(ex)
+            logging.info("SAM task status request error: " + str(ex))
         resp_body = json.dumps({'task_id': task_id, 'task_status': task['status']})
-        logging.info("sam task id: " + task_id + " status: " + task['status'])
         response = Response(resp_body, mimetype='application/json')
         return response
 
@@ -82,43 +74,59 @@ class SamRun(Resource):
         :param jobId:
         :return:
         """
-        logging.info("celery_qed task start request with inputs: {}".format(str(request.form)))
+        logging.info("SAM task start request with inputs: {}".format(str(request.form)))
         indexed_inputs = {}
+        # TODO: set based on env variable
+        use_celery = True
         # index the input dictionary
         for k, v in request.form.items():
             indexed_inputs[k] = {"0": v}
         valid_input = {"inputs": indexed_inputs, "run_type": "single"}
-        # SAM Run with celery
-        # task_id = sam_run.apply_async(args=(jobId, valid_input["inputs"]), queue="sam", taskset_id=jobId)
-        # SAM Run without celery
-        task_id = sam_run(jobId, valid_input["inputs"])
-        logging.info("celery_qed initiated with session id:{}".format(task_id))
-        resp_body = json.dumps({'task_id': str(task_id.id)})
+        if use_celery:
+            # SAM Run with celery
+            try:
+                task_id = sam_run.apply_async(args=(jobId, valid_input["inputs"]), queue="sam", taskset_id=jobId)
+                logging.info("SAM celery task initiated with task id:{}".format(task_id))
+                resp_body = json.dumps({'task_id': str(task_id.id)})
+            except Exception as ex:
+                logging.info("SAM celery task failed: " + str(ex))
+                resp_body = json.dumps({'task_id': "1234567890"})
+        else:
+            # SAM Run without celery
+            sam_run(jobId, valid_input["inputs"])
+            task_id = uuid.uuid4()
+            logging.info("SAM flask task completed with task id:{}".format(task_id))
+            resp_body = json.dumps({'task_id': str(task_id)})
         response = Response(resp_body, mimetype='application/json')
         return response
 
 
 class SamData(Resource):
     def get(self, task_id):
-        data_json = ""
         dir_path = os.getcwd()
+        logging.info("SAM data request for task id: {}".format(task_id))
         try:
-            # TODO: NOT CORRECT OUTPUT FILE.
-            with open(dir_path + '\\ubertool\\ubertool\\sam\\bin\\Results\\' + str(task_id) + '\\Custom_json.csv', 'rb') as data:
+            with open(dir_path + '\\ubertool\\ubertool\\sam\\bin\\Results\\' + str(task_id) + '\\out_json.csv', 'rb') as data:
                 data_json = data.read()
             data_json = json.dumps(json.loads(data_json))
         except FileNotFoundError as er:
+            logging.info("SAM data file not found, data request not successful.")
             return "{'error': 'data file not found'}"
+        logging.info("SAM data file found, data request successful.")
         return Response(data_json, mimetype='application/json')
 
 
 @app.task(name='tasks.sam_run', bind=True, ignore_result=False)
 def sam_run(self, jobID, inputs):
     task_id = sam_run.request.id
-    logging.info("celery_qed session id: {}".format(task_id))
-    logging.info("sam starting...")
+    logging.info("SAM CELERY task id: {}".format(task_id))
+    logging.info("SAM CELERY task starting...")
     inputs["csrfmiddlewaretoken"] = {"0": task_id}
-    rest_model_caller.model_run("sam", task_id, inputs, module=sam)
+    # Commented out model call for celery connection testing
+    # rest_model_caller.model_run("sam", task_id, inputs, module=sam)
+    print("SAM CELERY task test answer is: 42")
+    logging.info("SAM CELERY task test answer is: 42")
+    logging.info("SAM CELERY task completed.")
 
 
 def sam_status(task_id):
