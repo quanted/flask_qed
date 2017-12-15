@@ -1,3 +1,6 @@
 [submodule "ubertool"]
 	path = ubertool
 	url = https://github.com/quanted/ubertool.git
+[submodule "temp_config"]
+	path = temp_config
+	url = https://github.com/quanted/temp_config.git

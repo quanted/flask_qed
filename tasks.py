@@ -24,6 +24,10 @@ except:
 logging.getLogger('celery.task.default').setLevel(logging.DEBUG)
 logging.getLogger().setLevel(logging.DEBUG)
 
+from temp_config.set_environment import DeployEnv
+runtime_env = DeployEnv()
+runtime_env.load_deployment_environment()
+
 redis_hostname = os.environ.get('REDIS_HOSTNAME')
 redis_port = os.environ.get('REDIS_PORT')
 REDIS_HOSTNAME = os.environ.get('REDIS_HOSTNAME')
