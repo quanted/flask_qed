@@ -34,7 +34,7 @@ if not os.environ.get('REDIS_HOSTNAME'):
 
 logging.info("REDIS HOSTNAME: {}".format(REDIS_HOSTNAME))
 
-redis_conn = redis.StrictRedis(host=REDIS_HOSTNAME, port=6379, db=0)
+redis_conn = redis.StrictRedis(host='redis', port=6379, db=0)
 
 #app = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0',)
 app = Celery('tasks', broker='redis://redis:6379/0', backend='redis://redis:6379/0',)
