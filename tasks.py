@@ -32,9 +32,9 @@ redis_hostname = os.environ.get('REDIS_HOSTNAME')
 redis_port = os.environ.get('REDIS_PORT')
 REDIS_HOSTNAME = os.environ.get('REDIS_HOSTNAME')
 
-# if not os.environ.get('REDIS_HOSTNAME'):
-#     os.environ.setdefault('REDIS_HOSTNAME', 'localhost')
-#     REDIS_HOSTNAME = os.environ.get('REDIS_HOSTNAME')
+if not os.environ.get('REDIS_HOSTNAME'):
+    os.environ.setdefault('REDIS_HOSTNAME', 'redis')
+    REDIS_HOSTNAME = os.environ.get('REDIS_HOSTNAME')
 
 logging.info("REDIS HOSTNAME: {}".format(REDIS_HOSTNAME))
 
