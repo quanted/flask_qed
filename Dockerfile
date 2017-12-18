@@ -15,5 +15,6 @@ COPY . /src/
 WORKDIR /src
 EXPOSE 7777
 
-CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
-RUN celery worker -A tasks -c 1 -Q sam --loglevel=DEBUG -n sam_worker
+#CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
+#RUN celery worker -A tasks -c 1 -Q sam --loglevel=DEBUG -n sam_worker
+CMD ["sh", "/src/start_flask.sh"]
