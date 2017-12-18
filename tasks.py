@@ -13,16 +13,18 @@ from celery import Celery
 from flask import request, Response
 from flask_restful import Resource
 
+logging.getLogger('celery.task.default').setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.DEBUG)
+
 try:
     from ubertool_ecorest.ubertool.ubertool.sam import sam_exe as sam
     from ubertool_ecorest.REST_UBER import rest_model_caller, rest_validation
 except:
+    logging.info("SAM Task except import attempt..")
     from ubertool.ubertool.sam import sam_exe as sam
     from REST_UBER import rest_model_caller, rest_validation
+    logging.info("SAM Task except import complete!")
 
-
-logging.getLogger('celery.task.default').setLevel(logging.DEBUG)
-logging.getLogger().setLevel(logging.DEBUG)
 
 from temp_config.set_environment import DeployEnv
 runtime_env = DeployEnv()
