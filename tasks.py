@@ -83,7 +83,7 @@ class SamRun(Resource):
         logging.info("SAM task start request with inputs: {}".format(str(request.form)))
         indexed_inputs = {}
         # TODO: set based on env variable
-        use_celery = True
+        use_celery = False
         # index the input dictionary
         for k, v in request.form.items():
             indexed_inputs[k] = {"0": v}
@@ -129,8 +129,8 @@ def sam_run(self, jobID, inputs):
     logging.info("SAM CELERY task starting...")
     inputs["csrfmiddlewaretoken"] = {"0": task_id}
     # Commented out model call for celery connection testing
-    # rest_model_caller.model_run("sam", task_id, inputs, module=sam)
-    logging.info("SAM CELERY task test answer is: 42")
+    rest_model_caller.model_run("sam", task_id, inputs, module=sam)
+    # logging.info("SAM CELERY task test answer is: 42")
     logging.info("SAM CELERY task completed.")
 
 
