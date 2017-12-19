@@ -111,13 +111,15 @@ class SamData(Resource):
     def get(self, task_id):
         dir_path = os.getcwd()
         logging.info("SAM data request for task id: {}".format(task_id))
+        file_path = dir_path + '\\ubertool\\ubertool\\sam\\bin\\Results\\' + str(task_id) + '\\out_json.csv'
         try:
-            with open(dir_path + '\\ubertool\\ubertool\\sam\\bin\\Results\\' + str(task_id) + '\\out_json.csv', 'rb') as data:
+            logging.info("SAM data request file path: {}".format(file_path))
+            with open(file_path, 'rb') as data:
                 data_json = data.read()
             data_json = json.dumps(json.loads(data_json))
         except FileNotFoundError as er:
             logging.info("SAM data file not found, data request not successful.")
-            return "{'error': 'data file not found'}"
+            return "{'error': 'data file not found', 'file_path': " + str(file_path) + "}"
         logging.info("SAM data file found, data request successful.")
         return Response(data_json, mimetype='application/json')
 
