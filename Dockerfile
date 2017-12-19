@@ -15,8 +15,8 @@ COPY . /src/
 WORKDIR /src
 EXPOSE 7777
 
-RUN chmod 755 /src/start_flask.sh
+#RUN chmod 755 /src/start_flask.sh
 
 #CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
 #RUN celery worker -A tasks -c 1 -Q sam --loglevel=DEBUG -n sam_worker
-CMD ["sh", "/src/start_flask.sh"]
+#CMD ["sh", "/src/start_flask.sh"]
