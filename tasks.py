@@ -111,7 +111,7 @@ class SamData(Resource):
     def get(self, task_id):
         dir_path = os.getcwd()
         logging.info("SAM data request for task id: {}".format(task_id))
-        file_path = dir_path + '\\ubertool\\ubertool\\sam\\bin\\Results\\' + str(task_id) + '\\out_json.csv'
+        file_path = './ubertool/ubertool/sam/bin/Results/' + str(task_id) + '/out_json.csv'
         try:
             logging.info("SAM data request file path: {}".format(file_path))
             with open(file_path, 'rb') as data:
