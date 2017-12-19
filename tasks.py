@@ -99,8 +99,8 @@ class SamRun(Resource):
                 resp_body = json.dumps({'task_id': "1234567890"})
         else:
             # SAM Run without celery
-            sam_run(jobId, valid_input["inputs"])
             task_id = uuid.uuid4()
+            sam_run(task_id, valid_input["inputs"])
             logging.info("SAM flask task completed with task id:{}".format(task_id))
             resp_body = json.dumps({'task_id': str(task_id)})
         response = Response(resp_body, mimetype='application/json')
@@ -124,7 +124,10 @@ class SamData(Resource):
 
 @app.task(name='tasks.sam_run', bind=True, ignore_result=False)
 def sam_run(self, jobID, inputs):
-    task_id = sam_run.request.id
+    if sam_run.request.id is not None:
+        task_id = sam_run.request.id
+    else:
+        task_id = jobID
     logging.info("SAM CELERY task id: {}".format(task_id))
     logging.info("SAM CELERY task starting...")
     inputs["csrfmiddlewaretoken"] = {"0": task_id}
