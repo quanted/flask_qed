@@ -83,7 +83,7 @@ class SamRun(Resource):
         logging.info("SAM task start request with inputs: {}".format(str(request.form)))
         indexed_inputs = {}
         # TODO: set based on env variable
-        use_celery = False
+        use_celery = True
         # index the input dictionary
         for k, v in request.form.items():
             indexed_inputs[k] = {"0": v}
