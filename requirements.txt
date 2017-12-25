@@ -1,5 +1,5 @@
 boto==2.48.0
-codecov==2.0.9
+codecov==2.0.10
 coverage==4.4.2
 coveralls==1.2.0
 flask==0.12.2
