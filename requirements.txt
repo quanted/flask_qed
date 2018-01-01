@@ -20,6 +20,6 @@ requests==2.18.4
 scipy==1.0.0
 sqlalchemy==1.2.0
 # sqlalchemy-utils==0.32.14
-tabulate==0.8.1
+tabulate==0.8.2
 
 
