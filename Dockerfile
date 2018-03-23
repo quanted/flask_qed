@@ -2,8 +2,8 @@
 FROM quanted/qed_py3
 
 # Install Python Dependencies
-COPY requirements.txt /tmp/
-RUN pip install --requirement /tmp/requirements.txt
+# COPY requirements.txt /tmp/
+# RUN pip install --requirement /tmp/requirements.txt
 
 # Install uWSGI
 RUN pip install uwsgi
@@ -15,4 +15,8 @@ COPY . /src/
 WORKDIR /src
 EXPOSE 7777
 
-CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
+RUN chmod 755 /src/start_flask.sh
+
+#CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
+#RUN celery worker -A tasks -c 1 -Q sam --loglevel=DEBUG -n sam_worker
+CMD ["sh", "/src/start_flask.sh"]
