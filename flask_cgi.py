@@ -167,10 +167,10 @@ def rest_error_message(error, jid):
 
 
 
-@app.route("/api/ubertool/spec/")
+@app.route("/api/pram/spec/")
 def spec():
     """
-    Route that returns the Swagger formatted JSON representing the Ubertool API.
+    Route that returns the Swagger formatted JSON representing the pram API.
     :return: Swagger formatted JSON string
     """
 
@@ -185,7 +185,7 @@ def spec():
     return jsonify(swag)  # This produces a 'pretty printed' JSON output
 
 
-@app.route("/api/ubertool/")
+@app.route("/api/pram/")
 def api_doc():
     """
     Route to serve the API documentation (Swagger UI) static page being served by the backend.
@@ -343,56 +343,56 @@ def post_hms_submodel_rest(model, submodel, version):
 # These are the endpoints that will be introspected by the swagger() method & shown on API spec page
 # TODO: Add model endpoints here once they are refactored
 
-print('http://localhost:7777/api/ubertool/')
-print('http://localhost:7777/api/ubertool/spec/')
-print('http://localhost:7777/rest/ubertool/agdrift/')
-api.add_resource(agdrift.AgdriftGet, '/rest/ubertool/agdrift/')
-api.add_resource(agdrift.AgdriftPost, '/rest/ubertool/agdrift/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/beerex/')
-api.add_resource(beerex.BeerexGet, '/rest/ubertool/beerex/')
-api.add_resource(beerex.BeerexPost, '/rest/ubertool/beerex/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/earthworm/')
-api.add_resource(earthworm.EarthwormGet, '/rest/ubertool/earthworm/')
-api.add_resource(earthworm.EarthwormPost, '/rest/ubertool/earthworm/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/exponential/')
-api.add_resource(exponential.ExponentialGet, '/rest/ubertool/exponential/')
-api.add_resource(exponential.ExponentialPost, '/rest/ubertool/exponential/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/iec/')
-api.add_resource(iec.IecGet, '/rest/ubertool/iec/')
-api.add_resource(iec.IecPost, '/rest/ubertool/iec/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/kabam/')
-api.add_resource(kabam.KabamGet, '/rest/ubertool/kabam/')
-api.add_resource(kabam.KabamPost, '/rest/ubertool/kabam/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/leslie_probit/')
-api.add_resource(leslie_probit.LeslieProbitGet, '/rest/ubertool/leslie_probit/')
-api.add_resource(leslie_probit.LeslieProbitPost, '/rest/ubertool/leslie_probit/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/rice/')
-api.add_resource(rice.RiceGet, '/rest/ubertool/rice/')
-api.add_resource(rice.RicePost, '/rest/ubertool/rice/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/sam/')
-# api.add_resource(sam.SamGet, '/rest/ubertool/sam/')
-api.add_resource(tasks.SamRun, '/rest/ubertool/sam/')
-api.add_resource(tasks.SamStatus, '/rest/ubertool/sam/status/<string:task_id>')
-api.add_resource(tasks.SamData, '/rest/ubertool/sam/data/<string:task_id>')
-# api.add_resource(sam.SamPost, '/rest/ubertool/sam/<string:jobId>')
-# api.add_resource(sam.SamStatus, '/rest/ubertool/sam/status/<string:jobId>')
+print('http://localhost:7777/api/pram/')
+print('http://localhost:7777/api/pram/spec/')
+print('http://localhost:7777/rest/pram/agdrift/')
+api.add_resource(agdrift.AgdriftGet, '/rest/pram/agdrift/')
+api.add_resource(agdrift.AgdriftPost, '/rest/pram/agdrift/<string:jobId>')
+print('http://localhost:7777/rest/pram/beerex/')
+api.add_resource(beerex.BeerexGet, '/rest/pram/beerex/')
+api.add_resource(beerex.BeerexPost, '/rest/pram/beerex/<string:jobId>')
+print('http://localhost:7777/rest/pram/earthworm/')
+api.add_resource(earthworm.EarthwormGet, '/rest/pram/earthworm/')
+api.add_resource(earthworm.EarthwormPost, '/rest/pram/earthworm/<string:jobId>')
+print('http://localhost:7777/rest/pram/exponential/')
+api.add_resource(exponential.ExponentialGet, '/rest/pram/exponential/')
+api.add_resource(exponential.ExponentialPost, '/rest/pram/exponential/<string:jobId>')
+print('http://localhost:7777/rest/pram/iec/')
+api.add_resource(iec.IecGet, '/rest/pram/iec/')
+api.add_resource(iec.IecPost, '/rest/pram/iec/<string:jobId>')
+print('http://localhost:7777/rest/pram/kabam/')
+api.add_resource(kabam.KabamGet, '/rest/pram/kabam/')
+api.add_resource(kabam.KabamPost, '/rest/pram/kabam/<string:jobId>')
+print('http://localhost:7777/rest/pram/leslie_probit/')
+api.add_resource(leslie_probit.LeslieProbitGet, '/rest/pram/leslie_probit/')
+api.add_resource(leslie_probit.LeslieProbitPost, '/rest/pram/leslie_probit/<string:jobId>')
+print('http://localhost:7777/rest/pram/rice/')
+api.add_resource(rice.RiceGet, '/rest/pram/rice/')
+api.add_resource(rice.RicePost, '/rest/pram/rice/<string:jobId>')
+print('http://localhost:7777/rest/pram/sam/')
+# api.add_resource(sam.SamGet, '/rest/pram/sam/')
+api.add_resource(tasks.SamRun, '/rest/pram/sam/')
+api.add_resource(tasks.SamStatus, '/rest/pram/sam/status/<string:task_id>')
+api.add_resource(tasks.SamData, '/rest/pram/sam/data/<string:task_id>')
+# api.add_resource(sam.SamPost, '/rest/pram/sam/<string:jobId>')
+# api.add_resource(sam.SamStatus, '/rest/pram/sam/status/<string:jobId>')
 #importing screenip instead of sip because of conda problems
-print('http://localhost:7777/rest/ubertool/sip/')
-api.add_resource(screenip.ScreenipGet, '/rest/ubertool/sip/')
-api.add_resource(screenip.ScreenipPost, '/rest/ubertool/sip/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/stir/')
-api.add_resource(stir.StirGet, '/rest/ubertool/stir/')
-api.add_resource(stir.StirPost, '/rest/ubertool/stir/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/terrplant/')
-api.add_resource(terrplant.TerrplantGet, '/rest/ubertool/terrplant/')
-api.add_resource(terrplant.TerrplantPost, '/rest/ubertool/terrplant/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/therps/')
-api.add_resource(therps.TherpsGet, '/rest/ubertool/therps/')
-api.add_resource(therps.TherpsPost, '/rest/ubertool/therps/<string:jobId>')
-print('http://localhost:7777/rest/ubertool/trex/')
-api.add_resource(trex.TrexGet, '/rest/ubertool/trex/')
-api.add_resource(trex.TrexPost, '/rest/ubertool/trex/<string:jobId>')
-#api.add_resource(ModelCaller, '/rest/ubertool/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
+print('http://localhost:7777/rest/pram/sip/')
+api.add_resource(screenip.ScreenipGet, '/rest/pram/sip/')
+api.add_resource(screenip.ScreenipPost, '/rest/pram/sip/<string:jobId>')
+print('http://localhost:7777/rest/pram/stir/')
+api.add_resource(stir.StirGet, '/rest/pram/stir/')
+api.add_resource(stir.StirPost, '/rest/pram/stir/<string:jobId>')
+print('http://localhost:7777/rest/pram/terrplant/')
+api.add_resource(terrplant.TerrplantGet, '/rest/pram/terrplant/')
+api.add_resource(terrplant.TerrplantPost, '/rest/pram/terrplant/<string:jobId>')
+print('http://localhost:7777/rest/pram/therps/')
+api.add_resource(therps.TherpsGet, '/rest/pram/therps/')
+api.add_resource(therps.TherpsPost, '/rest/pram/therps/<string:jobId>')
+print('http://localhost:7777/rest/pram/trex/')
+api.add_resource(trex.TrexGet, '/rest/pram/trex/')
+api.add_resource(trex.TrexPost, '/rest/pram/trex/<string:jobId>')
+#api.add_resource(ModelCaller, '/rest/pram/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
 
