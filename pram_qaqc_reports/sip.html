@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (elem.innerHTML === 'Passed') {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <p>Report generated on 26-Mar-2018 at 11:07:32 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.16.1</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;pytest&apos;: &apos;3.4.2&apos;, &apos;py&apos;: &apos;1.5.2&apos;, &apos;pluggy&apos;: &apos;0.6.0&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.14393-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;metadata&apos;: &apos;1.6.0&apos;, &apos;html&apos;: &apos;1.16.1&apos;, &apos;celery&apos;: &apos;4.1.0&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.6.3</td></tr></table>
+    <h2>Summary</h2>
+    <p>33 tests ran in 54.69 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">33 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_assert_output_series</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>model output properties as pandas series
+╒════╤═════╤═════╕
+│    │   0 │   1 │
+╞════╪═════╪═════╡
+│  0 │   1 │   1 │
+├────┼─────┼─────┤
+│  1 │   1 │   1 │
+├────┼─────┼─────┤
+│  2 │   1 │   1 │
+├────┼─────┼─────┤
+│  3 │   1 │   1 │
+├────┼─────┼─────┤
+│  4 │   1 │   1 │
+├────┼─────┼─────┤
+│  5 │   1 │   1 │
+├────┼─────┼─────┤
+│  6 │   1 │   1 │
+├────┼─────┼─────┤
+│  7 │   1 │   1 │
+├────┼─────┼─────┤
+│  8 │   1 │   1 │
+├────┼─────┼─────┤
+│  9 │   1 │   1 │
+├────┼─────┼─────┤
+│ 10 │   1 │   1 │
+├────┼─────┼─────┤
+│ 11 │   1 │   1 │
+├────┼─────┼─────┤
+│ 12 │   1 │   1 │
+├────┼─────┼─────┤
+│ 13 │   1 │   1 │
+├────┼─────┼─────┤
+│ 14 │   1 │   1 │
+├────┼─────┼─────┤
+│ 15 │   1 │   1 │
+╘════╧═════╧═════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_assert_output_series_dtypes</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_act</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_act
+====  ==========  ==========
+  ..     out_act     exp_act
+====  ==========  ==========
+   0   7.69161     7.69161
+   1   2.30748     2.30748
+   2   0.769161    0.769161
+   3   3.8458      3.8458
+   4   0.57687     0.57687
+   5  12.5373     12.5373
+   6   0.0769161   0.0769161
+   7  26.4591     26.4591
+   8   0.0769161   0.0769161
+   9   0.0769161   0.0769161
+  10   0.0769161   0.0769161
+====  ==========  ==========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_acuconb</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>screenip integration test for acuconb
+
+                                          out_acuconb  \
+0   Drinking water exposure alone is NOT a potenti...   
+1   Drinking water exposure alone is NOT a potenti...   
+2   Exposure through drinking water alone is a pot...   
+3   Exposure through drinking water alone is a pot...   
+4   Drinking water exposure alone is NOT a potenti...   
+5   Exposure through drinking water alone is a pot...   
+6   Exposure through drinking water alone is a pot...   
+7   Exposure through drinking water alone is a pot...   
+8   Exposure through drinking water alone is a pot...   
+9   Exposure through drinking water alone is a pot...   
+10  Exposure through drinking water alone is a pot...   
+
+                                          exp_acuconb  
+0   Drinking water exposure alone is NOT a potenti...  
+1   Drinking water exposure alone is NOT a potenti...  
+2   Exposure through drinking water alone is a pot...  
+3   Exposure through drinking water alone is a pot...  
+4   Drinking water exposure alone is NOT a potenti...  
+5   Exposure through drinking water alone is a pot...  
+6   Exposure through drinking water alone is a pot...  
+7   Exposure through drinking water alone is a pot...  
+8   Exposure through drinking water alone is a pot...  
+9   Exposure through drinking water alone is a pot...  
+10  Exposure through drinking water alone is a pot...  
+
+
+test_screenip_integration_acuconb
+====  ======================================================================  ======================================================================
+  ..  out_acuconb                                                             exp_acuconb
+====  ======================================================================  ======================================================================
+   0  Drinking water exposure alone is NOT a potential concern for birds      Drinking water exposure alone is NOT a potential concern for birds
+   1  Drinking water exposure alone is NOT a potential concern for birds      Drinking water exposure alone is NOT a potential concern for birds
+   2  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   3  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   4  Drinking water exposure alone is NOT a potential concern for birds      Drinking water exposure alone is NOT a potential concern for birds
+   5  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   6  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   7  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   8  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   9  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+  10  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+====  ======================================================================  ======================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_acuconm</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>screenip integration test for acuconm
+
+                                          out_acuconm  \
+0   Drinking water exposure alone is NOT a potenti...   
+1   Drinking water exposure alone is NOT a potenti...   
+2   Drinking water exposure alone is NOT a potenti...   
+3   Drinking water exposure alone is NOT a potenti...   
+4   Drinking water exposure alone is NOT a potenti...   
+5   Drinking water exposure alone is NOT a potenti...   
+6   Exposure through drinking water alone is a pot...   
+7   Drinking water exposure alone is NOT a potenti...   
+8   Exposure through drinking water alone is a pot...   
+9   Exposure through drinking water alone is a pot...   
+10  Exposure through drinking water alone is a pot...   
+
+                                          exp_acuconm  
+0   Drinking water exposure alone is NOT a potenti...  
+1   Drinking water exposure alone is NOT a potenti...  
+2   Drinking water exposure alone is NOT a potenti...  
+3   Drinking water exposure alone is NOT a potenti...  
+4   Drinking water exposure alone is NOT a potenti...  
+5   Drinking water exposure alone is NOT a potenti...  
+6   Exposure through drinking water alone is a pot...  
+7   Drinking water exposure alone is NOT a potenti...  
+8   Exposure through drinking water alone is a pot...  
+9   Exposure through drinking water alone is a pot...  
+10  Exposure through drinking water alone is a pot...  
+
+
+test_screenip_integration_acuconm
+====  ========================================================================  ========================================================================
+  ..  out_acuconm                                                               exp_acuconm
+====  ========================================================================  ========================================================================
+   0  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   1  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   2  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   3  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   4  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   5  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   6  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+   7  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   8  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+   9  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+  10  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+====  ========================================================================  ========================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_acute_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_acute_bird
+====  ================  ================
+  ..    out_acute_bird    exp_acute_bird
+====  ================  ================
+   0        0.00928759        0.00928759
+   1        0.025916          0.025916
+   2        0.569132          0.569132
+   3       65.0007           65.0007
+   4        0.00324131        0.00324131
+   5        2.66733           2.66733
+   6      335.765           335.765
+   7        0.463512          0.463512
+   8        1.2798e+06        1.2798e+06
+   9        0.379784          0.379784
+  10        0.379784          0.379784
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_acute_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_acute_mamm
+====  ================  ================
+  ..    out_acute_mamm    exp_acute_mamm
+====  ================  ================
+   0       0.00418765        0.00418765
+   1       3.62265e-05       3.62265e-05
+   2       0.00366877        0.00366877
+   3       0.0117798         0.0117798
+   4       0.00188312        0.00188312
+   5       0.090327          0.090327
+   6       8.83606           8.83606
+   7       0.0186141         0.0186141
+   8    1490.8            1490.8
+   9       4.09971           4.09971
+  10       4.09971           4.09971
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_at_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_at_bird
+====  =============  =============
+  ..    out_at_bird    exp_at_bird
+====  =============  =============
+   0    3052.46        3052.46
+   1      25.3165        25.3165
+   2       1.49438        1.49438
+   3       0.747685       0.747685
+   4      79.9677        79.9677
+   5     112.36         112.36
+   6       3.13612        3.13612
+   7     258.634        258.634
+   8       0.126582       0.126582
+   9     117.303        117.303
+  10     117.303        117.303
+====  =============  =============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_at_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_at_mamm
+====  =============  =============
+  ..    out_at_mamm    exp_at_mamm
+====  =============  =============
+   0     1437.56        1437.56
+   1     3845.8         3845.8
+   2       49.2263        49.2263
+   3      876.074        876.074
+   4       29.2281        29.2281
+   5      704.551        704.551
+   6       25.3054        25.3054
+   7     1367.57        1367.57
+   8       23.0748        23.0748
+   9        2.30748        2.30748
+  10        2.30748        2.30748
+====  =============  =============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_chron_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_chron_bird
+====  ================  ================
+  ..    out_chron_bird    exp_chron_bird
+====  ================  ================
+   0         2.53968           2.53968
+   1         0.0403415         0.0403415
+   2         0.685713          0.685713
+   3       118.023           118.023
+   4         0.174149          0.174149
+   5        24.962            24.962
+   6     10405.5           10405.5
+   7        10.2524           10.2524
+   8    508004            508004
+   9        66.8427           66.8427
+  10        66.8427           66.8427
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_chron_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_chron_mamm
+====  ================  ================
+  ..    out_chron_mamm    exp_chron_mamm
+====  ================  ================
+   0         0.782671          0.782671
+   1         0.0603775         0.0603775
+   2         0.234801          0.234801
+   3         2.68344           2.68344
+   4         0.0954114         0.0954114
+   5         5.07605           5.07605
+   6      2907.07           2907.07
+   7         0.962088          0.962088
+   8    447241            447241
+   9       122.991           122.991
+  10       122.991           122.991
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_chronconb</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>screenip integration test for chronconb
+
+                                        out_chronconb  \
+0   Exposure through drinking water alone is a pot...   
+1   Drinking water exposure alone is NOT a potenti...   
+2   Drinking water exposure alone is NOT a potenti...   
+3   Exposure through drinking water alone is a pot...   
+4   Drinking water exposure alone is NOT a potenti...   
+5   Exposure through drinking water alone is a pot...   
+6   Exposure through drinking water alone is a pot...   
+7   Exposure through drinking water alone is a pot...   
+8   Exposure through drinking water alone is a pot...   
+9   Exposure through drinking water alone is a pot...   
+10  Exposure through drinking water alone is a pot...   
+
+                                        exp_chronconb  
+0   Exposure through drinking water alone is a pot...  
+1   Drinking water exposure alone is NOT a potenti...  
+2   Drinking water exposure alone is NOT a potenti...  
+3   Exposure through drinking water alone is a pot...  
+4   Drinking water exposure alone is NOT a potenti...  
+5   Exposure through drinking water alone is a pot...  
+6   Exposure through drinking water alone is a pot...  
+7   Exposure through drinking water alone is a pot...  
+8   Exposure through drinking water alone is a pot...  
+9   Exposure through drinking water alone is a pot...  
+10  Exposure through drinking water alone is a pot...  
+
+
+test_screenip_integration_chronconb
+====  ======================================================================  ======================================================================
+  ..  out_chronconb                                                           exp_chronconb
+====  ======================================================================  ======================================================================
+   0  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   1  Drinking water exposure alone is NOT a potential concern for birds      Drinking water exposure alone is NOT a potential concern for birds
+   2  Drinking water exposure alone is NOT a potential concern for birds      Drinking water exposure alone is NOT a potential concern for birds
+   3  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   4  Drinking water exposure alone is NOT a potential concern for birds      Drinking water exposure alone is NOT a potential concern for birds
+   5  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   6  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   7  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   8  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+   9  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+  10  Exposure through drinking water alone is a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+====  ======================================================================  ======================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_chronconm</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>screenip integration test for chronconm
+
+                                        out_chronconm  \
+0   Drinking water exposure alone is NOT a potenti...   
+1   Drinking water exposure alone is NOT a potenti...   
+2   Drinking water exposure alone is NOT a potenti...   
+3   Exposure through drinking water alone is a pot...   
+4   Drinking water exposure alone is NOT a potenti...   
+5   Exposure through drinking water alone is a pot...   
+6   Exposure through drinking water alone is a pot...   
+7   Drinking water exposure alone is NOT a potenti...   
+8   Exposure through drinking water alone is a pot...   
+9   Exposure through drinking water alone is a pot...   
+10  Exposure through drinking water alone is a pot...   
+
+                                        exp_chronconm  
+0   Drinking water exposure alone is NOT a potenti...  
+1   Drinking water exposure alone is NOT a potenti...  
+2   Drinking water exposure alone is NOT a potenti...  
+3   Exposure through drinking water alone is a pot...  
+4   Drinking water exposure alone is NOT a potenti...  
+5   Exposure through drinking water alone is a pot...  
+6   Exposure through drinking water alone is a pot...  
+7   Drinking water exposure alone is NOT a potenti...  
+8   Exposure through drinking water alone is a pot...  
+9   Exposure through drinking water alone is a pot...  
+10  Exposure through drinking water alone is a pot...  
+
+
+test_screenip_integration_chronconm
+====  ========================================================================  ========================================================================
+  ..  out_chronconm                                                             exp_chronconm
+====  ========================================================================  ========================================================================
+   0  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   1  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   2  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   3  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+   4  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   5  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+   6  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+   7  Drinking water exposure alone is NOT a potential concern for mammals      Drinking water exposure alone is NOT a potential concern for mammals
+   8  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+   9  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+  10  Exposure through drinking water alone is a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals
+====  ========================================================================  ========================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_det</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_det
+====  =========  =========
+  ..    out_det    exp_det
+====  =========  =========
+   0  11.1628    11.1628
+   1  16.2636    16.2636
+   2   1.24031    1.24031
+   3   0.411784   0.411784
+   4   1.48838    1.48838
+   5  12.0062    12.0062
+   6   0.101196   0.101196
+   7  11.6928    11.6928
+   8   0.318895   0.318895
+   9   0.66649    0.66649
+  10   0.66649    0.66649
+====  =========  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_dose_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_dose_bird
+====  ===============  ===============
+  ..    out_dose_bird    exp_dose_bird
+====  ===============  ===============
+   0          28.35            28.35
+   1           0.6561           0.6561
+   2           0.8505           0.8505
+   3          48.6             48.6
+   4           0.2592           0.2592
+   5         299.7            299.7
+   6        1053             1053
+   7         119.88           119.88
+   8      162000           162000
+   9          44.55            44.55
+  10          44.55            44.55
+====  ===============  ===============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_integration.py::TestScreenip::test_screenip_integration_dose_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_integration_dose_mamm
+====  ===============  ===============
+  ..    out_dose_mamm    exp_dose_mamm
+====  ===============  ===============
+   0          6.02             6.02
+   1          0.13932          0.13932
+   2          0.1806           0.1806
+   3         10.32            10.32
+   4          0.05504          0.05504
+   5         63.64            63.64
+   6        223.6            223.6
+   7         25.456           25.456
+   8      34400            34400
+   9          9.46             9.46
+  10          9.46             9.46
+====  ===============  ===============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_act</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_act
+=======  =======  =======
+      0        1        2
+=======  =======  =======
+10.5737  124.803  416.487
+10.5737  124.803  416.487
+=======  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_acuconb</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_acuconb
+======================================================================  ==================================================================  ======================================================================
+0                                                                       1                                                                   2
+======================================================================  ==================================================================  ======================================================================
+Exposure through drinking water alone is a potential concern for birds  Drinking water exposure alone is NOT a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+Exposure through drinking water alone is a potential concern for birds  Drinking water exposure alone is NOT a potential concern for birds  Exposure through drinking water alone is a potential concern for birds
+======================================================================  ==================================================================  ======================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_acuconm</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_acuconm
+====================================================================  ========================================================================  ====================================================================
+0                                                                     1                                                                         2
+====================================================================  ========================================================================  ====================================================================
+Drinking water exposure alone is NOT a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals  Drinking water exposure alone is NOT a potential concern for mammals
+Drinking water exposure alone is NOT a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals  Drinking water exposure alone is NOT a potential concern for mammals
+====================================================================  ========================================================================  ====================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_acute_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_acute_bird
+===  =======  ========
+  0        1         2
+===  =======  ========
+ 10  5.22093  0.47964
+ 10  5.22093  0.479639
+===  =======  ========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_acute_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_acute_mamm
+===  =======  =======
+  0        1        2
+===  =======  =======
+ 10  14.6866  2.12485
+ 10  14.6866  2.12485
+===  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_at_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_at_bird
+====  =======  =======
+   0        1        2
+====  =======  =======
+1000  687.923  109.336
+1000  687.923  109.336
+====  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_at_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_at_mamm
+=======  =======  =======
+      0        1        2
+=======  =======  =======
+11.8921  214.057  412.686
+11.8921  214.057  412.686
+=======  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_chron_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_chron_bird
+===  ========  =======
+  0         1        2
+===  ========  =======
+0.5  0.108911  2.39858
+0.5  0.10891   2.39857
+===  ========  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_chron_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_chron_mamm
+===  =======  =======
+  0        1        2
+===  =======  =======
+  2  14.1333  244.724
+  2  14.1333  244.725
+===  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_chronconb</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_chronconb
+==================================================================  ======================================================================  ==================================================================
+0                                                                   1                                                                       2
+==================================================================  ======================================================================  ==================================================================
+Drinking water exposure alone is NOT a potential concern for birds  Exposure through drinking water alone is a potential concern for birds  Drinking water exposure alone is NOT a potential concern for birds
+Drinking water exposure alone is NOT a potential concern for birds  Exposure through drinking water alone is a potential concern for birds  Drinking water exposure alone is NOT a potential concern for birds
+==================================================================  ======================================================================  ==================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_chronconm</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_chronconm
+====================================================================  ========================================================================  ====================================================================
+0                                                                     1                                                                         2
+====================================================================  ========================================================================  ====================================================================
+Drinking water exposure alone is NOT a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals  Drinking water exposure alone is NOT a potential concern for mammals
+Drinking water exposure alone is NOT a potential concern for mammals  Exposure through drinking water alone is a potential concern for mammals  Drinking water exposure alone is NOT a potential concern for mammals
+====================================================================  ========================================================================  ====================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_det</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_det
+======  =======  =======  =======
+     0        1        2        3
+======  =======  =======  =======
+4.2174  4.96126  7.97237  10.6646
+4.2174  4.96125  7.97237  10.6646
+======  =======  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_dose_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_dose_bird
+=====  ======  ======
+    0       1       2
+=====  ======  ======
+1e+06  4805.5  849727
+1e+06  4805.5  849727
+=====  ======  ======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_dose_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_dose_mamm
+=====  =======  ===========
+    0        1            2
+=====  =======  ===========
+8e+06  48205.8  3.80804e+06
+8e+06  48205.8  3.80804e+06
+=====  =======  ===========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_fi_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_fi_bird
+=========  =========  =========
+        0          1          2
+=========  =========  =========
+0.0129994  0.0265784  0.0204124
+0.012999   0.026578   0.020412
+=========  =========  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_fw_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_fw_bird
+======  ======  ======
+     0       1       2
+======  ======  ======
+0.0162  0.0162  0.0162
+0.0162  0.0162  0.0162
+======  ======  ======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/screenip/tests/test_screenip_unittest.py::TestScreenip::test_screenip_unit_fw_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_screenip_unit_fw_mamm
+=====  =====  =====
+    0      1      2
+=====  =====  =====
+0.172  0.172  0.172
+0.172  0.172  0.172
+=====  =====  =====
+</div></td></tr></tbody></table></body></html>

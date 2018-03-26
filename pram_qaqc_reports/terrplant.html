@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (elem.innerHTML === 'Passed') {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <p>Report generated on 26-Mar-2018 at 11:10:31 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.16.1</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;pytest&apos;: &apos;3.4.2&apos;, &apos;py&apos;: &apos;1.5.2&apos;, &apos;pluggy&apos;: &apos;0.6.0&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.14393-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;metadata&apos;: &apos;1.6.0&apos;, &apos;html&apos;: &apos;1.16.1&apos;, &apos;celery&apos;: &apos;4.1.0&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.6.3</td></tr></table>
+    <h2>Summary</h2>
+    <p>68 tests ran in 52.61 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">68 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_assert_output_series</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>model output properties as pandas series
+╒════╤═════╤═════╕
+│    │   0 │   1 │
+╞════╪═════╪═════╡
+│  0 │   1 │   1 │
+├────┼─────┼─────┤
+│  1 │   1 │   1 │
+├────┼─────┼─────┤
+│  2 │   1 │   1 │
+├────┼─────┼─────┤
+│  3 │   1 │   1 │
+├────┼─────┼─────┤
+│  4 │   1 │   1 │
+├────┼─────┼─────┤
+│  5 │   1 │   1 │
+├────┼─────┼─────┤
+│  6 │   1 │   1 │
+├────┼─────┼─────┤
+│  7 │   1 │   1 │
+├────┼─────┼─────┤
+│  8 │   1 │   1 │
+├────┼─────┼─────┤
+│  9 │   1 │   1 │
+├────┼─────┼─────┤
+│ 10 │   1 │   1 │
+├────┼─────┼─────┤
+│ 11 │   1 │   1 │
+├────┼─────┼─────┤
+│ 12 │   1 │   1 │
+├────┼─────┼─────┤
+│ 13 │   1 │   1 │
+├────┼─────┼─────┤
+│ 14 │   1 │   1 │
+├────┼─────┼─────┤
+│ 15 │   1 │   1 │
+├────┼─────┼─────┤
+│ 16 │   1 │   1 │
+├────┼─────┼─────┤
+│ 17 │   1 │   1 │
+├────┼─────┼─────┤
+│ 18 │   1 │   1 │
+├────┼─────┼─────┤
+│ 19 │   1 │   1 │
+├────┼─────┼─────┤
+│ 20 │   1 │   1 │
+├────┼─────┼─────┤
+│ 21 │   1 │   1 │
+├────┼─────┼─────┤
+│ 22 │   1 │   1 │
+├────┼─────┼─────┤
+│ 23 │   1 │   1 │
+├────┼─────┼─────┤
+│ 24 │   1 │   1 │
+├────┼─────┼─────┤
+│ 25 │   1 │   1 │
+├────┼─────┼─────┤
+│ 26 │   1 │   1 │
+├────┼─────┼─────┤
+│ 27 │   1 │   1 │
+├────┼─────┼─────┤
+│ 28 │   1 │   1 │
+├────┼─────┼─────┤
+│ 29 │   1 │   1 │
+├────┼─────┼─────┤
+│ 30 │   1 │   1 │
+├────┼─────┼─────┤
+│ 31 │   1 │   1 │
+├────┼─────┼─────┤
+│ 32 │   1 │   1 │
+╘════╧═════╧═════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_assert_output_series_dtypes</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lds_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_loc_dry
+====  =======================================================================================================================================  =======================================================================================================================================
+  ..  out_lds_loc_dry                                                                                                                          exp_lds_loc_dry
+====  =======================================================================================================================================  =======================================================================================================================================
+   0  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   1  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   2  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   3  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   4  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   5  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   6  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   7  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   8  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   9  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+  10  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+  11  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+====  =======================================================================================================================================  =======================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lds_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_loc_semi
+====  ================================================================================================================================================  ================================================================================================================================================
+  ..  out_lds_loc_semi                                                                                                                                  exp_lds_loc_semi
+====  ================================================================================================================================================  ================================================================================================================================================
+   0  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   1  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   2  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   3  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   4  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   5  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   6  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   7  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   8  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.
+   9  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+  10  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+  11  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+====  ================================================================================================================================================  ================================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lds_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_loc_spray
+====  ===============================================================================================================================  ===============================================================================================================================
+  ..  out_lds_loc_spray                                                                                                                exp_lds_loc_spray
+====  ===============================================================================================================================  ===============================================================================================================================
+   0  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   1  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   2  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   3  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   4  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   5  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   6  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   7  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   8  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.
+   9  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+  10  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+  11  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+====  ===============================================================================================================================  ===============================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lds_rq_dry</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_rq_dry
+====  ================  ================
+  ..    out_lds_rq_dry    exp_lds_rq_dry
+====  ================  ================
+   0         12.6316           12.6316
+   1         12.6316           12.6316
+   2         12.6316           12.6316
+   3         11.28             11.28
+   4         22.56             22.56
+   5         37.6              37.6
+   6         13.16             13.16
+   7          6.89333           6.89333
+   8          0.136364          0.136364
+   9          0.89153           0.89153
+  10         18.1588           18.1588
+  11         30.2647           30.2647
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lds_rq_semi</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_rq_semi
+====  =================  =================
+  ..    out_lds_rq_semi    exp_lds_rq_semi
+====  =================  =================
+   0         107.368             107.368
+   1         107.368             107.368
+   2         107.368             107.368
+   3          95.88               95.88
+   4         191.76              191.76
+   5         206.8               206.8
+   6          97.76               97.76
+   7          35.0933             35.0933
+   8           0.954545            0.95455
+   9           7.57801             7.57801
+  10         154.35              154.35
+  11         166.456             166.456
+====  =================  =================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lds_rq_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_rq_spray
+====  ==================  ==================
+  ..    out_lds_rq_spray    exp_lds_rq_spray
+====  ==================  ==================
+   0           2.10526              2.10526
+   1           2.10526              2.10526
+   2           2.10526              2.10526
+   3           9.4                  9.4
+   4          18.8                 18.8
+   5          94                   94
+   6          18.8                 18.8
+   7          18.8                 18.8
+   8           0.0454545            0.045455
+   9          38.3142              38.3142
+  10         395.769              395.769
+  11        1978.85              1978.85
+====  ==================  ==================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lms_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_loc_dry
+====  =========================================================================================================================================  =========================================================================================================================================
+  ..  out_lms_loc_dry                                                                                                                            exp_lms_loc_dry
+====  =========================================================================================================================================  =========================================================================================================================================
+   0  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   1  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   2  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   3  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   4  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   5  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   6  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   7  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   8  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   9  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+  10  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+  11  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+====  =========================================================================================================================================  =========================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lms_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_loc_semi
+====  ==================================================================================================================================================  ==================================================================================================================================================
+  ..  out_lms_loc_semi                                                                                                                                    exp_lms_loc_semi
+====  ==================================================================================================================================================  ==================================================================================================================================================
+   0  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   1  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   2  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   3  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   4  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   5  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   6  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   7  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   8  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.
+   9  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.
+  10  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+  11  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+====  ==================================================================================================================================================  ==================================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lms_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_loc_spray
+====  =================================================================================================================================  =================================================================================================================================
+  ..  out_lms_loc_spray                                                                                                                  exp_lms_loc_spray
+====  =================================================================================================================================  =================================================================================================================================
+   0  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   1  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   2  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   3  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   4  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   5  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   6  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   7  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   8  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.
+   9  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.
+  10  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+  11  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+====  =================================================================================================================================  =================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lms_rq_dry</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_rq_dry
+====  ================  ================
+  ..    out_lms_rq_dry    exp_lms_rq_dry
+====  ================  ================
+   0          7.05882            7.05882
+   1          7.05882            7.05882
+   2          7.05882            7.05882
+   3          0.94               0.94
+   4          1.88               1.88
+   5          3.13333            3.13333
+   6          1.09667            1.09667
+   7          0.574444           0.57444
+   8          0.015              0.015
+   9          0.09375            0.09375
+  10          2.28667            2.28667
+  11          3.81111            3.81111
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lms_rq_semi</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_rq_semi
+====  =================  =================
+  ..    out_lms_rq_semi    exp_lms_rq_semi
+====  =================  =================
+   0          60                  60
+   1          60                  60
+   2          60                  60
+   3           7.99                7.99
+   4          15.98               15.98
+   5          17.2333             17.2333
+   6           8.14667             8.14667
+   7           2.92444             2.92444
+   8           0.105               0.105
+   9           0.796875            0.79688
+  10          19.4367             19.4367
+  11          20.9611             20.9611
+====  =================  =================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_lms_rq_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_rq_spray
+====  ==================  ==================
+  ..    out_lms_rq_spray    exp_lms_rq_spray
+====  ==================  ==================
+   0           1.17647              1.17647
+   1           1.17647              1.17647
+   2           1.17647              1.17647
+   3           9.4                  9.4
+   4          18.8                 18.8
+   5          94                   94
+   6          18.8                 18.8
+   7          18.8                 18.8
+   8           0.005                0.005
+   9           0.0729927            0.072993
+  10           2.94                 2.94
+  11          14.7                 14.7
+====  ==================  ==================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_min_lds_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_lds_spray
+====  ===================  ===================
+  ..    out_min_lds_spray    exp_min_lds_spray
+====  ===================  ===================
+   0             0.019                0.019
+   1             0.019                0.019
+   2             0.019                0.019
+   3             0.0001               0.0001
+   4             0.0001               0.0001
+   5             0.0001               0.0001
+   6             0.0001               0.0001
+   7             0.0001               0.0001
+   8             0.11                 0.11
+   9             0.000261             0.000261
+  10             2.6e-05              2.6e-05
+  11             2.6e-05              2.6e-05
+====  ===================  ===================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_min_lms_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_lms_spray
+====  ===================  ===================
+  ..    out_min_lms_spray    exp_min_lms_spray
+====  ===================  ===================
+   0               0.034                0.034
+   1               0.034                0.034
+   2               0.034                0.034
+   3               0.0001               0.0001
+   4               0.0001               0.0001
+   5               0.0001               0.0001
+   6               0.0001               0.0001
+   7               0.0001               0.0001
+   8               1                    1
+   9               0.137                0.137
+  10               0.0035               0.0035
+  11               0.0035               0.0035
+====  ===================  ===================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_min_nds_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_nds_spray
+====  ===================  ===================
+  ..    out_min_nds_spray    exp_min_nds_spray
+====  ===================  ===================
+   0             0.0023               0.0023
+   1             0.0023               0.0023
+   2             0.0023               0.0023
+   3             0.00023              0.00023
+   4             0.00023              0.00023
+   5             0.00023              0.00023
+   6             0.00023              0.00023
+   7             0.00023              0.00023
+   8             0.13                 0.13
+   9             0.000513             0.000513
+  10             0.00016              0.00016
+  11             0.00016              0.00016
+====  ===================  ===================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_min_nms_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_nms_spray
+====  ===================  ===================
+  ..    out_min_nms_spray    exp_min_nms_spray
+====  ===================  ===================
+   0               0.0067               0.0067
+   1               0.0067               0.0067
+   2               0.0067               0.0067
+   3               0.0009               0.0009
+   4               0.0009               0.0009
+   5               0.0009               0.0009
+   6               0.0009               0.0009
+   7               0.0009               0.0009
+   8               1                    1
+   9               0.472                0.472
+  10               0.028                0.028
+  11               0.028                0.028
+====  ===================  ===================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nds_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_loc_dry
+====  ===========================================================================================================================================  ===========================================================================================================================================
+  ..  out_nds_loc_dry                                                                                                                              exp_nds_loc_dry
+====  ===========================================================================================================================================  ===========================================================================================================================================
+   0  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   1  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   2  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   3  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   4  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   5  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   6  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   7  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   8  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   9  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+  10  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+  11  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+====  ===========================================================================================================================================  ===========================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nds_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_loc_semi
+====  ====================================================================================================================================================  ====================================================================================================================================================
+  ..  out_nds_loc_semi                                                                                                                                      exp_nds_loc_semi
+====  ====================================================================================================================================================  ====================================================================================================================================================
+   0  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   1  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   2  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   3  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   4  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   5  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   6  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   7  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   8  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.
+   9  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+  10  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+  11  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+====  ====================================================================================================================================================  ====================================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nds_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_loc_spray
+====  ===================================================================================================================================  ===================================================================================================================================
+  ..  out_nds_loc_spray                                                                                                                    exp_nds_loc_spray
+====  ===================================================================================================================================  ===================================================================================================================================
+   0  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   1  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   2  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   3  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   4  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   5  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   6  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   7  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   8  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.
+   9  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+  10  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+  11  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+====  ===================================================================================================================================  ===================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nds_rq_dry</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_rq_dry
+====  ================  ================
+  ..    out_nds_rq_dry    exp_nds_rq_dry
+====  ================  ================
+   0        104.348           104.348
+   1        104.348           104.348
+   2        104.348           104.348
+   3          2.96842           2.96842
+   4          5.93684           5.93684
+   5          9.89474           9.89474
+   6          3.46316           3.46316
+   7          1.81404           1.81403
+   8          0.115385          0.115385
+   9          0.487805          0.487805
+  10          9.35455           9.35454
+  11         15.5909           15.5909
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nds_rq_semi</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_rq_semi
+====  =================  =================
+  ..    out_nds_rq_semi    exp_nds_rq_semi
+====  =================  =================
+   0         886.957             886.957
+   1         886.957             886.957
+   2         886.957             886.957
+   3          25.2316             25.2316
+   4          50.4632             50.4632
+   5          54.4211             54.4211
+   6          25.7263             25.7263
+   7           9.23509             9.23509
+   8           0.807692            0.80769
+   9           4.14634             4.14634
+  10          79.5136             79.5136
+  11          85.75               85.75
+====  =================  =================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nds_rq_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_rq_spray
+====  ==================  ==================
+  ..    out_nds_rq_spray    exp_nds_rq_spray
+====  ==================  ==================
+   0          17.3913             17.3913
+   1          17.3913             17.3913
+   2          17.3913             17.3913
+   3           4.08696             4.08696
+   4           8.17391             8.17391
+   5          40.8696             40.8696
+   6           8.17391             8.17391
+   7           8.17391             8.17391
+   8           0.0384615           0.0384615
+   9          19.4932             19.4932
+  10          64.3125             64.3125
+  11         321.563             321.562
+====  ==================  ==================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nms_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_loc_dry
+====  =============================================================================================================================================  =============================================================================================================================================
+  ..  out_nms_loc_dry                                                                                                                                exp_nms_loc_dry
+====  =============================================================================================================================================  =============================================================================================================================================
+   0  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   1  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   2  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   3  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   4  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   5  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+   6  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   7  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   8  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+   9  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+  10  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.
+  11  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+====  =============================================================================================================================================  =============================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nms_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_loc_semi
+====  ======================================================================================================================================================  ======================================================================================================================================================
+  ..  out_nms_loc_semi                                                                                                                                        exp_nms_loc_semi
+====  ======================================================================================================================================================  ======================================================================================================================================================
+   0  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   1  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   2  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   3  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   4  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   5  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   6  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   7  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+   8  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.
+   9  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.
+  10  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+  11  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+====  ======================================================================================================================================================  ======================================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nms_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_loc_spray
+====  =====================================================================================================================================  =====================================================================================================================================
+  ..  out_nms_loc_spray                                                                                                                      exp_nms_loc_spray
+====  =====================================================================================================================================  =====================================================================================================================================
+   0  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   1  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   2  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   3  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   4  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   5  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   6  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   7  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+   8  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.
+   9  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.
+  10  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.
+  11  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.                The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+====  =====================================================================================================================================  =====================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nms_rq_dry</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_rq_dry
+====  ================  ================
+  ..    out_nms_rq_dry    exp_nms_rq_dry
+====  ================  ================
+   0        35.8209           35.8209
+   1        35.8209           35.8209
+   2        35.8209           35.8209
+   3         0.512727          0.512727
+   4         1.02545           1.02546
+   5         1.70909           1.70909
+   6         0.598182          0.598182
+   7         0.313333          0.313333
+   8         0.015             0.015
+   9         0.0357143         0.0357143
+  10         0.752927          0.752927
+  11         1.25488           1.25488
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nms_rq_semi</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_rq_semi
+====  =================  =================
+  ..    out_nms_rq_semi    exp_nms_rq_semi
+====  =================  =================
+   0         304.478             304.478
+   1         304.478             304.478
+   2         304.478             304.478
+   3           4.35818             4.35818
+   4           8.71636             8.71636
+   5           9.4                 9.4
+   6           4.44364             4.44364
+   7           1.59515             1.59515
+   8           0.105               0.105
+   9           0.303571            0.30357
+  10           6.39988             6.39988
+  11           6.90183             6.90183
+====  =================  =================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_nms_rq_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_rq_spray
+====  ==================  ==================
+  ..    out_nms_rq_spray    exp_nms_rq_spray
+====  ==================  ==================
+   0           5.97015             5.97015
+   1           5.97015             5.97015
+   2           5.97015             5.97015
+   3           1.04444             1.04444
+   4           2.08889             2.08889
+   5          10.4444             10.4444
+   6           2.08889             2.08889
+   7           2.08889             2.08889
+   8           0.005               0.005
+   9           0.0211864           0.0211864
+  10           0.3675              0.3675
+  11           1.8375              1.8375
+====  ==================  ==================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_rundry</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_rundry
+====  =============  =============
+  ..    out_run_dry    exp_run_dry
+====  =============  =============
+   0     0.2            0.2
+   1     0.2            0.2
+   2     0.2            0.2
+   3     0.0047         0.0047
+   4     0.0094         0.0094
+   5     0.0094         0.0094
+   6     0.0047         0.0047
+   7     0.00156667     0.00156667
+   8     0.01           0.01
+   9     0.05           0.05
+  10     0.05145        0.05145
+  11     0.05145        0.05145
+====  =============  =============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_runsemi</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_runsemi
+====  ==============  ==============
+  ..    out_run_semi    exp_run_semi
+====  ==============  ==============
+   0       2               2
+   1       2               2
+   2       2               2
+   3       0.047           0.047
+   4       0.094           0.094
+   5       0.094           0.094
+   6       0.047           0.047
+   7       0.0156667       0.0156667
+   8       0.1             0.1
+   9       0.5             0.5
+  10       0.5145          0.5145
+  11       0.5145          0.5145
+====  ==============  ==============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_spray</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_spray
+====  ===========  ===========
+  ..    out_spray    exp_spray
+====  ===========  ===========
+   0      0.04         0.04
+   1      0.04         0.04
+   2      0.04         0.04
+   3      0.00094      0.00094
+   4      0.00188      0.00188
+   5      0.0094       0.0094
+   6      0.00188      0.00188
+   7      0.00188      0.00188
+   8      0.005        0.005
+   9      0.01         0.01
+  10      0.01029      0.01029
+  11      0.05145      0.05145
+====  ===========  ===========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_totaldry</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_totaldry
+====  ===============  ===============
+  ..    out_total_dry    exp_total_dry
+====  ===============  ===============
+   0       0.24             0.24
+   1       0.24             0.24
+   2       0.24             0.24
+   3       0.00564          0.00564
+   4       0.01128          0.01128
+   5       0.0188           0.0188
+   6       0.00658          0.00658
+   7       0.00344667       0.00344667
+   8       0.015            0.015
+   9       0.06             0.06
+  10       0.06174          0.06174
+  11       0.1029           0.1029
+====  ===============  ===============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_integration.py::TestTerrplant::test_terrplant_totalsemi</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_totalsemi
+====  ================  ================
+  ..    out_total_semi    exp_total_semi
+====  ================  ================
+   0         2.04              2.04
+   1         2.04              2.04
+   2         2.04              2.04
+   3         0.04794           0.04794
+   4         0.09588           0.09588
+   5         0.1034            0.1034
+   6         0.04888           0.04888
+   7         0.0175467         0.0175467
+   8         0.105             0.105
+   9         0.51              0.51
+  10         0.52479           0.52479
+  11         0.56595           0.56595
+====  ================  ================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lds_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_loc_dry
+=========================================================================================================================  =======================================================================================================================================  =========================================================================================================================
+0                                                                                                                          1                                                                                                                                        2
+=========================================================================================================================  =======================================================================================================================================  =========================================================================================================================
+The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+=========================================================================================================================  =======================================================================================================================================  =========================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lds_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_loc_semi
+==================================================================================================================================  ================================================================================================================================================  ==================================================================================================================================
+0                                                                                                                                   1                                                                                                                                                 2
+==================================================================================================================================  ================================================================================================================================================  ==================================================================================================================================
+The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+==================================================================================================================================  ================================================================================================================================================  ==================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lds_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_loc_spray
+=================================================================================================================  ===============================================================================================================================  =================================================================================================================
+0                                                                                                                  1                                                                                                                                2
+=================================================================================================================  ===============================================================================================================================  =================================================================================================================
+The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+=================================================================================================================  ===============================================================================================================================  =================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lds_rq_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_rq_dry
+===  =======  ======
+  0        1       2
+===  =======  ======
+ 55  1.00186  6.0437
+ 55  1.00186  6.0437
+===  =======  ======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lds_rq_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_rq_semi
+===  =======  ======
+  0        1       2
+===  =======  ======
+100  2502.03  16.083
+100  2502.03  16.083
+===  =======  ======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lds_rq_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lds_rq_spray
+===  ========  =======
+  0         1        2
+===  ========  =======
+250  0.710572  1.28799
+250  0.710572  1.28799
+===  ========  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lms_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_loc_dry
+===========================================================================================================================  =========================================================================================================================================  ===========================================================================================================================
+0                                                                                                                            1                                                                                                                                          2
+===========================================================================================================================  =========================================================================================================================================  ===========================================================================================================================
+The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+===========================================================================================================================  =========================================================================================================================================  ===========================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lms_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_loc_semi
+====================================================================================================================================  ==================================================================================================================================================  ====================================================================================================================================
+0                                                                                                                                     1                                                                                                                                                   2
+====================================================================================================================================  ==================================================================================================================================================  ====================================================================================================================================
+The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+====================================================================================================================================  ==================================================================================================================================================  ====================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lms_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_loc_spray
+===================================================================================================================  =================================================================================================================================  ===================================================================================================================
+0                                                                                                                    1                                                                                                                                  2
+===================================================================================================================  =================================================================================================================================  ===================================================================================================================
+The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+===================================================================================================================  =================================================================================================================================  ===================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lms_rq_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_rq_dry
+===  =======  =======
+  0        1        2
+===  =======  =======
+550  3.4028   234.083
+550  3.40279  234.083
+===  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lms_rq_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_rq_semi
+====  =========  =======
+   0          1        2
+====  =========  =======
+1000  0.0217296  72.1962
+1000  0.0217295  72.1962
+====  =========  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_lms_rq_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_lms_rq_spray
+===  =======  =========
+  0        1          2
+===  =======  =========
+500  3.75436  0.0477229
+500  3.75436  0.0477229
+===  =======  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_min_lds_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_lds_spray
+======  =======  =====
+     0        1      2
+======  =======  =====
+0.3206  1.00319  12.32
+0.3206  1.00319  12.32
+======  =======  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_min_lms_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_lms_spray
+======  ======  ========
+     0       1         2
+======  ======  ========
+0.0205  1.9234  0.000453
+0.0205  1.9234  0.000453
+======  ======  ========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_min_nds_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_nds_spray
+======  =======  ======
+     0        1       2
+======  =======  ======
+0.0325  0.00342  1.3456
+0.0325  0.00342  1.3456
+======  =======  ======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_min_nms_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_min_nms_spray
+======  ======  =====
+     0       1      2
+======  ======  =====
+0.0501  0.9999  1.945
+0.0501  0.9999  1.945
+======  ======  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nds_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_loc_dry
+=============================================================================================================================  ===========================================================================================================================================  =============================================================================================================================
+0                                                                                                                              1                                                                                                                                            2
+=============================================================================================================================  ===========================================================================================================================================  =============================================================================================================================
+The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+=============================================================================================================================  ===========================================================================================================================================  =============================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nds_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_loc_semi
+======================================================================================================================================  ====================================================================================================================================================  ======================================================================================================================================
+0                                                                                                                                       1                                                                                                                                                     2
+======================================================================================================================================  ====================================================================================================================================================  ======================================================================================================================================
+The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+======================================================================================================================================  ====================================================================================================================================================  ======================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nds_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_loc_spray
+=====================================================================================================================  ===================================================================================================================================  =====================================================================================================================
+0                                                                                                                      1                                                                                                                                    2
+=====================================================================================================================  ===================================================================================================================================  =====================================================================================================================
+The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed dicot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+=====================================================================================================================  ===================================================================================================================================  =====================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nds_rq_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_rq_dry
+===  =======  =======
+  0        1        2
+===  =======  =======
+275  1.01242  9.06226
+275  1.01242  9.06226
+===  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nds_rq_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_rq_semi
+===  =======  ========
+  0        1         2
+===  =======  ========
+500  3.46414  0.999987
+500  3.46414  0.999986
+===  =======  ========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nds_rq_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nds_rq_spray
+=======  ========  =======
+      0         1        2
+=======  ========  =======
+235.516  0.258482  1.99414
+235.516  0.258482  1.99414
+=======  ========  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nms_loc_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_loc_dry
+===============================================================================================================================  =============================================================================================================================================  ===============================================================================================================================
+0                                                                                                                                1                                                                                                                                              2
+===============================================================================================================================  =============================================================================================================================================  ===============================================================================================================================
+The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to dry areas indicates a potential risk.
+===============================================================================================================================  =============================================================================================================================================  ===============================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nms_loc_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_loc_spray
+=======================================================================================================================  =====================================================================================================================================  =======================================================================================================================
+0                                                                                                                        1                                                                                                                                      2
+=======================================================================================================================  =====================================================================================================================================  =======================================================================================================================
+The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via spray drift indicates a potential risk.
+=======================================================================================================================  =====================================================================================================================================  =======================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nms_rq_dry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_rq_dry
+===  =======  =========
+  0        1          2
+===  =======  =========
+110  1.45211  0.0669796
+110  1.45211  0.0669796
+===  =======  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nms_rq_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_rq_semi
+===  =======  =======
+  0        1        2
+===  =======  =======
+200  4.19728  16.1835
+200  4.19728  16.1835
+===  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_nms_rq_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_nms_rq_spray
+=======  =======  =======
+      0        1        2
+=======  =======  =======
+215.506  1.89663  16.6012
+215.506  1.89663  16.6012
+=======  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_out_nms_loc_semi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_out_nms_loc_semi
+========================================================================================================================================  ======================================================================================================================================================  ========================================================================================================================================
+0                                                                                                                                         1                                                                                                                                                       2
+========================================================================================================================================  ======================================================================================================================================================  ========================================================================================================================================
+The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates that potential risk is minimal.  The risk quotient for non-listed monocot seedlings exposed to the pesticide via runoff to semi-aquatic areas indicates a potential risk.
+========================================================================================================================================  ======================================================================================================================================================  ========================================================================================================================================
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_rundry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_rundry
+===  ====  =====
+  0     1      2
+===  ====  =====
+0.5  4.41  6.048
+0.5  4.41  6.048
+===  ====  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_runsemi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_runsemi
+===  ===  ===
+  0    1    2
+===  ===  ===
+  5  2.5   19
+  5  2.5   19
+===  ===  ===
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_spray</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_spray
+===  ====  =====
+  0     1      2
+===  ====  =====
+  5  5.36  19.05
+  5  5.36  19.05
+===  ====  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_totaldry</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_totaldry
+===  =====  =====
+  0      1      2
+===  =====  =====
+5.5  15.65  35.32
+5.5  15.65  35.32
+===  =====  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/terrplant/tests/test_terrplant_unittest.py::TestTerrplant::test_terrplant_totalsemi</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_terrplant_totalsemi
+=====  =====  ======
+    0      1       2
+=====  =====  ======
+5.034  46.52  71.669
+5.034  46.52  71.669
+=====  =====  ======
+</div></td></tr></tbody></table></body></html>

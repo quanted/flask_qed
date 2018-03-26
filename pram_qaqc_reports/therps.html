@@ -1,0 +1,2937 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (elem.innerHTML === 'Passed') {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <p>Report generated on 26-Mar-2018 at 11:11:24 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.16.1</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;pytest&apos;: &apos;3.4.2&apos;, &apos;py&apos;: &apos;1.5.2&apos;, &apos;pluggy&apos;: &apos;0.6.0&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.14393-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;metadata&apos;: &apos;1.6.0&apos;, &apos;html&apos;: &apos;1.16.1&apos;, &apos;celery&apos;: &apos;4.1.0&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.6.3</td></tr></table>
+    <h2>Summary</h2>
+    <p>107 tests ran in 48.56 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">107 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_bp_lg</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_bp_lg │   exp_arq_dose_bp_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │          0.000581397 │          0.000581397 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │          1.35133     │          1.35133     │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │          0.393307    │          0.393307    │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │          0.675667    │          0.675667    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │          0.72409     │          0.72409     │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │          0.66511     │          0.66511     │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_bp_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_bp_lg_mean │   exp_arq_dose_bp_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               0.000193799 │               0.000193799 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.450445    │               0.450445    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.131102    │               0.131102    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.225222    │               0.225222    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.241363    │               0.241363    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.221703    │               0.221703    │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_bp_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_bp_md │   exp_arq_dose_bp_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │           0.00138507 │           0.00138507 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │           2.06188    │           2.06188    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │           0.600113   │           0.600113   │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │           1.03094    │           1.03094    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │           1.10483    │           1.10483    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │           1.01483    │           1.01483    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_bp_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_bp_md_mean │   exp_arq_dose_bp_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               0.000461691 │               0.000461691 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.687294    │               0.687294    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.200038    │               0.200038    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.343647    │               0.343647    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.368275    │               0.368275    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.338278    │               0.338278    │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_bp_sm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_bp_sm │   exp_arq_dose_bp_sm │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │           0.00329969 │           0.00329969 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │           2.09799    │           2.09799    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │           0.610624   │           0.610624   │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │           1.049      │           1.049      │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │           1.12417    │           1.12417    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │           1.03261    │           1.03261    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_bp_sm_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_bp_sm_mean │   exp_arq_dose_bp_sm_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                 0.0010999 │                 0.0010999 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                 0.699332  │                 0.699332  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                 0.203541  │                 0.203541  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                 0.349666  │                 0.349666  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                 0.374725  │                 0.374725  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                 0.344202  │                 0.344202  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_fr_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_fr_lg │   exp_arq_dose_fr_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │          6.45996e-05 │          6.45996e-05 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │          0.150148    │          0.150148    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │          0.0437008   │          0.0437008   │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │          0.0750741   │          0.0750741   │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │          0.0804544   │          0.0804544   │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │          0.0739011   │          0.0739011   │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_fr_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_fr_lg_mean │   exp_arq_dose_fr_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               3.01465e-05 │               3.01465e-05 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.0700692   │               0.0700692   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.0203937   │               0.0203937   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.0350346   │               0.0350346   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.0375454   │               0.0375454   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.0344872   │               0.0344872   │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_fr_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_fr_md │   exp_arq_dose_fr_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │          0.000153897 │          0.000153897 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │          0.229098    │          0.229098    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │          0.0666793   │          0.0666793   │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │          0.114549    │          0.114549    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │          0.122758    │          0.122758    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │          0.112759    │          0.112759    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_fr_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_fr_md_mean │   exp_arq_dose_fr_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               7.18186e-05 │               7.18186e-05 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.106912    │               0.106912    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.031117    │               0.031117    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.0534562   │               0.0534562   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.0572872   │               0.0572872   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.052621    │               0.052621    │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_fr_sm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_fr_sm │   exp_arq_dose_fr_sm │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │          0.000366632 │          0.000366632 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │          0.233111    │          0.233111    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │          0.0678471   │          0.0678471   │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │          0.116555    │          0.116555    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │          0.124908    │          0.124908    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │          0.114734    │          0.114734    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_fr_sm_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_fr_sm_mean │   exp_arq_dose_fr_sm_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               0.000171095 │               0.000171095 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.108785    │               0.108785    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.031662    │               0.031662    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.0543925   │               0.0543925   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.0582906   │               0.0582905   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.0535426   │               0.0535426   │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_hm_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_hm_lg │   exp_arq_dose_hm_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │           0.00283909 │           0.00283909 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │           9.30273    │           9.30273    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │           2.70757    │           2.70757    │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │           4.65136    │           4.65136    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │           4.98471    │           4.98471    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │           4.57869    │           4.57869    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_hm_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_hm_lg_mean │   exp_arq_dose_hm_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                0.00100551 │                0.00100551 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                3.29472    │                3.29472    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                0.958931   │                0.958931   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                1.64736    │                1.64736    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                1.76542    │                1.76542    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                1.62162    │                1.62162    │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_hm_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_hm_md │   exp_arq_dose_hm_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │            0.0401032 │            0.0401032 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │           59.8392    │           59.8392    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │           17.4163    │           17.4163    │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │           29.9196    │           29.9196    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │           32.0638    │           32.0638    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │           29.4521    │           29.4521    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_hm_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_hm_md_mean │   exp_arq_dose_hm_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                 0.0142032 │                 0.0142032 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                21.193     │                21.193     │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                 6.16826   │                 6.16826   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                10.5965    │                10.5965    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                11.3559    │                11.3559    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                10.4309    │                10.4309    │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_im_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_im_lg │   exp_arq_dose_im_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │          0.000177443 │          0.000177443 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │          0.58142     │          0.58142     │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │          0.169223    │          0.169223    │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │          0.29071     │          0.29071     │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │          0.311544    │          0.311544    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │          0.286168    │          0.286168    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_im_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_im_lg_mean │   exp_arq_dose_im_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               8.28067e-05 │               8.28067e-05 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.27133     │               0.27133     │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.0789708   │               0.0789708   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.135665    │               0.135665    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.145387    │               0.145387    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.133545    │               0.133545    │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_im_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_im_md │   exp_arq_dose_im_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │           0.00250645 │           0.00250645 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │           3.73995    │           3.73995    │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │           1.08852    │           1.08852    │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │           1.86997    │           1.86997    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │           2.00399    │           2.00399    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │           1.84076    │           1.84076    │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_im_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_im_md_mean │   exp_arq_dose_im_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                0.00116968 │                0.00116968 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                1.74531    │                1.74531    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                0.507974   │                0.507974   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                0.872654   │                0.872654   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                0.935194   │                0.935194   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                0.859019   │                0.859019   │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_tp_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_tp_lg │   exp_arq_dose_tp_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │          2.72491e-05 │          2.72491e-05 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │          0.0469064   │          0.0469064   │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │          0.0136522   │          0.0136522   │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │          0.0234532   │          0.0234532   │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │          0.025134    │          0.025134    │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │          0.0230868   │          0.0230868   │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_tp_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_tp_lg_mean │   exp_arq_dose_tp_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               9.08303e-06 │               9.08303e-06 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.0156355   │               0.0156355   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.00455072  │               0.00455072  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.00781774  │               0.00781774  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.008378    │               0.008378    │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.00769559  │               0.00769558  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_tp_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_arq_dose_tp_md │   exp_arq_dose_tp_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │           6.4916e-05 │           6.4916e-05 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │           0.0715704  │           0.0715704  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │           0.0208307  │           0.0208306  │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │           0.0357852  │           0.0357852  │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │           0.0383498  │           0.0383498  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │           0.0352261  │           0.0352261  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_arq_dose_tp_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_arq_dose_tp_md_mean │   exp_arq_dose_tp_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │               2.16387e-05 │               2.16387e-05 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │               0.0238568   │               0.0238568   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │               0.00694355  │               0.00694355  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │               0.0119284   │               0.0119284   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │               0.0127833   │               0.0127833   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │               0.011742    │               0.011742    │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_assert_output_series</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>model output properties as pandas series
+╒════╤═════╤═════╕
+│    │   0 │   1 │
+╞════╪═════╪═════╡
+│  0 │   1 │   1 │
+├────┼─────┼─────┤
+│  1 │   1 │   1 │
+├────┼─────┼─────┤
+│  2 │   1 │   1 │
+├────┼─────┼─────┤
+│  3 │   1 │   1 │
+├────┼─────┼─────┤
+│  4 │   1 │   1 │
+├────┼─────┼─────┤
+│  5 │   1 │   1 │
+├────┼─────┼─────┤
+│  6 │   1 │   1 │
+├────┼─────┼─────┤
+│  7 │   1 │   1 │
+├────┼─────┼─────┤
+│  8 │   1 │   1 │
+├────┼─────┼─────┤
+│  9 │   1 │   1 │
+├────┼─────┼─────┤
+│ 10 │   1 │   1 │
+├────┼─────┼─────┤
+│ 11 │   1 │   1 │
+├────┼─────┼─────┤
+│ 12 │   1 │   1 │
+├────┼─────┼─────┤
+│ 13 │   1 │   1 │
+├────┼─────┼─────┤
+│ 14 │   1 │   1 │
+├────┼─────┼─────┤
+│ 15 │   1 │   1 │
+├────┼─────┼─────┤
+│ 16 │   1 │   1 │
+├────┼─────┼─────┤
+│ 17 │   1 │   1 │
+├────┼─────┼─────┤
+│ 18 │   1 │   1 │
+├────┼─────┼─────┤
+│ 19 │   1 │   1 │
+├────┼─────┼─────┤
+│ 20 │   1 │   1 │
+├────┼─────┼─────┤
+│ 21 │   1 │   1 │
+├────┼─────┼─────┤
+│ 22 │   1 │   1 │
+├────┼─────┼─────┤
+│ 23 │   1 │   1 │
+├────┼─────┼─────┤
+│ 24 │   1 │   1 │
+├────┼─────┼─────┤
+│ 25 │   1 │   1 │
+├────┼─────┼─────┤
+│ 26 │   1 │   1 │
+├────┼─────┼─────┤
+│ 27 │   1 │   1 │
+├────┼─────┼─────┤
+│ 28 │   1 │   1 │
+├────┼─────┼─────┤
+│ 29 │   1 │   1 │
+├────┼─────┼─────┤
+│ 30 │   1 │   1 │
+├────┼─────┼─────┤
+│ 31 │   1 │   1 │
+├────┼─────┼─────┤
+│ 32 │   1 │   1 │
+├────┼─────┼─────┤
+│ 33 │   1 │   1 │
+├────┼─────┼─────┤
+│ 34 │   1 │   1 │
+├────┼─────┼─────┤
+│ 35 │   1 │   1 │
+├────┼─────┼─────┤
+│ 36 │   1 │   1 │
+├────┼─────┼─────┤
+│ 37 │   1 │   1 │
+├────┼─────┼─────┤
+│ 38 │   1 │   1 │
+├────┼─────┼─────┤
+│ 39 │   1 │   1 │
+├────┼─────┼─────┤
+│ 40 │   1 │   1 │
+├────┼─────┼─────┤
+│ 41 │   1 │   1 │
+├────┼─────┼─────┤
+│ 42 │   1 │   1 │
+├────┼─────┼─────┤
+│ 43 │   1 │   1 │
+├────┼─────┼─────┤
+│ 44 │   1 │   1 │
+├────┼─────┼─────┤
+│ 45 │   1 │   1 │
+├────┼─────┼─────┤
+│ 46 │   1 │   1 │
+├────┼─────┼─────┤
+│ 47 │   1 │   1 │
+├────┼─────┼─────┤
+│ 48 │   1 │   1 │
+├────┼─────┼─────┤
+│ 49 │   1 │   1 │
+├────┼─────┼─────┤
+│ 50 │   1 │   1 │
+├────┼─────┼─────┤
+│ 51 │   1 │   1 │
+├────┼─────┼─────┤
+│ 52 │   1 │   1 │
+├────┼─────┼─────┤
+│ 53 │   1 │   1 │
+├────┼─────┼─────┤
+│ 54 │   1 │   1 │
+├────┼─────┼─────┤
+│ 55 │   1 │   1 │
+├────┼─────┼─────┤
+│ 56 │   1 │   1 │
+├────┼─────┼─────┤
+│ 57 │   1 │   1 │
+├────┼─────┼─────┤
+│ 58 │   1 │   1 │
+├────┼─────┼─────┤
+│ 59 │   1 │   1 │
+├────┼─────┼─────┤
+│ 60 │   1 │   1 │
+├────┼─────┼─────┤
+│ 61 │   1 │   1 │
+├────┼─────┼─────┤
+│ 62 │   1 │   1 │
+├────┼─────┼─────┤
+│ 63 │   1 │   1 │
+├────┼─────┼─────┤
+│ 64 │   1 │   1 │
+├────┼─────┼─────┤
+│ 65 │   1 │   1 │
+├────┼─────┼─────┤
+│ 66 │   1 │   1 │
+├────┼─────┼─────┤
+│ 67 │   1 │   1 │
+├────┼─────┼─────┤
+│ 68 │   1 │   1 │
+├────┼─────┼─────┤
+│ 69 │   1 │   1 │
+├────┼─────┼─────┤
+│ 70 │   1 │   1 │
+├────┼─────┼─────┤
+│ 71 │   1 │   1 │
+├────┼─────┼─────┤
+│ 72 │   1 │   1 │
+├────┼─────┼─────┤
+│ 73 │   1 │   1 │
+├────┼─────┼─────┤
+│ 74 │   1 │   1 │
+├────┼─────┼─────┤
+│ 75 │   1 │   1 │
+├────┼─────┼─────┤
+│ 76 │   1 │   1 │
+├────┼─────┼─────┤
+│ 77 │   1 │   1 │
+├────┼─────┼─────┤
+│ 78 │   1 │   1 │
+├────┼─────┼─────┤
+│ 79 │   1 │   1 │
+├────┼─────┼─────┤
+│ 80 │   1 │   1 │
+╘════╧═════╧═════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_assert_output_series_dtypes</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_bl</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_arq_herp_bl │   exp_eec_arq_herp_bl │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │               0.0185  │               0.0185  │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │               3.97059 │               3.97059 │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │               1.15564 │               1.15564 │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │               1.98529 │               1.98529 │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │               2.12757 │               2.12757 │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │               1.95427 │               1.95427 │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_bl_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_arq_herp_bl_mean │   exp_eec_arq_herp_bl_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                 0.00616665 │                 0.00616665 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                 1.32353    │                 1.32353    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                 0.385215   │                 0.385215   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                 0.661765   │                 0.661765   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                 0.709191   │                 0.709191   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                 0.651425   │                 0.651425   │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_fr</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_arq_herp_fr │   exp_eec_arq_herp_fr │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │            0.00205555 │            0.00205555 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │            0.441176   │            0.441176   │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │            0.128405   │            0.128405   │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │            0.220588   │            0.220588   │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │            0.236397   │            0.236397   │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │            0.217142   │            0.217142   │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_fr_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_arq_herp_fr_mean │   exp_eec_arq_herp_fr_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                0.000959257 │                0.000959257 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                0.205882    │                0.205882    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                0.0599223   │                0.0599223   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                0.102941    │                0.102941    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                0.110319    │                0.110319    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                0.101333    │                0.101333    │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_hm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_arq_herp_hm │   exp_eec_arq_herp_hm │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │              0.031357 │              0.031357 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │              4.65136  │              4.65136  │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │              1.35378  │              1.35378  │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │              2.32568  │              2.32568  │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │              2.49235  │              2.49235  │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │              2.28934  │              2.28934  │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_hm_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_arq_herp_hm_mean │   exp_eec_arq_herp_hm_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                  0.0111056 │                  0.0111056 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                  1.64736   │                  1.64736   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                  0.479465  │                  0.479465  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                  0.823679  │                  0.823679  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                  0.882709  │                  0.882709  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                  0.810809  │                  0.810809  │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_im</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_arq_herp_im │   exp_eec_arq_herp_im │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │            0.00195981 │            0.00195981 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │            0.29071    │            0.29071    │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │            0.0846115  │            0.0846115  │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │            0.145355   │            0.145355   │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │            0.155772   │            0.155772   │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │            0.143084   │            0.143084   │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_im_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_arq_herp_im_mean │   exp_eec_arq_herp_im_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                0.000914578 │                0.000914578 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                0.135665    │                0.135665    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                0.0394854   │                0.0394854   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                0.0678324   │                0.0678324   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                0.0726937   │                0.0726937   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                0.0667725   │                0.0667725   │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_tp</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_arq_herp_tp │   exp_eec_arq_herp_tp │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │           0.000867062 │           0.000867062 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │           0.137824    │           0.137824    │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │           0.0401138   │           0.0401138   │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │           0.0689119   │           0.0689119   │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │           0.0738506   │           0.0738506   │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │           0.0678352   │           0.0678352   │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_arq_herp_tp_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_arq_herp_tp_mean │   exp_eec_arq_herp_tp_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                0.000289021 │                0.000289021 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                0.0459413   │                0.0459413   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                0.0133713   │                0.0133713   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                0.0229706   │                0.0229706   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                0.0246169   │                0.0246169   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                0.0226117   │                0.0226117   │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_bl</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_crq_herp_bl │   exp_eec_crq_herp_bl │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │              0.454544 │              0.454544 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │             21.6      │             21.6      │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │              6.2867   │              6.2867   │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │             10.8      │             10.8      │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │             11.574    │             11.574    │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │             10.6312   │             10.6312   │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_bl_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_crq_herp_bl_mean │   exp_eec_crq_herp_bl_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                   0.151515 │                   0.151515 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                   7.2      │                   7.2      │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                   2.09557  │                   2.09557  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                   3.6      │                   3.6      │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                   3.858    │                   3.858    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                   3.54375  │                   3.54375  │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_fr</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_crq_herp_fr │   exp_eec_crq_herp_fr │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │             0.0505049 │             0.0505049 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │             2.4       │             2.4       │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │             0.698523  │             0.698523  │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │             1.2       │             1.2       │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │             1.286     │             1.286     │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │             1.18125   │             1.18125   │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_fr_mean</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_crq_herp_fr_mean │   exp_eec_crq_herp_fr_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                  0.0235689 │                  0.0235689 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                  1.12      │                  1.12      │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                  0.325977  │                  0.325977  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                  0.56      │                  0.56      │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                  0.600133  │                  0.600133  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                  0.55125   │                  0.55125   │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_hm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_crq_herp_hm │   exp_eec_crq_herp_hm │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │               0.77044 │               0.77044 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │              25.3034  │              25.3034  │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │               7.36459 │               7.36459 │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │              12.6517  │              12.6517  │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │              13.5584  │              13.5584  │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │              12.454   │              12.454   │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_hm_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_crq_herp_hm_mean │   exp_eec_crq_herp_hm_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                   0.272864 │                   0.272864 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                   8.96163  │                   8.96163  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                   2.60829  │                   2.60829  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                   4.48081  │                   4.48081  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                   4.80194  │                   4.80194  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                   4.4108   │                   4.4108   │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_im</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_crq_herp_im │   exp_eec_crq_herp_im │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │             0.0481525 │             0.0481525 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │             1.58146   │             1.58146   │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │             0.460287  │             0.460287  │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │             0.790732  │             0.790732  │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │             0.8474    │             0.8474    │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │             0.778377  │             0.778377  │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_im_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_crq_herp_im_mean │   exp_eec_crq_herp_im_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                  0.0224712 │                  0.0224712 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                  0.738016  │                  0.738016  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                  0.2148    │                  0.2148    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                  0.369008  │                  0.369008  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                  0.395454  │                  0.395454  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                  0.363242  │                  0.363242  │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_tp</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════╤═══════════════════════╕
+│    │   out_eec_crq_herp_tp │   exp_eec_crq_herp_tp │
+╞════╪═══════════════════════╪═══════════════════════╡
+│  0 │             0.0213037 │             0.0213037 │
+├────┼───────────────────────┼───────────────────────┤
+│  1 │             0.749762  │             0.749762  │
+├────┼───────────────────────┼───────────────────────┤
+│  2 │             0.218219  │             0.218219  │
+├────┼───────────────────────┼───────────────────────┤
+│  3 │             0.374881  │             0.374881  │
+├────┼───────────────────────┼───────────────────────┤
+│  4 │             0.401747  │             0.401747  │
+├────┼───────────────────────┼───────────────────────┤
+│  5 │             0.369023  │             0.369023  │
+╘════╧═══════════════════════╧═══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_crq_herp_tp_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════════╤════════════════════════════╕
+│    │   out_eec_crq_herp_tp_mean │   exp_eec_crq_herp_tp_mean │
+╞════╪════════════════════════════╪════════════════════════════╡
+│  0 │                 0.00710123 │                 0.00710123 │
+├────┼────────────────────────────┼────────────────────────────┤
+│  1 │                 0.249921   │                 0.249921   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  2 │                 0.0727397  │                 0.0727397  │
+├────┼────────────────────────────┼────────────────────────────┤
+│  3 │                 0.12496    │                 0.12496    │
+├────┼────────────────────────────┼────────────────────────────┤
+│  4 │                 0.133916   │                 0.133916   │
+├────┼────────────────────────────┼────────────────────────────┤
+│  5 │                 0.123008   │                 0.123008   │
+╘════╧════════════════════════════╧════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_bl</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════╤════════════════════════╕
+│    │   out_eec_diet_herp_bl │   exp_eec_diet_herp_bl │
+╞════╪════════════════════════╪════════════════════════╡
+│  0 │                45.4544 │                45.4544 │
+├────┼────────────────────────┼────────────────────────┤
+│  1 │               540      │               540      │
+├────┼────────────────────────┼────────────────────────┤
+│  2 │               157.168  │               157.168  │
+├────┼────────────────────────┼────────────────────────┤
+│  3 │               270      │               270      │
+├────┼────────────────────────┼────────────────────────┤
+│  4 │               289.35   │               289.35   │
+├────┼────────────────────────┼────────────────────────┤
+│  5 │               265.781  │               265.781  │
+╘════╧════════════════════════╧════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_bl_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═════════════════════════════╤═════════════════════════════╕
+│    │   out_eec_diet_herp_bl_mean │   exp_eec_diet_herp_bl_mean │
+╞════╪═════════════════════════════╪═════════════════════════════╡
+│  0 │                     15.1515 │                     15.1515 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  1 │                    180      │                    180      │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  2 │                     52.3892 │                     52.3892 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  3 │                     90      │                     90      │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  4 │                     96.45   │                     96.45   │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  5 │                     88.5938 │                     88.5938 │
+╘════╧═════════════════════════════╧═════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_fr</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════╤════════════════════════╕
+│    │   out_eec_diet_herp_fr │   exp_eec_diet_herp_fr │
+╞════╪════════════════════════╪════════════════════════╡
+│  0 │                5.05049 │                5.05049 │
+├────┼────────────────────────┼────────────────────────┤
+│  1 │               60       │               60       │
+├────┼────────────────────────┼────────────────────────┤
+│  2 │               17.4631  │               17.4631  │
+├────┼────────────────────────┼────────────────────────┤
+│  3 │               30       │               30       │
+├────┼────────────────────────┼────────────────────────┤
+│  4 │               32.15    │               32.15    │
+├────┼────────────────────────┼────────────────────────┤
+│  5 │               29.5312  │               29.5312  │
+╘════╧════════════════════════╧════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_fr_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═════════════════════════════╤═════════════════════════════╕
+│    │   out_eec_diet_herp_fr_mean │   exp_eec_diet_herp_fr_mean │
+╞════╪═════════════════════════════╪═════════════════════════════╡
+│  0 │                     2.35689 │                     2.35689 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  1 │                    28       │                    28       │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  2 │                     8.14943 │                     8.14943 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  3 │                    14       │                    14       │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  4 │                    15.0033  │                    15.0033  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  5 │                    13.7812  │                    13.7812  │
+╘════╧═════════════════════════════╧═════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_hm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════╤════════════════════════╕
+│    │   out_eec_diet_herp_hm │   exp_eec_diet_herp_hm │
+╞════╪════════════════════════╪════════════════════════╡
+│  0 │                 77.044 │                 77.044 │
+├────┼────────────────────────┼────────────────────────┤
+│  1 │                632.585 │                632.585 │
+├────┼────────────────────────┼────────────────────────┤
+│  2 │                184.115 │                184.115 │
+├────┼────────────────────────┼────────────────────────┤
+│  3 │                316.293 │                316.293 │
+├────┼────────────────────────┼────────────────────────┤
+│  4 │                338.96  │                338.96  │
+├────┼────────────────────────┼────────────────────────┤
+│  5 │                311.351 │                311.351 │
+╘════╧════════════════════════╧════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_hm_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═════════════════════════════╤═════════════════════════════╕
+│    │   out_eec_diet_herp_hm_mean │   exp_eec_diet_herp_hm_mean │
+╞════╪═════════════════════════════╪═════════════════════════════╡
+│  0 │                     27.2864 │                     27.2864 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  1 │                    224.041  │                    224.041  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  2 │                     65.2073 │                     65.2073 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  3 │                    112.02   │                    112.02   │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  4 │                    120.048  │                    120.048  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  5 │                    110.27   │                    110.27   │
+╘════╧═════════════════════════════╧═════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_im</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════╤════════════════════════╕
+│    │   out_eec_diet_herp_im │   exp_eec_diet_herp_im │
+╞════╪════════════════════════╪════════════════════════╡
+│  0 │                4.81525 │                4.81525 │
+├────┼────────────────────────┼────────────────────────┤
+│  1 │               39.5366  │               39.5366  │
+├────┼────────────────────────┼────────────────────────┤
+│  2 │               11.5072  │               11.5072  │
+├────┼────────────────────────┼────────────────────────┤
+│  3 │               19.7683  │               19.7683  │
+├────┼────────────────────────┼────────────────────────┤
+│  4 │               21.185   │               21.185   │
+├────┼────────────────────────┼────────────────────────┤
+│  5 │               19.4594  │               19.4594  │
+╘════╧════════════════════════╧════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_im_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═════════════════════════════╤═════════════════════════════╕
+│    │   out_eec_diet_herp_im_mean │   exp_eec_diet_herp_im_mean │
+╞════╪═════════════════════════════╪═════════════════════════════╡
+│  0 │                     2.24712 │                     2.24712 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  1 │                    18.4504  │                    18.4504  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  2 │                     5.37001 │                     5.37001 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  3 │                     9.2252  │                     9.2252  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  4 │                     9.88634 │                     9.88634 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  5 │                     9.08106 │                     9.08106 │
+╘════╧═════════════════════════════╧═════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_tp</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤════════════════════════╤════════════════════════╕
+│    │   out_eec_diet_herp_tp │   exp_eec_diet_herp_tp │
+╞════╪════════════════════════╪════════════════════════╡
+│  0 │                2.13037 │                2.13037 │
+├────┼────────────────────────┼────────────────────────┤
+│  1 │               18.744   │               18.744   │
+├────┼────────────────────────┼────────────────────────┤
+│  2 │                5.45547 │                5.45547 │
+├────┼────────────────────────┼────────────────────────┤
+│  3 │                9.37202 │                9.37202 │
+├────┼────────────────────────┼────────────────────────┤
+│  4 │               10.0437  │               10.0437  │
+├────┼────────────────────────┼────────────────────────┤
+│  5 │                9.22558 │                9.22558 │
+╘════╧════════════════════════╧════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_diet_herp_tp_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═════════════════════════════╤═════════════════════════════╕
+│    │   out_eec_diet_herp_tp_mean │   exp_eec_diet_herp_tp_mean │
+╞════╪═════════════════════════════╪═════════════════════════════╡
+│  0 │                    0.710123 │                    0.710123 │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  1 │                    6.24801  │                    6.24801  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  2 │                    1.81849  │                    1.81849  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  3 │                    3.12401  │                    3.12401  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  4 │                    3.34789  │                    3.34789  │
+├────┼─────────────────────────────┼─────────────────────────────┤
+│  5 │                    3.07519  │                    3.07519  │
+╘════╧═════════════════════════════╧═════════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_bp_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_bp_lg │   exp_eec_dose_bp_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │              1.1833  │              1.1833  │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             13.5133  │             13.5133  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │              3.93307 │              3.93307 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │              6.75667 │              6.75667 │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │              7.2409  │              7.2409  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │              6.6511  │              6.6511  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_bp_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_bp_lg_mean │   exp_eec_dose_bp_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                  0.394433 │                  0.394433 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  4.50445  │                  4.50445  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                  1.31102  │                  1.31102  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                  2.25222  │                  2.25222  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                  2.41363  │                  2.41363  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                  2.21703  │                  2.21703  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_bp_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_bp_md │   exp_eec_dose_bp_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │              1.99569 │              1.99569 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             20.6188  │             20.6188  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │              6.00113 │              6.00113 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │             10.3094  │             10.3094  │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │             11.0483  │             11.0483  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │             10.1483  │             10.1483  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_bp_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_bp_md_mean │   exp_eec_dose_bp_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                  0.665231 │                  0.665231 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  6.87294  │                  6.87294  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                  2.00038  │                  2.00038  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                  3.43647  │                  3.43647  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                  3.68275  │                  3.68275  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                  3.38278  │                  3.38278  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_bp_sm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_bp_sm │   exp_eec_dose_bp_sm │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │              3.36584 │              3.36584 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             20.9799  │             20.9799  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │              6.10624 │              6.10624 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │             10.49    │             10.49    │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │             11.2417  │             11.2417  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │             10.3261  │             10.3261  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_bp_sm_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_bp_sm_mean │   exp_eec_dose_bp_sm_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                   1.12195 │                   1.12195 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                   6.99332 │                   6.99332 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                   2.03541 │                   2.03541 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                   3.49666 │                   3.49666 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                   3.74725 │                   3.74725 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                   3.44202 │                   3.44202 │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_fr_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_fr_lg │   exp_eec_dose_fr_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │             0.131478 │             0.131478 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             1.50148  │             1.50148  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │             0.437008 │             0.437008 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │             0.750741 │             0.750741 │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │             0.804544 │             0.804544 │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │             0.739011 │             0.739011 │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_fr_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_fr_lg_mean │   exp_eec_dose_fr_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                 0.0613562 │                 0.0613562 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                 0.700692  │                 0.700692  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                 0.203937  │                 0.203937  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                 0.350346  │                 0.350346  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                 0.375454  │                 0.375454  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                 0.344872  │                 0.344872  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_fr_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_fr_md │   exp_eec_dose_fr_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │             0.221744 │             0.221744 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             2.29098  │             2.29098  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │             0.666793 │             0.666793 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │             1.14549  │             1.14549  │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │             1.22758  │             1.22758  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │             1.12759  │             1.12759  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_fr_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_fr_md_mean │   exp_eec_dose_fr_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                  0.10348  │                  0.10348  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  1.06912  │                  1.06912  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                  0.31117  │                  0.31117  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                  0.534562 │                  0.534562 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                  0.572872 │                  0.572872 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                  0.52621  │                  0.52621  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_fr_sm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_fr_sm │   exp_eec_dose_fr_sm │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │             0.373983 │             0.373983 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             2.33111  │             2.33111  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │             0.678471 │             0.678471 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │             1.16555  │             1.16555  │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │             1.24908  │             1.24908  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │             1.14734  │             1.14734  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_fr_sm_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_fr_sm_mean │   exp_eec_dose_fr_sm_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                  0.174525 │                  0.174525 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  1.08785  │                  1.08785  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                  0.31662  │                  0.31662  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                  0.543925 │                  0.543925 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                  0.582906 │                  0.582906 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                  0.535426 │                  0.535426 │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_hm_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_hm_lg │   exp_eec_dose_hm_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │               5.7783 │               5.7783 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │              93.0273 │              93.0273 │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │              27.0757 │              27.0757 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │              46.5136 │              46.5136 │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │              49.8471 │              49.8471 │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │              45.7869 │              45.7869 │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_hm_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_hm_lg_mean │   exp_eec_dose_hm_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                   2.04648 │                   2.04648 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  32.9472  │                  32.9472  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                   9.58931 │                   9.58931 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                  16.4736  │                  16.4736  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                  17.6542  │                  17.6542  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                  16.2162  │                  16.2162  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_hm_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_hm_md │   exp_eec_dose_hm_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │               57.783 │               57.783 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │              598.392 │              598.392 │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │              174.163 │              174.163 │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │              299.196 │              299.196 │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │              320.638 │              320.638 │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │              294.521 │              294.521 │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_hm_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_hm_md_mean │   exp_eec_dose_hm_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                   20.4648 │                   20.4648 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  211.93   │                  211.93   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                   61.6826 │                   61.6826 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                  105.965  │                  105.965  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                  113.559  │                  113.559  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                  104.309  │                  104.309  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_im_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_im_lg │   exp_eec_dose_im_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │             0.361144 │             0.361144 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             5.8142   │             5.8142   │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │             1.69223  │             1.69223  │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │             2.9071   │             2.9071   │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │             3.11544  │             3.11544  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │             2.86168  │             2.86168  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_im_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_im_lg_mean │   exp_eec_dose_im_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                  0.168534 │                  0.168534 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  2.7133   │                  2.7133   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                  0.789708 │                  0.789708 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                  1.35665  │                  1.35665  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                  1.45387  │                  1.45387  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                  1.33545  │                  1.33545  │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_im_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_im_md │   exp_eec_dose_im_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │              3.61144 │              3.61144 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │             37.3995  │             37.3995  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │             10.8852  │             10.8852  │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │             18.6997  │             18.6997  │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │             20.0399  │             20.0399  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │             18.4076  │             18.4076  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_im_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_im_md_mean │   exp_eec_dose_im_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                   1.68534 │                   1.68534 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                  17.4531  │                  17.4531  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                   5.07974 │                   5.07974 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                   8.72654 │                   8.72654 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                   9.35194 │                   9.35194 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                   8.59019 │                   8.59019 │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_tp_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_tp_lg │   exp_eec_dose_tp_lg │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │            0.0554592 │            0.0554592 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │            0.469064  │            0.469064  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │            0.136522  │            0.136522  │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │            0.234532  │            0.234532  │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │            0.25134   │            0.25134   │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │            0.230868  │            0.230868  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_tp_lg_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_tp_lg_mean │   exp_eec_dose_tp_lg_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                 0.0184864 │                 0.0184864 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                 0.156355  │                 0.156355  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                 0.0455072 │                 0.0455072 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                 0.0781774 │                 0.0781774 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                 0.08378   │                 0.08378   │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                 0.0769559 │                 0.0769559 │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_tp_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════════╤══════════════════════╕
+│    │   out_eec_dose_tp_md │   exp_eec_dose_tp_md │
+╞════╪══════════════════════╪══════════════════════╡
+│  0 │            0.0935348 │            0.0935348 │
+├────┼──────────────────────┼──────────────────────┤
+│  1 │            0.715704  │            0.715704  │
+├────┼──────────────────────┼──────────────────────┤
+│  2 │            0.208307  │            0.208307  │
+├────┼──────────────────────┼──────────────────────┤
+│  3 │            0.357852  │            0.357852  │
+├────┼──────────────────────┼──────────────────────┤
+│  4 │            0.383498  │            0.383498  │
+├────┼──────────────────────┼──────────────────────┤
+│  5 │            0.352261  │            0.352261  │
+╘════╧══════════════════════╧══════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_eec_dose_tp_md_mean</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤═══════════════════════════╤═══════════════════════════╕
+│    │   out_eec_dose_tp_md_mean │   exp_eec_dose_tp_md_mean │
+╞════╪═══════════════════════════╪═══════════════════════════╡
+│  0 │                 0.0311783 │                 0.0311783 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  1 │                 0.238568  │                 0.238568  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  2 │                 0.0694355 │                 0.0694355 │
+├────┼───────────────────────────┼───────────────────────────┤
+│  3 │                 0.119284  │                 0.119284  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  4 │                 0.127833  │                 0.127833  │
+├────┼───────────────────────────┼───────────────────────────┤
+│  5 │                 0.11742   │                 0.11742   │
+╘════╧═══════════════════════════╧═══════════════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_ld50_ad_lg</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════╤══════════════════╕
+│    │   out_ld50_ad_lg │   exp_ld50_ad_lg │
+╞════╪══════════════════╪══════════════════╡
+│  0 │          2035.27 │          2035.27 │
+├────┼──────────────────┼──────────────────┤
+│  1 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  2 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  3 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  4 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  5 │            10    │            10    │
+╘════╧══════════════════╧══════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_ld50_ad_md</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════╤══════════════════╕
+│    │   out_ld50_ad_md │   exp_ld50_ad_md │
+╞════╪══════════════════╪══════════════════╡
+│  0 │          1440.86 │          1440.86 │
+├────┼──────────────────┼──────────────────┤
+│  1 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  2 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  3 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  4 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  5 │            10    │            10    │
+╘════╧══════════════════╧══════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_integration.py::TestTherps::test_ld50_ad_sm</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/> 
+╒════╤══════════════════╤══════════════════╕
+│    │   out_ld50_ad_sm │   exp_ld50_ad_sm │
+╞════╪══════════════════╪══════════════════╡
+│  0 │          1020.05 │          1020.05 │
+├────┼──────────────────┼──────────────────┤
+│  1 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  2 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  3 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  4 │            10    │            10    │
+├────┼──────────────────┼──────────────────┤
+│  5 │            10    │            10    │
+╘════╧══════════════════╧══════════════════╛
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_arq_diet_herp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_arq_diet_herp
+========  =========  ========
+       0          1         2
+========  =========  ========
+0.013872  0.0581364  0.001404
+0.013872  0.0581364  0.001404
+========  =========  ========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_arq_diet_mamm</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_arq_diet_mamm
+==========  =========  ==========
+         0          1           2
+==========  =========  ==========
+0.00293909  0.0383086  0.00165828
+0.00293908  0.0383086  0.00165828
+==========  =========  ==========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_arq_diet_tp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_arq_diet_tp
+===========  ==========  ===========
+          0           1            2
+===========  ==========  ===========
+0.000162745  0.00224059  9.87047e-05
+0.000162745  0.00224058  9.87047e-05
+===========  ==========  ===========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_arq_dose_herp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_arq_dose_herp
+===========  ========  ===========
+          0         1            2
+===========  ========  ===========
+0.000466465  0.029849  0.000273828
+0.00046646   0.029849  0.000273824
+===========  ========  ===========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_arq_dose_mamm</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_arq_dose_mamm
+=========  ========  ==========
+        0         1           2
+=========  ========  ==========
+0.0750178  0.611702  0.00156831
+0.0750178  0.611702  0.0015683
+=========  ========  ==========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_arq_dose_tp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_arq_dose_tp
+===========  ==========  ===========
+          0           1            2
+===========  ==========  ===========
+1.64176e-05  0.00153385  1.92508e-05
+1.64172e-05  0.00153385  1.92511e-05
+===========  ==========  ===========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_at_bird</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_at_bird
+=======  =======  =======
+      0        1        2
+=======  =======  =======
+48.9731  136.995  95.1634
+48.9731  136.995  95.1634
+=======  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_conc_initial</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_conc_initial
+=====  =====  =====
+    0      1      2
+=====  =====  =====
+1.734  9.828  0.702
+1.734  9.828  0.702
+=====  =====  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_conc_timestep</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_conc_timestep
+===========  =========  =======
+          0          1        2
+===========  =========  =======
+0.000972655  0.0870551  9.84715
+0.000972655  0.0870551  9.84715
+===========  =========  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_convert_app_intervals</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_convert_app_intervals
+====================  ====================  ====================  ====================
+0                     1                     2                     3
+====================  ====================  ====================  ====================
+0   1.2000000000e+00  0   2.3000000000e+00  0   2.5000000000e+00  0   5.1000000000e+00
+1   1.2000000000e+00  dtype: float64        1   2.5000000000e+00  1   5.1000000000e+00
+2   1.2000000000e+00                        2   2.5000000000e+00  2   5.1000000000e+00
+dtype: float64                              3   2.5000000000e+00  dtype: float64
+                                            dtype: float64
+[1.2, 1.2, 1.2]       [2.3]                 [2.5, 2.5, 2.5, 2.5]  [5.1, 5.1, 5.1]
+====================  ====================  ====================  ====================
+============  ============  ===============  ============
+0             1             2                3
+============  ============  ===============  ============
+0     1       0    1        0     1          0     1
+1     8       dtype: int32  1    22          1     8
+2    15                     2    43          2    15
+dtype: int64                3    64          dtype: int64
+                            dtype: int64
+[1, 8, 15]    [1]           [1, 22, 43, 64]  [1, 8, 15]
+============  ============  ===============  ============
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_crq_diet_herp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_crq_diet_herp
+=======  =======  =========
+      0        1          2
+=======  =======  =========
+0.06936  1.45341  0.0127636
+0.06936  1.4534   0.0127636
+=======  =======  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_crq_diet_mamm</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_crq_diet_mamm
+=========  ========  =========
+        0         1          2
+=========  ========  =========
+0.0146954  0.957715  0.0150753
+0.0146954  0.957715  0.0150753
+=========  ========  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_crq_diet_tp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_crq_diet_tp
+===========  =========  ===========
+          0          1            2
+===========  =========  ===========
+0.000813725  0.0560146  0.000897315
+0.00081372   0.0560146  0.000897309
+===========  =========  ===========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_diet_mamm</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_diet_mamm
+========  =======  =======
+       0        1        2
+========  =======  =======
+0.367386  95.7715  0.82914
+0.367386  95.7715  0.82914
+========  =======  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_diet_max</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_diet_max
+=====  =======  =====
+    0        1      2
+=====  =======  =====
+1.734  145.341  0.702
+1.734  145.341  0.702
+=====  =======  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_diet_timeseries</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_diet_timeseries
+===  =====  ===========
+  0      1            2
+===  =====  ===========
+  0  1.734  6.79157e-05
+  0  1.734  6.79157e-05
+===  =====  ===========
+=====  =======  =======  =======  ===========
+    0        1        2        3            4
+=====  =======  =======  =======  ===========
+9.828  145.341  80.9392  20.6687  1.12045e-18
+9.828  145.341  80.9393  20.6687  1.12045e-18
+=====  =======  =======  =======  ===========
+===  =====  ========  ========
+  0      1         2         3
+===  =====  ========  ========
+  0  0.702  0.565646  0.087722
+  0  0.702  0.565646  0.087722
+===  =====  ========  ========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_diet_timeseriesA</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_diet_timeseriesA
+===  =====  ===========
+  0      1            2
+===  =====  ===========
+  0  1.734  6.79157e-05
+  0  1.734  6.79157e-05
+===  =====  ===========
+=====  =======  =======  =======  ===========
+    0        1        2        3            4
+=====  =======  =======  =======  ===========
+9.828  145.341  80.9392  20.6687  1.12045e-18
+9.828  145.341  80.9393  20.6687  1.12045e-18
+=====  =======  =======  =======  ===========
+===  =====  ========  ========
+  0      1         2         3
+===  =====  ========  ========
+  0  0.702  0.565646  0.087722
+  0  0.702  0.565646  0.087722
+===  =====  ========  ========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_diet_tp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_diet_tp
+=========  =======  =========
+        0        1          2
+=========  =======  =========
+0.0203431  5.60146  0.0493523
+0.0203431  5.60146  0.0493523
+=========  =======  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_dose_herp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_dose_herp
+=========  =======  =========
+        0        1          2
+=========  =======  =========
+0.0228443  4.08916  0.0260584
+0.0228443  4.08916  0.0260584
+=========  =======  =========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_dose_mamm</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_dose_mamm
+=======  ====  ========
+      0     1         2
+=======  ====  ========
+3.67386  83.8  0.149245
+3.67386  83.8  0.149245
+=======  ====  ========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_eec_dose_tp</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_eec_dose_tp
+==========  ========  ==========
+         0         1           2
+==========  ========  ==========
+0.00080402  0.210129  0.00183197
+0.00080401  0.210129  0.00183196
+==========  ========  ==========
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_fi_herp</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_fi_herp
+=========  ========  =======
+        0         1        2
+=========  ========  =======
+0.0293298  0.385401  1.05454
+0.0293298  0.385402  1.05454
+=========  ========  =======
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_fi_mamm</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_fi_mamm
+=======  ======  =====
+      0       1      2
+=======  ======  =====
+3.17808  23.063  53.15
+3.17808  23.063  53.15
+=======  ======  =====
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">ubertool/ubertool/therps/tests/test_therps_unittest.py::Testtherps::test_percent_to_frac</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>
+
+test_percent_to_frac
+=======  ======  ======
+      0       1       2
+=======  ======  ======
+0.04556  0.1034  0.9389
+0.04556  0.1034  0.9389
+=======  ======  ======
+</div></td></tr></tbody></table></body></html>
