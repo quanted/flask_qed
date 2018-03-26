@@ -4,3 +4,6 @@
 [submodule "temp_config"]
 	path = temp_config
 	url = https://github.com/quanted/temp_config.git
+[submodule "pram_qaqc_reports"]
+	path = pram_qaqc_reports
+	url = https://github.com/quanted/pram_qaqc_reports.git
