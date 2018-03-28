@@ -7,6 +7,7 @@ Google Earth Engine Script
 import json
 # ee.Initialize()
 
+
 def get_timezone(latitude, longitude):
     tzInfo = ee.FeatureCollection('ft:12EZLvV1mM8iGQiF41Z6isKip8ObYsn4IgT6c1ApJ')
     timeZones = ee.FeatureCollection('ft:1W4iGwwnWg0sW1POUnSVfbT_yj8aDvKa8rOb9XgL5')
