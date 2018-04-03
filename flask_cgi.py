@@ -2,8 +2,8 @@ from werkzeug.wsgi import DispatcherMiddleware
 from werkzeug.serving import run_simple
 import logging
 
-import flask_pram as pram
-import flask_hms as hms
+import pram_flask.flask_pram as pram
+import hms_flask.flask_hms as hms
 
 logging.debug("flask_cgi started: live flask apps")
 app = DispatcherMiddleware(pram.app, {
