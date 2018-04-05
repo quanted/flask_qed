@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from ubertool.ubertool.varroapop import varroapop_exe as varroapop
-from flask import request
+from flask import request, jsonify
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
@@ -47,6 +47,7 @@ class VarroapopPost(VarroapopHandler):
         inputs = rest_validation.parse_inputs(request.json)
 
         if inputs:
-            return rest_model_caller.model_run(self.name, jobId, inputs, module=varroapop)
+            data = rest_model_caller.model_run(self.name, jobId, inputs, module=varroapop)
+            return jsonify(**data)
         else:
             return rest_model_caller.error(self.name, jobId, inputs)
