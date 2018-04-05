@@ -3,8 +3,7 @@ from flask_restful import Api, Resource
 import os
 import logging
 
-from hms_flask.modules.hms import ncdc_stations
-from hms_flask.modules.hms import percent_area
+from hms_flask.modules import hms_controller
 
 app = Flask(__name__)
 app.config.update(
@@ -30,12 +29,12 @@ logging.info(base_url + "/gis")
 api.add_resource(StatusTest, '/gis/test/')
 
 # HMS endpoints
-# TODO: add endpoint for get after converting post endpoint to celery function
+# Data retrieval endpoint
+api.add_resource(hms_controller.HMSTaskData, '/data')
 logging.info(base_url + "/gis/ncdc/stations/")
-api.add_resource(ncdc_stations.HMSNcdcStations, '/gis/ncdc/stations/')
+api.add_resource(hms_controller.NCDCStationsInGeojson, '/gis/ncdc/stations/')
 logging.info(base_url + "/gis/percentage/")
-api.add_resource(percent_area.getPercentArea, '/gis/percentage/')
-
+api.add_resource(hms_controller.NLDASGridCells, '/gis/percentage/')
 
 if __name__ == '__main__':
     app.run(port=7777, debug=True)
