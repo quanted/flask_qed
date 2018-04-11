@@ -248,7 +248,10 @@ api.add_resource(trex.TrexPost, '/rest/pram/trex/<string:jobId>')
 print('http://localhost:7777/rest/pram/varroapop/')
 api.add_resource(varroapop.VarroapopGet, '/rest/pram/varroapop/')
 api.add_resource(varroapop.VarroapopPost, '/rest/pram/varroapop/<string:jobId>')
-api.add_resource(varroapop.VarroapopGetResults, '/rest/pram/varroapop/<string:api_sessionid>')
+api.add_resource(varroapop.VarroapopGetResults, '/rest/pram/varroapop/<string:api_sessionid>/results/')
+api.add_resource(varroapop.VarroapopGetInput, '/rest/pram/varroapop/<string:api_sessionid>/input/')
+api.add_resource(varroapop.VarroapopGetLog, '/rest/pram/varroapop/<string:api_sessionid>/log/')
+
 #api.add_resource(ModelCaller, '/rest/pram/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
