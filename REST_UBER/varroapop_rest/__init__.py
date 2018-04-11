@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from ubertool.ubertool.varroapop import varroapop_exe as varroapop
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from REST_UBER import rest_validation, rest_schema, rest_model_caller
 
 
@@ -51,3 +51,21 @@ class VarroapopPost(VarroapopHandler):
             return jsonify(**data)
         else:
             return rest_model_caller.error(self.name, jobId, inputs)
+
+
+class VarroapopGetInput(VarroapopHandler):
+
+    def get(self, api_sessionid):
+        return Response(varroapop.VarroapopFiles(api_sessionid).fetch_input(), mimetype = 'text/plain')
+
+
+class VarroapopGetLog(VarroapopHandler):
+
+    def get(self, api_sessionid):
+        return Response(varroapop.VarroapopFiles(api_sessionid).fetch_log(), mimetype = 'text/plain')
+
+
+class VarroapopGetResults(VarroapopHandler):
+
+    def get(self, api_sessionid):
+        return Response(varroapop.VarroapopFiles(api_sessionid).fetch_results(), mimetype = 'text/plain')
