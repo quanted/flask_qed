@@ -1,6 +1,6 @@
 #FROM python:3
-#FROM quanted/qed_py3
-FROM dbsmith88/py-gdal
+FROM quanted/qed_py3
+#FROM dbsmith88/py-gdal
 
 # Install Python Dependencies
 # COPY requirements.txt /tmp/
