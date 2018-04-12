@@ -41,6 +41,8 @@ from pram_flask.REST_UBER import stir_rest as stir
 from pram_flask.REST_UBER import terrplant_rest as terrplant
 from pram_flask.REST_UBER import therps_rest as therps
 from pram_flask.REST_UBER import trex_rest as trex
+from pram_flask.REST_UBER import varroapop_rest as varroapop
+
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
@@ -242,6 +244,12 @@ api.add_resource(therps.TherpsPost, '/rest/pram/therps/<string:jobId>')
 print('http://localhost:7777/rest/pram/trex/')
 api.add_resource(trex.TrexGet, '/rest/pram/trex/')
 api.add_resource(trex.TrexPost, '/rest/pram/trex/<string:jobId>')
+print('http://localhost:7777/rest/pram/varroapop/')
+api.add_resource(varroapop.VarroapopGet, '/rest/pram/varroapop/')
+api.add_resource(varroapop.VarroapopPost, '/rest/pram/varroapop/<string:jobId>')
+api.add_resource(varroapop.VarroapopGetResults, '/rest/pram/varroapop/<string:api_sessionid>/results/') #proxy R API
+api.add_resource(varroapop.VarroapopGetInput, '/rest/pram/varroapop/<string:api_sessionid>/input/') #proxy R API
+api.add_resource(varroapop.VarroapopGetLog, '/rest/pram/varroapop/<string:api_sessionid>/log/') #proxy R API
 #api.add_resource(ModelCaller, '/rest/pram/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 
