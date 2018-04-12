@@ -4,3 +4,6 @@
 [submodule "hms_flask"]
 	path = hms_flask
 	url = https://github.com/quanted/hms_flask.git
+[submodule "temp_config"]
+	path = temp_config
+	url = https://github.com/quanted/temp_config.git
