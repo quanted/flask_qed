@@ -22,7 +22,6 @@ EXPOSE 7777
 
 RUN chmod 755 /src/start_flask.sh
 #RUN chmod 755 /flask_qed/start_flask.sh
-RUN pip freeze | grep celery
 
 #CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
 #RUN celery worker -A tasks -c 1 -Q sam --loglevel=DEBUG -n sam_worker
