@@ -49,6 +49,14 @@ os.environ.update({
     'PROJECT_ROOT': PROJECT_ROOT
 })
 
+from temp_config.set_environment import DeployEnv
+
+runtime_env = DeployEnv()
+runtime_env.load_deployment_environment()
+
+if not os.environ.get('OPENCPU_REST_SERVER'):
+    os.environ.update({'OPENCPU_REST_SERVER': 'http://172.20.100.18:5656'})
+
 #needs to be after project root is set
 import pram_flask.uber_swagger
 
