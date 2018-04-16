@@ -10,7 +10,7 @@ runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
 
 if not os.environ.get('OPENCPU_REST_SERVER'):
-    os.environ.update({'OPENCPU_REST_SERVER': 'http://172.20.100.18:5656'})
+    os.environ.update({'OPENCPU_REST_SERVER': 'http://134.67.114.8:5656'})
     
 # logging.info("OPENCPU_REST_SERVER: {}".format(OPENCPU_REST_SERVER))
 
