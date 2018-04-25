@@ -6,7 +6,6 @@ import pandas as pd
 import requests
 import sys
 import tabulate
-import tasks
 
 try:
     from flask_cors import CORS
@@ -15,7 +14,6 @@ except ImportError:
     cors = False
 from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api
-
 
 app = Flask(__name__)
 app.config.update(
@@ -28,29 +26,39 @@ if cors:
 else:
     logging.debug("CORS not enabled")
 
-
-from REST_UBER import agdrift_rest as agdrift
-from REST_UBER import beerex_rest as beerex
-from REST_UBER import earthworm_rest as earthworm
-from REST_UBER import exponential_rest as exponential
-from REST_UBER import iec_rest as iec
-from REST_UBER import kabam_rest as kabam
-from REST_UBER import leslie_probit_rest as leslie_probit
-from REST_UBER import rice_rest as rice
+import pram_flask.tasks as tasks
+from pram_flask.REST_UBER import agdrift_rest as agdrift
+from pram_flask.REST_UBER import beerex_rest as beerex
+from pram_flask.REST_UBER import earthworm_rest as earthworm
+from pram_flask.REST_UBER import exponential_rest as exponential
+from pram_flask.REST_UBER import iec_rest as iec
+from pram_flask.REST_UBER import kabam_rest as kabam
+from pram_flask.REST_UBER import leslie_probit_rest as leslie_probit
+from pram_flask.REST_UBER import rice_rest as rice
 # from REST_UBER import sam_rest as sam
-from REST_UBER import screenip_rest as screenip
-from REST_UBER import stir_rest as stir
-from REST_UBER import terrplant_rest as terrplant
-from REST_UBER import therps_rest as therps
-from REST_UBER import trex_rest as trex
+from pram_flask.REST_UBER import screenip_rest as screenip
+from pram_flask.REST_UBER import stir_rest as stir
+from pram_flask.REST_UBER import terrplant_rest as terrplant
+from pram_flask.REST_UBER import therps_rest as therps
+from pram_flask.REST_UBER import trex_rest as trex
+from pram_flask.REST_UBER import varroapop_rest as varroapop
+
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 os.environ.update({
     'PROJECT_ROOT': PROJECT_ROOT
 })
 
+from temp_config.set_environment import DeployEnv
+
+runtime_env = DeployEnv()
+runtime_env.load_deployment_environment()
+
+if not os.environ.get('OPENCPU_REST_SERVER'):
+    os.environ.update({'OPENCPU_REST_SERVER': 'http://172.20.100.18:5656'})
+
 #needs to be after project root is set
-import uber_swagger
+import pram_flask.uber_swagger
 
 # TODO: Remove this and Generic model handler below... (not used with refactored models)
 _ACTIVE_MODELS = (
@@ -244,6 +252,12 @@ api.add_resource(therps.TherpsPost, '/rest/pram/therps/<string:jobId>')
 print('http://localhost:7777/rest/pram/trex/')
 api.add_resource(trex.TrexGet, '/rest/pram/trex/')
 api.add_resource(trex.TrexPost, '/rest/pram/trex/<string:jobId>')
+print('http://localhost:7777/rest/pram/varroapop/')
+api.add_resource(varroapop.VarroapopGet, '/rest/pram/varroapop/')
+api.add_resource(varroapop.VarroapopPost, '/rest/pram/varroapop/<string:jobId>')
+api.add_resource(varroapop.VarroapopGetResults, '/rest/pram/varroapop/<string:api_sessionid>/results/') #proxy R API
+api.add_resource(varroapop.VarroapopGetInput, '/rest/pram/varroapop/<string:api_sessionid>/input/') #proxy R API
+api.add_resource(varroapop.VarroapopGetLog, '/rest/pram/varroapop/<string:api_sessionid>/log/') #proxy R API
 #api.add_resource(ModelCaller, '/rest/pram/<string:model>/<string:jid>')  # Temporary generic route for API endpoints
 
 

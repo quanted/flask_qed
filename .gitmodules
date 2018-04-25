@@ -1,9 +1,9 @@
-[submodule "ubertool"]
-	path = ubertool
-	url = https://github.com/quanted/ubertool.git
+[submodule "pram_flask"]
+	path = pram_flask
+	url = https://github.com/quanted/pram_flask.git
+[submodule "hms_flask"]
+	path = hms_flask
+	url = https://github.com/quanted/hms_flask.git
 [submodule "temp_config"]
 	path = temp_config
 	url = https://github.com/quanted/temp_config.git
-[submodule "pram_qaqc_reports"]
-	path = pram_qaqc_reports
-	url = https://github.com/quanted/pram_qaqc_reports.git
