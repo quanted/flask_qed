@@ -25,6 +25,5 @@ celery.conf.update(
     CELERY_RESULT_SERIALIZER='json',
     CELERY_IGNORE_RESULT=True,
     CELERY_TRACK_STARTED=True,
-    worker_max_tasks_per_child = 1,
-    worker_max_memory_per_child = 50000
+    CELERYD_MAX_MEMORY_PER_CHILD = 50000
 )
