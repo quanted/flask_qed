@@ -13,9 +13,7 @@ FROM quanted/qed_py3:$version
 RUN pip install uwsgi
 
 # Install GIS requirements
-RUN apt-get install -y \
-    libproj-dev \
-    libgeos-dev
+RUN echo $PATH
 
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
