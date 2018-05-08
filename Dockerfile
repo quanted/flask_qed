@@ -13,7 +13,7 @@ FROM quanted/qed_py3:$version
 RUN pip install uwsgi
 
 # Update PATH
-RUN echo 'export=/usr/local/lib:$PATH'
+RUN echo 'export=/usr/local/gdal:$PATH'
 
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
