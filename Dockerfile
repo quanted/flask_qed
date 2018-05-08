@@ -12,8 +12,8 @@ FROM quanted/qed_py3:$version
 # Install uWSGI
 RUN pip install uwsgi
 
-# Install GIS requirements
-RUN echo $PATH
+# Update PATH
+RUN echo 'export=/usr/local/lib:$PATH'
 
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
