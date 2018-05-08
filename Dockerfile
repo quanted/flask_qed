@@ -11,7 +11,7 @@ FROM quanted/qed_py3:$version
 
 # Install uWSGI
 RUN pip install uwsgi
-RUN pip install geos
+RUN pip list | grep Fiona
 
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
