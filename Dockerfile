@@ -11,7 +11,11 @@ FROM quanted/qed_py3:$version
 
 # Install uWSGI
 RUN pip install uwsgi
-RUN pip list | grep Fiona
+
+# Install GIS requirements
+RUN apt-get install -y \
+    libproj-dev \
+    libgeos-dev
 
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
