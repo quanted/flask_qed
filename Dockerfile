@@ -12,6 +12,9 @@ FROM quanted/qed_py3:$version
 # Install uWSGI
 RUN pip install uwsgi
 
+# Update and install GIS packages
+RUN apt-get -y update && apt-get -y install libgeos-3.4.2 libgeos-dev
+
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
 

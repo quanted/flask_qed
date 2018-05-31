@@ -236,6 +236,7 @@ print('http://localhost:7777/rest/pram/sam/')
 api.add_resource(tasks.SamRun, '/rest/pram/sam/')
 api.add_resource(tasks.SamStatus, '/rest/pram/sam/status/<string:task_id>')
 api.add_resource(tasks.SamData, '/rest/pram/sam/data/<string:task_id>')
+api.add_resource(tasks.SamSummaryHUC8, '/rest/pram/sam/summary/huc8/<string:task_id>')
 #importing screenip instead of sip because of conda problems
 print('http://localhost:7777/rest/pram/sip/')
 api.add_resource(screenip.ScreenipGet, '/rest/pram/sip/')
