@@ -8,7 +8,7 @@ notifications:
 
 before_install:
  - chmod +x travis_build.sh
- - chmod +x run_pytests.py
+ - chmod +x run_pytests.sh
 
 install: ./travis_build.sh
 
