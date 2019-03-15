@@ -16,7 +16,7 @@ celery_tasks = [
 
 if os.environ.get('DOCKER_HOSTNAME'):
     if "KUBERNETES" in os.environ.get('DOCKER_HOSTNAME'):
-        redis = redis_port
+        redis = redis_port.replace("tcp", "redis")
     else:
         redis = 'redis://' + redis_server + ':' + redis_port + '/0'
 else:
