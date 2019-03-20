@@ -14,8 +14,14 @@ celery_tasks = [
     'pram_flask.tasks'
 ]
 
-redis = 'redis://' + redis_server + ':' + redis_port + '/0'
-logging.info("Celery connecting to redis server: " + redis)
+if os.environ.get('DOCKER_HOSTNAME'):
+    if "KUBERNETES" in os.environ.get('DOCKER_HOSTNAME'):
+        redis = redis_port.replace("tcp", "redis")
+    else:
+        redis = 'redis://' + redis_server + ':' + redis_port + '/0'
+else:
+    redis = 'redis://' + redis_server + ':' + redis_port + '/0'
+logging.warning("Celery connecting to redis server: " + redis)
 
 celery = Celery('flask_qed', broker=redis, backend=redis, include=celery_tasks)
 
