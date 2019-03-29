@@ -22,7 +22,7 @@ COPY . /src/
 WORKDIR /src
 #COPY . /flask_qed/
 #WORKDIR /flask_qed
-EXPOSE 7777 8080
+EXPOSE 8080
 
 #ENV PYTHONPATH $PYTHONPATH:/flask_qed
 
