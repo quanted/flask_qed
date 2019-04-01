@@ -27,7 +27,7 @@ EXPOSE 7777 8080
 #ENV PYTHONPATH $PYTHONPATH:/flask_qed
 
 RUN chmod 755 /src/start_flask.sh
-#RUN chmod 755 /flask_qed/start_flask.sh
+RUN chmod -R 755 /src
 
 #CMD ["uwsgi", "/etc/uwsgi/uwsgi.ini"]
 #RUN celery worker -A tasks -c 1 -Q sam --loglevel=DEBUG -n sam_worker
