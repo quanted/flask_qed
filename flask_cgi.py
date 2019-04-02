@@ -1,9 +1,11 @@
-from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.serving import run_simple
 import logging
 import os
+
 import pram_flask.flask_pram as pram
 import hms_flask.flask_hms as hms
+
 
 from temp_config.set_environment import DeployEnv
 runtime_env = DeployEnv()
