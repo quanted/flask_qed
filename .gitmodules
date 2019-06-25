@@ -7,3 +7,6 @@
 [submodule "temp_config"]
 	path = temp_config
 	url = https://github.com/quanted/temp_config.git
+[submodule "nta_flask"]
+	path = nta_flask
+	url = https://github.com/quanted/nta_flask.git
