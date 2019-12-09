@@ -16,10 +16,10 @@ if not os.environ.get('OPENCPU_REST_SERVER'):
 # logging.info("OPENCPU_REST_SERVER: {}".format(OPENCPU_REST_SERVER))
 
 logging.info("flask_cgi started: live flask apps")
-app = DispatcherMiddleware(pram.app,
-                           {'/hms': hms.app,
-                            '/nta': nta.app}
-                           )
+
+app = DispatcherMiddleware(pram.app, {
+    '/hms': hms.app,
+    '/nta': nta.app})
 
 if __name__ == "__main__":
     run_simple('localhost', 7777, app, use_reloader=True, use_debugger=True, use_evalex=True)
