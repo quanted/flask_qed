@@ -137,4 +137,3 @@ To get the current state of a celery task, call the celery.AsyncResult() functio
 
 #### Overview
 The examples provided above can be found [here](https://github.com/quanted/qed_flask). The following is completely functional as mentioned here on the dev and staging branches. Local development and testing can be done using either Docker locally or executing each of the applications used in the stack locally.
-
