@@ -1,4 +1,4 @@
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.wsgi import DispatcherMiddleware
 from werkzeug.serving import run_simple
 import logging
 import os
