@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+pip install pytest-html
 python -m pytest -k "agdrift" --html=pram_flask/pram_qaqc_reports/agdrift.html --self-contained-html
 python -m pytest -k "beerex" --html=pram_flask/pram_qaqc_reports/beerex.html --self-contained-html
 python -m pytest -k "earthworm" --html=pram_flask/pram_qaqc_reports/earthworm.html --self-contained-html

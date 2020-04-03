@@ -3,6 +3,7 @@ import logging
 from celery import Celery
 
 from temp_config.set_environment import DeployEnv
+
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
 
@@ -14,8 +15,14 @@ celery_tasks = [
     'pram_flask.tasks'
 ]
 
-redis = 'redis://' + redis_server + ':' + redis_port + '/0'
-logging.info("Celery connecting to redis server: " + redis)
+if os.environ.get('DOCKER_HOSTNAME'):
+    if "KUBERNETES" in os.environ.get('DOCKER_HOSTNAME'):
+        redis = redis_port.replace("tcp", "redis")
+    else:
+        redis = 'redis://' + redis_server + ':' + redis_port + '/0'
+else:
+    redis = 'redis://' + redis_server + ':' + redis_port + '/0'
+logging.warning("Celery connecting to redis server: " + redis)
 
 celery = Celery('flask_qed', broker=redis, backend=redis, include=celery_tasks)
 

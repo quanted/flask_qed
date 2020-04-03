@@ -23,6 +23,7 @@ class StatusTest(Resource):
         return {"status": "flask_hms up and running."}
 
 
+
 base_url = "https://localhost:7777/hms"
 logging.info(" flask_hms started: live endpoints")
 logging.info(base_url + "/gis")
@@ -37,6 +38,11 @@ logging.info(base_url + "/gis/percentage/")
 api.add_resource(hms_controller.NLDASGridCells, '/gis/percentage/')
 logging.info(base_url + "/hydrodynamic/constant_volume/")
 api.add_resource(hms_controller.Hydrodynamics, '/hydrodynamic/constant_volume/')
+logging.info(base_url + "/nwm/data/")
+api.add_resource(hms_controller.NWMDownload, '/nwm/data/')
+logging.info(base_url + "/nwm/forecast/short_term/")
+api.add_resource(hms_controller.NWMDataShortTerm, "/nwm/forecast/short_term/")
+
 
 if __name__ == '__main__':
     app.run(port=7777, debug=True)
