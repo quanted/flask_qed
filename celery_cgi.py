@@ -3,6 +3,7 @@ import logging
 from celery import Celery
 
 from temp_config.set_environment import DeployEnv
+
 runtime_env = DeployEnv()
 runtime_env.load_deployment_environment()
 
