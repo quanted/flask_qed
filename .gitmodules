@@ -1,6 +1,3 @@
-[submodule "pram_flask"]
-	path = pram_flask
-	url = https://github.com/quanted/pram_flask.git
 [submodule "hms_flask"]
 	path = hms_flask
 	url = https://github.com/quanted/hms_flask.git
@@ -10,3 +7,6 @@
 [submodule "nta_flask"]
 	path = nta_flask
 	url = https://github.com/quanted/nta_flask.git
+[submodule "pram_flask"]
+	path = pram_flask
+	url = https://github.com/quanted/pram_flask
