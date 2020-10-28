@@ -1,6 +1,6 @@
 # qed_py3 is debian linux with buildpack-deps
 # updated with all needed qed python dependencies
-FROM quanted/qed_py3:lite
+FROM quanted/qed_py3:dev
 
 # Install uWSGI
 RUN pip install uwsgi
