@@ -7,6 +7,7 @@ do
     then
         echo "Not installing $package"
     else
+        echo "Installing $package"
         pip install $package
     fi
 done
