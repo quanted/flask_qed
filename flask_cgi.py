@@ -17,6 +17,9 @@ if not os.environ.get('OPENCPU_REST_SERVER'):
 
 logging.info("flask_cgi started: live flask apps")
 
+app = DispatcherMiddleware(pram.app, {
+    '/hms': hms.app,
+    '/nta': nta.app})
 """
 app = DispatcherMiddleware(pram.app, {
     '/hms': hms.app,
