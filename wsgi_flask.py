@@ -13,6 +13,6 @@ print("WSGI Current working directory: {}".format(curr_wd))
 sys.path.insert(0, curr_wd)                             # '/var/www/ubertool/ubertool_ecorest'
 print(sys.path)
 # ... build or import your bottle application here ...
-#import flask_cgi
+import flask_cgi
 
-#application = flask_cgi.app
+application = flask_cgi.app

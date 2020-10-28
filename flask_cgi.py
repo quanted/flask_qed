@@ -4,7 +4,7 @@ import logging
 import os
 import pram_flask.flask_pram as pram
 #import hms_flask.flask_hms as hms
-#import nta_flask.flask_nta as nta
+import nta_flask.flask_nta as nta
 
 from temp_config.set_environment import DeployEnv
 runtime_env = DeployEnv()
@@ -17,8 +17,8 @@ if not os.environ.get('OPENCPU_REST_SERVER'):
 
 logging.info("flask_cgi started: live flask apps")
 
+#'/hms': hms.app,
 app = DispatcherMiddleware(pram.app, {
-    '/hms': hms.app,
     '/nta': nta.app})
 """
 app = DispatcherMiddleware(pram.app, {
