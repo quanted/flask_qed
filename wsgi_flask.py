@@ -1,6 +1,8 @@
 import os
 import sys
-
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
 # Change working directory so relative paths (and template lookup) work again
 os.chdir(os.path.dirname(__file__))
