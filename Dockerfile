@@ -1,9 +1,6 @@
 # qed_py3 is debian linux with buildpack-deps
 # updated with all needed qed python dependencies
-# Use 'version' ARG for grabbing correct qed_py3 base image.
-# Defaults to 'latest' if not set.
-ARG version=dev
-FROM quanted/qed_py3:$version
+FROM quanted/qed_py3:lite
 
 # Install uWSGI
 RUN pip install uwsgi
@@ -11,7 +8,8 @@ RUN pip install uwsgi
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
 
-COPY . /src/
+RUN mkdir /src/
+COPY start_flask.sh /src/start_flask.sh
 WORKDIR /src
 EXPOSE 7777 8080
 
