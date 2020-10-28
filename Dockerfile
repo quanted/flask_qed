@@ -2,7 +2,7 @@
 # updated with all needed qed python dependencies
 # Use 'version' ARG for grabbing correct qed_py3 base image.
 # Defaults to 'latest' if not set.
-ARG version=gdal_update
+ARG version=dev
 FROM quanted/qed_py3:$version
 
 # Install uWSGI
