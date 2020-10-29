@@ -3,7 +3,7 @@ from werkzeug.serving import run_simple
 import logging
 import os
 import pram_flask.flask_pram as pram
-#import hms_flask.flask_hms as hms
+import hms_flask.flask_hms as hms
 import nta_flask.flask_nta as nta
 
 from temp_config.set_environment import DeployEnv
@@ -17,15 +17,9 @@ if not os.environ.get('OPENCPU_REST_SERVER'):
 
 logging.info("flask_cgi started: live flask apps")
 
-#'/hms': hms.app,
-app = DispatcherMiddleware(pram.app, {
-    '/nta': nta.app})
-"""
 app = DispatcherMiddleware(pram.app, {
     '/hms': hms.app,
     '/nta': nta.app})
-"""
 
-#if __name__ == "__main__":
-if False:
+if __name__ == "__main__":
     run_simple('localhost', 7777, app, use_reloader=True, use_debugger=True, use_evalex=True)
