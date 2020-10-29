@@ -3,7 +3,7 @@
 # Use 'version' ARG for grabbing correct qed_py3 base image.
 # Defaults to 'latest' if not set.
 ARG version=dev
-FROM quanted/qed_py3:$version
+FROM quanted/qed_py3:mc_3.1.4
 
 # Install uWSGI
 RUN pip install uwsgi
