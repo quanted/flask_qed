@@ -2,8 +2,8 @@
 # updated with all needed qed python dependencies
 FROM quanted/qed_py3:mc_3.1.4
 
-# Install uWSGI
-RUN pip install uwsgi
+RUN conda install -c conda-forge scipy
+RUN conda install -c conda-forge numpy
 
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
