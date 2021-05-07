@@ -1,0 +1,36 @@
+stages:
+  - Build
+  - Image Scan
+  - Application Scan
+
+Build Image:
+  stage: Build
+  tags:
+    - docker
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+  
+Prisma:
+  stage: Image Scan
+  tags:
+    - docker
+  when: manual
+  image: docker:20.10
+  # This needs a TwistCLI image based on a Docker base image.
+  script:
+    - echo "Simulate a Prisma scan."
+
+NetSparker:
+  stage: Application Scan
+  tags:
+    - docker
+  when: manual
+  image: docker:20.10
+  # This needs a NetSparker image to invoke the scan.
+  script:
+    - echo "Simulate a NetSparker scan."
