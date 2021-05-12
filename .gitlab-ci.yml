@@ -6,7 +6,7 @@ stages:
 Build Image:
   stage: Build
   tags:
-    - docker
+    - devsecops-instance
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -18,7 +18,7 @@ Build Image:
 Prisma:
   stage: Image Scan
   tags:
-    - docker
+    - devsecops-instance
   when: manual
   image: docker:20.10
   # This needs a TwistCLI image based on a Docker base image.
@@ -28,7 +28,7 @@ Prisma:
 NetSparker:
   stage: Application Scan
   tags:
-    - docker
+    - devsecops-instance
   when: manual
   image: docker:20.10
   # This needs a NetSparker image to invoke the scan.
