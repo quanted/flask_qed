@@ -4,7 +4,7 @@
 # Defaults to 'latest' if not set.
 FROM quanted/qed_py3:mc_3.1.4
 
-# Install uWSGI
+# Install UWSGI
 RUN pip install uwsgi
 
 # Overwrite the uWSGI config
@@ -13,6 +13,8 @@ COPY uwsgi.ini /etc/uwsgi/
 COPY . /src/
 WORKDIR /src
 EXPOSE 7777 8080
+
+RUN pip install numpy --upgrade
 
 RUN chmod 755 /src/start_flask.sh
 
