@@ -15,6 +15,7 @@ WORKDIR /src
 EXPOSE 7777 8080
 
 RUN pip install numpy --upgrade
+RUN pip install importlib_metadata --upgrade
 
 RUN chmod 755 /src/start_flask.sh
 
