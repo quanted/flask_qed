@@ -14,8 +14,7 @@ COPY . /src/
 WORKDIR /src
 EXPOSE 7777 8080
 
-RUN pip uninstall -y numpy
-RUN pip install numpy==1.21.0
+RUN conda install -c conda-forge --force-reinstall -y xarray numpy netCDF4
 RUN pip install importlib_metadata==3.8.2
 
 RUN chmod 755 /src/start_flask.sh
