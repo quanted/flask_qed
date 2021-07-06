@@ -14,7 +14,7 @@ COPY . /src/
 WORKDIR /src
 EXPOSE 7777 8080
 
-RUN pip uninstall numpy
+RUN pip uninstall -y numpy
 RUN pip install numpy==1.21.1
 RUN pip install importlib_metadata==3.8.2
 
