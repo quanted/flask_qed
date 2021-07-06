@@ -5,7 +5,7 @@
 FROM quanted/qed_py3:mc3.8_3.1.4
 
 # Install UWSGI
-RUN pip install uwsgi
+RUN pip3 install uwsgi
 
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
@@ -15,7 +15,7 @@ WORKDIR /src
 EXPOSE 7777 8080
 
 RUN conda install -c conda-forge --force-reinstall -y xarray numpy netCDF4
-RUN pip install importlib_metadata==3.8.2
+RUN pip3 install importlib_metadata==3.8.2
 
 RUN chmod 755 /src/start_flask.sh
 
