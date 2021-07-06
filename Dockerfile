@@ -14,7 +14,8 @@ COPY . /src/
 WORKDIR /src
 EXPOSE 7777 8080
 
-RUN pip uninstall numpy ; pip install numpy
+RUN pip uninstall numpy
+RUN pip install numpy==1.21.1
 RUN pip install importlib_metadata==3.8.2
 
 RUN chmod 755 /src/start_flask.sh
