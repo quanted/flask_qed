@@ -2,7 +2,7 @@
 # updated with all needed qed python dependencies
 # Use 'version' ARG for grabbing correct qed_py3 base image.
 # Defaults to 'latest' if not set.
-FROM quanted/qed_py3:mc_3.1.4
+FROM quanted/qed_py3:mc3.8_3.1.4
 
 # Install UWSGI
 RUN pip install uwsgi
