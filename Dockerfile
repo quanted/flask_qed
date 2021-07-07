@@ -18,4 +18,4 @@ ENV PATH /opt/conda/envs/pyenv:$PATH
 
 RUN chmod 755 /src/start_flask.sh
 
-CMD ["sh", "/src/start_flask.sh"]
+CMD ["conda", "run", "-n", "pyenv", "/bin/bash", "/src/start_flask.sh"]
