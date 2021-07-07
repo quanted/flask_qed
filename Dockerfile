@@ -13,7 +13,8 @@ EXPOSE 7777 8080
 
 # Install UWSGI
 RUN conda install -n pyenv -c conda-forge --force-reinstall -y uwsgi xarray numpy netCDF4 importlib_metadata=3.8.1
-ENV PYTHONPATH $PYTHONPATH:/src:/src/pram_flask/ubertool/ubertool
+ENV PYTHONPATH /opt/conda/envs/pyenv:$PYTHONPATH:/src:/src/pram_flask/ubertool/ubertool
+ENV PATH /opt/conda/envs/pyenv:$PATH
 
 RUN chmod 755 /src/start_flask.sh
 
