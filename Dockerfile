@@ -12,8 +12,8 @@ WORKDIR /src
 EXPOSE 7777 8080
 
 # Install UWSGI
-RUN conda install -n pyenv -c conda-forge --force-reinstall -y uwsgi xarray netCDF4 importlib_metadata=3.8.1
-RUN conda install -n pyenv -c conda-forge --force-reinstall -y numpy
+RUN conda install -n pyenv -c conda-forge --force-reinstall -y uwsgi numpy importlib_metadata=3.8.1
+RUN conda install -n pyenv -c conda-forge --force-reinstall -y xarray
 ENV PYTHONPATH /opt/conda/envs/pyenv:$PYTHONPATH:/src:/src/pram_flask/ubertool/ubertool
 ENV PATH /opt/conda/envs/pyenv:$PATH
 
