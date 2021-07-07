@@ -4,9 +4,6 @@
 # Defaults to 'latest' if not set.
 FROM quanted/qed_py3:mc3.8_3.1.4
 
-# Install UWSGI
-RUN pip3 install uwsgi
-
 # Overwrite the uWSGI config
 COPY uwsgi.ini /etc/uwsgi/
 
@@ -14,8 +11,8 @@ COPY . /src/
 WORKDIR /src
 EXPOSE 7777 8080
 
-RUN conda install -c conda-forge --force-reinstall -y xarray numpy netCDF4
-RUN pip3 install importlib_metadata==3.8.2
+# Install UWSGI
+RUN conda install -c conda-forge --force-reinstall -y uwsgi xarray numpy netCDF4 importlib_metadata=3.8.1
 
 RUN chmod 755 /src/start_flask.sh
 
