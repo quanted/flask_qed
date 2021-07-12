@@ -15,7 +15,7 @@ EXPOSE 7777 8080
 RUN conda install -n pyenv -c conda-forge --force-reinstall -y xarray netCDF4 uwsgi numpy importlib_metadata=3.8.1
 RUN conda uninstall -n pyenv numpy
 RUN conda install -n pyenv numpy=1.20.1
-RUN conda install -n pyenv -c conda-forge pytz=2021.1
+RUN conda install -n pyenv -c conda-forge pytz=2021.1 pandas geopandas
 
 ENV PYTHONPATH /opt/conda/envs/pyenv:$PYTHONPATH:/src:/src/pram_flask/ubertool/ubertool
 ENV PATH /opt/conda/envs/pyenv:$PATH
