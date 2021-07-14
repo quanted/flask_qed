@@ -27,10 +27,10 @@ logging.warning("Celery connecting to redis server: " + redis)
 celery = Celery('flask_qed', broker=redis, backend=redis, include=celery_tasks)
 
 celery.conf.update(
-    CELERY_ACCEPT_CONTENT=['json'],
-    CELERY_TASK_SERIALIZER='json',
-    CELERY_RESULT_SERIALIZER='json',
-    CELERY_IGNORE_RESULT=False,
-    CELERY_TRACK_STARTED=True,
-    CELERYD_MAX_MEMORY_PER_CHILD=50000000
+    accept_content=['json'],
+    # CELERY_TASK_SERIALIZER='json',
+    result_serializer='json',
+    task_ignore_result=False,
+    # CELERY_TRACK_STARTED=True,
+    worker_max_memory_per_child=50000000
 )
