@@ -12,6 +12,7 @@ WORKDIR /src
 EXPOSE 7777 8080
 
 # Install UWSGI
+RUN conda install -n pyenv -c conda-forge uwsgi
 #RUN conda uninstall -n pyenv --force numpy
 #RUN conda install -n pyenv numpy=1.20.1
 #RUN conda install -n pyenv -c conda-forge --force-reinstall -y xarray netCDF4 uwsgi numpy importlib_metadata=3.8.1
