@@ -13,8 +13,7 @@ EXPOSE 7777 8080
 
 # Install UWSGI
 RUN conda install -n pyenv -c conda-forge uwsgi werkzeug -y
-RUN conda uninstall -n pyenv numpy -y
-RUN conda install -n pyenv -c conda-forge numpy=1.19.5 -y
+RUN conda install -n pyenv -c conda-forge --force-reinstall numpy=1.19.5 -y
 
 ENV PYTHONPATH /opt/conda/envs/pyenv:$PYTHONPATH:/src:/src/pram_flask/ubertool/ubertool
 ENV PATH /opt/conda/envs/pyenv:$PATH
