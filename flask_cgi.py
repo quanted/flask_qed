@@ -20,6 +20,7 @@ logging.info("flask_cgi started: live flask apps")
 app = DispatcherMiddleware(pram.app, {
     '/hms': hms.app,
     '/nta': nta.app,
+    '/nta_flask_api': nta.app
 })
 
 if __name__ == "__main__":
