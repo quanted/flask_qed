@@ -18,12 +18,10 @@ Build Image:
 Prisma:
   stage: Image Scan
   tags:
-    - devsecops-instance
+    - twistcli
   when: manual
-  image: docker:20.10
-  # This needs a TwistCLI image based on a Docker base image.
   script:
-    - echo "Simulate a Prisma scan."
+    - /public/server/apps/twistcli images scan --details --address https://prismacloud.gitlab-prod.aws.epa.gov $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 NetSparker:
   stage: Application Scan
