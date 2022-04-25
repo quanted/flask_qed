@@ -12,7 +12,7 @@ redis_port = os.environ.get('REDIS_PORT')
 
 celery_tasks = [
     'hms_flask.modules.hms_controller',
-    'pram_flask.tasks'
+    'pram_flask.sam_tasks'
 ]
 
 if os.environ.get('DOCKER_HOSTNAME'):
