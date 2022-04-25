@@ -26,7 +26,7 @@ if cors:
 else:
     logging.debug("CORS not enabled")
 
-import pram_flask.tasks as tasks
+import pram_flask.sam_tasks as tasks
 from pram_flask.REST_UBER import agdrift_rest as agdrift
 from pram_flask.REST_UBER import beerex_rest as beerex
 from pram_flask.REST_UBER import earthworm_rest as earthworm
